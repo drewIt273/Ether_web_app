@@ -1,0 +1,31 @@
+/**
+ * Instance by DrewIt
+ *
+ * ui.themes.css
+ */
+
+html[data-theme="notion-dark-theme"] {
+    --bg-base-color: #181818;
+    --bg-aside-color: #1F1F1F;
+    --bg-border-color: #4d4d4d3d;
+    --bg-tooltip-color: #303030;
+    --bg-secondrary-color: #1F1F1F; /* For modals */
+    --bg-tertiary-color: #252525; /* For popups */
+    --bg-scrollbar-color: #4D4D4D;
+    --bg-hover-color: #2C2C2C;
+    --bg-selected: #1B2734;
+    --fg-base-color: #D5D5D5;
+    --selection-color: #1A334E;
+    --svg-color: #d7d7d7;
+}
+html[data-theme="notion-light-theme"] {
+    --bg-base-color: #FCFCFC;
+    --bg-aside-color: #F8F8F6;
+    --bg-secondrary-color: #FCFCFC;
+}
+html[aside-state="fixed"] aside#sidebar-nav {
+    background: var(--bg-aside-color);
+}
+html[aside-state="absolute"] aside#sidebar-nav {
+    background: var(--bg-base-color);
+}

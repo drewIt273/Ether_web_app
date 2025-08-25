@@ -1,0 +1,83 @@
+/**
+ * Instance by DrewIt
+ *
+ * ui.roots.css
+ */
+
+:root {
+    --font-monospace: "Berkeley Mono","SFMono Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace;
+    --font-regular: "Inter Variable","SF Pro Display",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Open Sans","Helvetica Neue","Linear Thai",sans-serif;
+    --font-display: var(--font-regular);
+    --font-emoji: "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Segoe UI","Twemoji Mozilla","Noto Color Emoji","Android Emoji";
+    --speed-highlightFadeIn: 0s;
+    --speed-highlightFadeOut: .15s;
+    --speed-quickTransition: .1s;
+    --speed-regularTransition: .25s;
+    --speed-slowTransition: .35s;
+    --font-size-micro: .6875rem;
+    --font-size-microPlus: .6875rem;
+    --font-size-mini: .75rem;
+    --font-size-miniPlus: .75rem;
+    --font-size-small: .8125rem;
+    --font-size-smallPlus: .8125rem;
+    --font-size-regular: .9375rem;
+    --font-size-regularPlus: .9375rem;
+    --font-size-large: 1.125rem;
+    --font-size-largePlus: 1.125rem;
+    --font-size-title1: 2.25rem;
+    --font-size-title2: 1.5rem;
+    --font-size-title3: 1.25rem;
+    --font-weight-light: 300;
+    --font-weight-normal: 450;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --radius-circle: 50%;
+    --radius-rounded: 9999px;
+    --editor-block-spacing: 1rem;
+    --editor-block-spacing-large: 1.375rem;
+    --editor-block-spacing-small: .375rem;
+    --editor-block-radius: 6px;
+    --editor-block-menu-size: 20px;
+    --editor-block-menu-offset: 28px;
+    --editor-last-invisible-paragraph-spacing: 10px;
+    --editor-line-height: 1.6;
+    --editor-letter-spacing: -.00666667em;
+    --editor-list-inset: 1.5rem;
+    --editor-bullet-disc-width: .5em;
+    --editor-bullet-disc-offset: .5em;
+    --editor-todolist-checkbox-width: 14px;
+    --editor-font-size: var(--font-size-regular);
+    --editor-safe-area: 16px;
+    --ease-in-quad: cubic-bezier(.55,.085,.68,.53);
+    --ease-in-cubic: cubic-bezier(.55,.055,.675,.19);
+    --ease-in-quart: cubic-bezier(.895,.03,.685,.22);
+    --ease-in-quint: cubic-bezier(.755,.05,.855,.06);
+    --ease-in-expo: cubic-bezier(.95,.05,.795,.035);
+    --ease-in-circ: cubic-bezier(.6,.04,.98,.335);
+    --ease-out-quad: cubic-bezier(.25,.46,.45,.94);
+    --ease-out-cubic: cubic-bezier(.215,.61,.355,1);
+    --ease-out-quart: cubic-bezier(.165,.84,.44,1);
+    --ease-out-quint: cubic-bezier(.23,1,.32,1);
+    --ease-out-expo: cubic-bezier(.19,1,.22,1);
+    --ease-out-circ: cubic-bezier(.075,.82,.165,1);
+    --ease-in-out-quad: cubic-bezier(.455,.03,.515,.955);
+    --ease-in-out-cubic: cubic-bezier(.645,.045,.355,1);
+    --ease-in-out-quart: cubic-bezier(.77,0,.175,1);
+    --ease-in-out-quint: cubic-bezier(.86,0,.07,1);
+    --ease-in-out-expo: cubic-bezier(1,0,0,1);
+    --ease-in-out-circ: cubic-bezier(.785,.135,.15,.86)
+}
+:root {
+    --em-white: #ffffff;
+    --em-black: #000000;
+    --em-orange: #ff5314;
+    --em-blue: #3b5998;
+    --em-cornflowerblue: #6495ed;
+    --em-cadetblue: #5f9ea0;
+    --em-darkcyan: #008b8b;
+    --em-indigo: #770ac8;
+    --em-blueviolet: #8a2be2;
+    --em-brown: #a52a2a;
+    --em-crimson: #ed143d;
+}
