@@ -9,6 +9,8 @@
 .o\[9\] {opacity: .9;} .o\[7\] {opacity: .7;} .o\[5\] {opacity: .5;} .o\[3\] {opacity: .3;}
 .d-flex {display: flex;} .d-block {display: block;}
 .sm-gap {gap: 3px;} .sl-gap {gap: 5px;} .md-gap {gap: 9px;}
+.uppercase {text-transform: uppercase;} .capitalize {text-transform: capitalize;} .lowercase {text-transform: lowercase;}
+.relative {position: relative;} .absolute {position: absolute;} .fixed {position: fixed;}
 .cross-center {
     display: flex;
     align-items: center;
@@ -74,4 +76,38 @@ html button {
     height: 28px;
     font-weight: 600;
     font-family: var(--font-emoji);
+}
+.col-resizer, .row-resizer {
+    background-color: var(--cr-transparent);
+    z-index: 56;
+    transition: background .3s var(--ease-out-circ);
+    transition-delay: .3s;
+    position: absolute;
+}
+.col-resizer:hover, .row-resizer:hover {
+    background-color: var(--bg-secondrary-border-color);
+}
+.col-resizer {
+    top: 0;
+    width: 4px;
+    height: 100%;
+    cursor: col-resize;
+}
+.row-resizer {
+    left: 0;
+    width: 100%;
+    height: 4px;
+    cursor: row-resize;
+}
+.col-resizer.right-side {
+    right: -1px;
+}
+.col-resizer.left-side {
+    left: -1px;
+}
+.row-resizer.top-side {
+    top: -1px;
+}
+.row-resizer.down-side {
+    bottom: -1px;
 }

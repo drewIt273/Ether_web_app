@@ -72,7 +72,7 @@ body, web-app {
 }
 aside#sidebar-nav {
     position: fixed;
-    z-index: 96;
+    z-index: 56;
     bottom: 0px;
     height: 100%;
 }
