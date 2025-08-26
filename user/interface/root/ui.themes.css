@@ -10,6 +10,7 @@ html[data-theme="notion-dark-theme"] {
     --bg-border-color: #4d4d4d3d;
     --bg-tooltip-color: #303030;
     --bg-secondrary-color: #1F1F1F; /* For modals */
+    --bg-secondrary-border-color: #2b2b2b;
     --bg-tertiary-color: #252525; /* For popups */
     --bg-scrollbar-color: #4D4D4D;
     --bg-hover-color: #2C2C2C;
