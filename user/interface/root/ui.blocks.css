@@ -72,8 +72,9 @@ html button {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+    width: 25px;
+    height: 25px;
+    font-size: 12px;
     font-weight: 600;
     font-family: var(--font-emoji);
 }
@@ -110,4 +111,7 @@ html button {
 }
 .row-resizer.down-side {
     bottom: -1px;
+}
+#n01 {
+    height: 100%;
 }

@@ -73,13 +73,20 @@ body, web-app {
 aside#sidebar-nav {
     position: fixed;
     z-index: 56;
+    overflow: hidden;
+    border: 1px solid var(--cr-transparent);
+    transition: all .3s var(--ease-in-quad);
+}
+html[aside-state="fixed"] aside#sidebar-nav {
+    border-right-color: var(--bg-border-color);
     bottom: 0px;
     height: 100%;
 }
-html[aside-state="fixed"] aside#sidebar-nav {
-    border: 0;
-    border-right: 1px solid var(--bg-border-color);
-}
 html[aside-state="absolute"] aside#sidebar-nav {
-    border: 0;
+    border-radius: 9px;
+    margin-left: 10px;
+    margin-top: 20px;
+    bottom: 20px;
+    height: calc(100dvh - 40px);
+    background-color: var(--bg-aside-color);
 }
