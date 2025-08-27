@@ -75,6 +75,14 @@ class query$ {
         return this
     }
 
+    hover0(enter, leave, enterDelay = 0, leaveDelay = 0) {
+        let t = this.nodes.at(0)
+        t.addEventListener("mouseenter", () => setTimeout(() => enter, enterDelay))
+        t.addEventListener("mouseleave", () => setTimeout(() => leave, leaveDelay))
+
+        return this
+    }
+
     css(styleObjOrProp) {
         if (typeof styleObjOrProp === "string") {
 
