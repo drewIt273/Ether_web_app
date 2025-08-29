@@ -225,13 +225,17 @@ class query$ {
         }
     }
 
-    children(selector = "", i = 0) {
+    childrenOf(selector = "", i = 0) {
         if (selector === "" || undefined) {
-            return this.nodes[0].childNodes
+            return this.nodes[i].childNodes
         }
         else {
             return document.querySelector(`${this.selector}${selector}`).childNodes
         }
+    }
+
+    targetChild(selector) {
+        return document.querySelector(`${this.selector} ${selector}`)
     }
 
     prop(n, v = "") {
