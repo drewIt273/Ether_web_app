@@ -80,7 +80,7 @@ aside#sidebar-nav {
 html[aside-state="fixed"] aside#sidebar-nav {
     border-right-color: var(--bg-border-color);
     bottom: 0px;
-    height: 100%;
+    height: 100dvh;
 }
 html[aside-state="absolute"] aside#sidebar-nav {
     border-radius: 9px;
@@ -89,4 +89,15 @@ html[aside-state="absolute"] aside#sidebar-nav {
     bottom: 20px;
     height: calc(100dvh - 40px);
     background-color: var(--bg-aside-color);
+}
+html[aside-state="sticky"] aside#sidebar-nav {
+    border-radius: 14px;
+    border-color: var(--bg-border-color);
+    height: calc(100dvh - 100px);
+    max-height: 560px;
+    margin: 20px;
+    position: absolute;
+}
+html[aside-state="sticky"] aside#sidebar-nav #nav-bar > .h-center {
+    padding-inline: 7px;
 }
