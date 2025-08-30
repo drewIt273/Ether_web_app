@@ -40,4 +40,14 @@
     </body>
     <script src="../root/ejscss.js"></script>
     <script type="module" src="../../../nodes/scripts/events/event.mouse.js"></script>
+    <script>
+        let d = document.querySelectorAll('[data-sidebar-section-type="header-wrapper"] [data-sidebar-section-type="header"] button');
+        d.forEach(n => {
+            let a = n.parentElement.parentElement.parentElement, e = a.querySelector('#h02'); const h = e.getBoundingClientRect().height; e.style.height = `${h}px`
+            n.addEventListener("click", () => {
+                a.toggleAttribute("open"); a.toggleAttribute("close");
+                if (a.hasAttribute("close")) {insert(e, ehcs);} else if (a.hasAttribute("open")) {insert(e, eocs); e.style.height = `${h}px`}
+            })
+        })
+    </script>
 </html>
