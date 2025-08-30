@@ -9,8 +9,7 @@
 var
 // collapsed collapsable element
 ehcs = {
-    height: "0px",
-    overflow: "hidden",
+    height: "1e-05px",
     opacity: 0,
     position: "initial",
     "pointer-events": "none"
@@ -22,14 +21,6 @@ eocs = {
     opacity: 1,
     position: "initial",
     "pointer-events": "auto"
-},
-
-sidebar_absolute_state_visible = {
-    left: "0px"
-},
-
-sidebar_absolute_state_hidden = {
-    left: "-317px"
 }
 
 function insert(node, ...css) {
