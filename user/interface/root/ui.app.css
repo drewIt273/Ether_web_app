@@ -52,6 +52,14 @@ body, web-app {
     height: 100%;
     margin: 0;
 }
+html button {
+    height: 100%;
+    display: block;
+    text-align: left;
+    background-color: transparent;
+    font-family: var(--font-display);
+    color: inherit;
+}
 #mainLayoutContainer {
     display: flex;
     flex-direction: row;
