@@ -21,7 +21,7 @@ import {dom} from "../domquery.js"
                     f("absolute"); SP(d, "width", "10px"); SP(e, "margin-left", ""); da.firstElementChild.innerHTML = `<span id="n02"></span>`
                 }
                 if (a == "absolute") {
-                    f("fixed"); SP(d, "width", "320px"); SP(e, "margin-left", ""); da.firstElementChild.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="var(--svg-color)" aria-hidden="true" data-slot="icon" class="svg-size"><path stroke-linecap="round" stroke-linejoin="round" d="m18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5"></path></svg>`
+                    f("fixed"); SP(d, "width", "320px"); SP(e, "margin-left", ""); da.firstElementChild.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="var(--svg-color)" aria-hidden="true" data-slot="icon" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="m18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5"></path></svg>`
                 }
             }
             nepf(), sno.nodes.forEach(node => {ns(node)})
