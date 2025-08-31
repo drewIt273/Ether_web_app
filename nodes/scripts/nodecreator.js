@@ -2,55 +2,100 @@
  * Instance by DrewIt
  * 
  * nodecreator.js
+ * co-built with GPT-5
  */
 
-export function jsx(tag = "", obj = {}) {
-	const E = document.createElement(tag), matchCaps = /[A-Z]/g
+const SVG_NAMESPACE = `http://www.W3.org/2000/svg`;
+const SVG_TAGS = new Set(["svg", "g", "path", "circle", "line", "polyline", "polygon", "ellipse", "text", "defs", "use", "mask", "clipPath", "linearGradient", "radialGradient", "stop"]);
 
-    // Set default svg attribute
-        if (tag === "svg") {
-            E.setAttribute("xmlns", "http://www.w3.org/2000/svg")
+function isNode(v) {return v instanceof Node}
+
+/**
+ * Converts camelCase or pascalCase to kebab-case: myAttrName -> my-attr-name
+ * @param {string} s 
+ */
+function toKebab(s) {
+    return String(s).replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
+}
+
+/**
+ * @param {object} spec { tag, ...attrs, textContent, innerHTML, append, children }
+ */
+function createFromSpec(spec) {
+    if (!spec || typeof spec !== "object") return null;
+    if (!spec.tag) return null;
+    return jsx(spec.tag, spec)
+}
+
+export function jsx(tag = "div", obj = {}) {
+    if (!tag) tag = "div"
+
+    // Create elements with SVG namespace when appropriate
+        const useNS = SVG_TAGS.has(tag)
+        const E = useNS ? document.createElementNS(SVG_NAMESPACE, tag) : document.createElement(tag)
+
+    // Helper to set attributes safely
+        function setAttr(name, value) {
+            E.setAttribute(name, value)
         }
 
-    for (const [key, value] of Object.entries(obj)) {
+    for (const [key, value] of Object.entries(obj || {})) {
 
-        // Set className
-            if (key === "class") {
+        // Skip null/undefined
+            if (value == null) continue;
+
+        // Direct element properties
+            if (key === "class" || key === "className") {
                 E.className = String(value)
                 continue;
             }
-
-        // Set id
             if (key === "id") {
                 E.id = String(value)
                 continue;
             }
-
-        // Set style object
             if (key === "style") {
                 if (typeof value === "object") {
                     Object.assign(E.style, value)
                 }
+                else {
+                    E.setAttribute("style", String(value))
+                }
                 continue;
             }
-
-        // Set innerHTML. Don't use along with append
-            if (key === "innerHTML" && typeof value === "string") {
-                E.innerHTML = value
+            if (key === "innerHTML") {
+                E.innerHTML = String(value)
                 continue;
             }
-
-        // Set children. Don't use along with innerHTML
+            if (key === "textContent") {
+                E.textContent = String(value)
+                continue;
+            }
+        
+        // append. create+append element(s) from spec(s)
             if (key === "append") {
-                if (typeof value === "object") {
-                    let h;
-                    for (const [o, v] of Object.entries(value)) {
-                        if (o === "tag") {
-                            h = jsx(String(v), value);
-                            E.appendChild(h)
-                        }
+                const arr = Array.isArray(value) ? value : [value]
+                for (const spec of arr) {
+                    if (spec == null) continue
+                    if (typeof spec === "string" || typeof spec === "number") {
+                        E.appendChild(document.createTextNode(String(spec)))
+                    }
+                    else if (isNode(spec)) {
+                        E.appendChild(spec)
+                    }
+                    else if (typeof spec === "object") {
+
+                        // If spec has it own tag, we create it recursively
+                            const c = createFromSpec(spec)
+                            if (c) E.appendChild(c)
                     }
                 }
+                continue
+            }
+
+        // Event listeners onClick -> click
+            if (/^on[A-Z]/.test(key) && typeof value === "function") {
+                const ev = key.slice(2).toLowerCase()
+                E.addEventListener(ev, value)
                 continue;
             }
 
