@@ -4,7 +4,7 @@
  * event.mouse.js
  */
 
-import {dom} from "../domquery.js"
+import {dom, E} from "../domquery.js"
 
 /**
  * Sidebar local function handler
@@ -47,4 +47,11 @@ import {dom} from "../domquery.js"
                 SP(e, "margin-left", "10px")
             }
         }, "#h01")
+
+    dom("[event-scroll]")
+
+        .delegate("scroll", () => {
+            let a = E.parentElement.querySelector('#nav-bar');
+            (E.scrollTop > 0) ? SP(a, "border-color", "var(--bg-border-color)") : SP(a, "border-color", "")
+        }, '[data-sidebar-section-type="container"]')
 }()
