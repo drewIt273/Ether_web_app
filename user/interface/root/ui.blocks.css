@@ -230,3 +230,12 @@
     border-right-color: var(--svg-color);
     background-color: var(--cr-transparent);
 }
+*:not([default-scrollbar])::-webkit-scrollbar {
+    width: 4px; height: 4px;
+    background-color: var(--cr-transparent);
+}
+*:not([default-scrollbar])::-webkit-scrollbar-thumb {
+    width: 4px; height: 4px;
+    border-radius: 5px;
+    background-color: var(--bg-scrollbar-color);
+}
