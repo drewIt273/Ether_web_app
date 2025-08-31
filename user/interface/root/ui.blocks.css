@@ -163,6 +163,7 @@
 [data-sidebar-section-type="container"] {
     margin: 2px;
     padding-inline: .9rem;
+    margin-bottom: 0;
 }
 [data-sidebar-section-type="header-wrapper"] {
     margin-top: 8px;
