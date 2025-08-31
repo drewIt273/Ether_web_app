@@ -378,6 +378,11 @@ class query$ {
         return this.nodes[0]
     }
 
+    find(selector, all = false) {
+        if (!all) return this.filter(selector).item(0)
+        else return this.filter(selector)
+    }
+
     count() {
         return this.nodes.length
     }
