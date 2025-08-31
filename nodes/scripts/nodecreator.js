@@ -99,25 +99,169 @@ export function jsx(tag = "div", obj = {}) {
                 continue;
             }
 
-        // Set text content
-            if (key === "textContent") {
-                E.textContent = String(value)
-                continue;
-            }
-        
-        // For properties like ariaLabel, dataAttributes; breakes them down to give aria-label, data-attributes
-            if ((ks('aria') || ks('data') || ks('stroke')) && key.match(matchCaps)) {
-                let a = key.search(matchCaps), b = key.slice(0, a), c = key.slice(a).toLowerCase(), d = b.concat('-', c); console.log(a, b, c, d);
-                E.setAttribute(d, String(value))
-            }
-            else {
-                if (key !== "tag") E.setAttribute(key, String(value))
+        // Boolean attributes: true -> present, false -> ommited
+            if (typeof value === "boolean") {
+                if (value) E.setAttribute(toKebab(key), "")
+                continue
             }
 
-        function ks(v) {
-            return key.startsWith(v)
-        }
-	}
+        // Converts camelCase to kebab-case for attributes (dataTest -> data-test)
+            const attr = toKebab(key)
+            if (attr !== "tag") setAttr(attr, value)
+    }
 
-	return E
+    return E
 }
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+const XLINK_NS = "http://www.w3.org/1999/xlink";
+const XML_NS  = "http://www.w3.org/XML/1998/namespace";
+
+function normalizeChildrenArg(attrs, explicitChildren) {
+    // Priority: explicitChildren (argument) > attrs.children > attrs.append
+        if (explicitChildren && explicitChildren.length) return explicitChildren
+        if (Array.isArray(attrs.children)) return attrs.children
+        if (Array.isArray(attrs.append)) return attrs.append
+        if (attrs.children != null) return [attrs.children]
+        if (attrs.append != null) return [attrs.append]
+        return []
+}
+
+/**
+ * 
+ * @param {Element} e 
+ * @param {string} n 
+ * @param {} v  
+ */
+// Namsespaced-aware setter for svg
+    function setSVGAttr(e, n, v) {
+        if (v == null) return;
+
+        // Namespaced attributes
+            if (n.startsWith("xlink:")) {
+                e.setAttributeNS(XLINK_NS, n, String(v))
+                return;
+            }
+            if (n.startsWith("xml:")) {
+                e.setAttribute(XML_NS, n, String(v))
+                return;
+            }
+            if (typeof v === "boolean") {
+                if (v) e.setAttribute(n, "")
+                else e.removeAttribute(n)
+                return;
+            }
+
+        // default: set attribute with provided casing (important for viewBox, preserveAspectRatio, etc.)
+            e.setAttribute(n, String(v))
+    }
+
+// Create element from spec recursively
+    function createSVGFromSpec(spec) {
+        if (spec == null) return null;
+        if (isNode(spec)) return spec;
+        if (typeof spec === "string" || typeof spec === "number") {
+            return document.createTextNode(String(spec))
+        }
+        if (typeof spec !== "object" || !spec.tag) return null;
+        const attrs = spec.attrs || {}
+        const children = spec.children || spec.append || spec.c || [];
+        const node = vector(spec.tag, attrs, children);
+        if (spec.textContent != null) node.textContent = String(spec.textContent);
+        if (spec.innerHTML != null) node.innerHTML = String(spec.innerHTML); // caution: avoid if untrusted
+        return node
+    }
+
+export function vector(tag = "g", attrs = {}, children = []) {
+    if (!tag) tag = 'g'
+    const E = document.createElementNS(SVG_NS, tag)
+
+    // Normalize children (attrs.children / attrs.append are allowed)
+        const mergedChildren = normalizeChildrenArg(attrs, Array.isArray(children) ? children : (children ? [children] : []));
+    
+    // apply attributes in attrs (skip special control keys)
+        for (const [rawKey, rawValue] of Object.entries(attrs || {})) {
+            if (rawValue == null) continue;
+
+            // skip special control keys
+                if (["children","append","c","textContent","innerHTML"].includes(rawKey)) continue;
+
+            // class handling
+                if (rawKey === "class" || rawKey === "className") {
+                    // for SVG prefer setAttribute('class', ...)
+                        E.setAttribute("class", String(rawValue));
+                        continue;
+                }
+
+            // style: accept object or string; for SVG we can set style.cssText or attributes individually
+                if (rawKey === "style") {
+                    if (typeof rawValue === "object") {
+
+                    // assign each style property (camelCase or kebab accepted)
+                        for (const [k, v] of Object.entries(rawValue)) {
+
+                            // prefer CSSStyleDeclaration when possible
+                                try { E.style[k] = v; } catch(e) { /* fallback */ E.style.setProperty(k, v); }
+                        }
+                    }
+                    else {
+                        E.setAttribute("style", String(rawValue));
+                    }
+                    continue;
+                }
+
+            // event handlers: onClick -> click
+                if (/^on[A-Z]/.test(rawKey) && typeof rawValue === "function") {
+                    const evt = rawKey.slice(2).toLowerCase();
+                    E.addEventListener(evt, rawValue);
+                    continue;
+                }
+
+            // id handling (common)
+                if (rawKey === "id") {
+                    E.id = String(rawValue);
+                    continue;
+                }
+
+            // default: SVG attributes — keep original casing (important)
+                setSVGAttr(E, rawKey, rawValue);
+        }
+
+    // append children
+        for (const child of mergedChildren) {
+            if (child == null || child === false) continue;
+            if (isNode(child)) {
+                E.appendChild(child);
+            }
+            else if (typeof child === "string" || typeof child === "number") {
+                E.appendChild(document.createTextNode(String(child)));
+            }
+            else if (Array.isArray(child)) {
+                // flatten nested arrays
+                    for (const c of child) {
+                        const node = createSVGFromSpec(c);
+                        if (node) E.appendChild(node);
+                    }
+            }
+            else if (typeof child === "object") {
+                const node = createSVGFromSpec(child);
+                if (node) E.appendChild(node);
+            }
+        }
+
+    return E
+}
+
+// Usage examples
+const svg1 = vector("svg", { width: 200, height: 200, viewBox: "0 0 100 100", style: { border: "1px solid #ddd" } }, [
+    { tag: "circle", attrs: { cx: 50, cy: 50, r: 40, fill: "tomato" } },
+    { tag: "text", attrs: { x: 50, y: 55, "text-anchor": "middle", "font-size": "12px", fill: "#fff" }, textContent: "OK" }
+]);
+const defs = vector("defs", {}, [
+    { tag: "image", attrs: { id: "img1", width: 50, height: 50, "xlink:href": "https://example.com/icon.png" } }
+  ]);
+  const svg2 = vector("svg", { width: 100, height: 100, viewBox: "0 0 100 100" }, [
+    defs,
+    { tag: "use", attrs: { "x": 10, "y": 10, "xlink:href": "#img1" } }
+]);
+document.querySelector("aside").append(svg1, svg2)
