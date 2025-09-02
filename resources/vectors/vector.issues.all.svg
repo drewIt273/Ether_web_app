@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 74" fill="none" height="120" width="120">
+<path d="M18 33.5c-9.39 0-17-5.96-17-13.3V15h34v5.2c0 7.34-7.61 13.3-17 13.3Z" stroke="lch(34.555% 1 139.088 / 1)" stroke-width="1.5"></path>
+<ellipse cx="17" cy="13.05" rx="17" ry="13.05" transform="matrix(-1 0 0 1 35 1)" fill="lch(5.882% 0 139.088 / 1)" stroke="lch(34.555% 1 139.088 / 1)" stroke-width="1.5"></ellipse>
+<ellipse cx="13" cy="9" rx="13" ry="9" transform="matrix(-1 0 0 1 31 5)" fill="lch(5.882% 0 139.088 / 1)" stroke="lch(90.084% 1 139.088 / 1)" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="1 3"></ellipse>
+<path d="M62 73c-9.39 0-17-5.96-17-13.3v-5.2h34v5.2C79 67.03 71.39 73 62 73Z" stroke="lch(34.555% 1 139.088 / 1)" stroke-width="1.5"></path>
+<ellipse cx="17" cy="13.05" rx="17" ry="13.05" transform="matrix(-1 0 0 1 79 40.5)" fill="lch(5.882% 0 139.088 / 1)" stroke="lch(34.555% 1 139.088 / 1)" stroke-width="1.5"></ellipse>
+<ellipse cx="13" cy="9" rx="13" ry="9" transform="matrix(-1 0 0 1 75 44.5)" fill="lch(90.084% 1 139.088 / 1)" stroke="lch(90.084% 1 139.088 / 1)" stroke-width="1.5"></ellipse>
+<path d="m55.5 53.64 3.05 2.39a1 1 0 0 0 1.22.01l8.73-6.54" stroke="lch(5.882% 0 139.088 / 1)" stroke-width="2.5" stroke-linecap="round"></path>
+<path d="M62 33.5c-9.39 0-17-5.96-17-13.3V15h34v5.2c0 7.34-7.61 13.3-17 13.3Z" stroke="lch(34.555% 1 139.088 / 1)" stroke-width="1.5"></path>
+<ellipse cx="17" cy="13.05" rx="17" ry="13.05" transform="matrix(-1 0 0 1 79 1)" fill="lch(5.882% 0 139.088 / 1)" stroke="lch(34.555% 1 139.088 / 1)" stroke-width="1.5"></ellipse>
+<ellipse cx="13" cy="9" rx="13" ry="9" transform="matrix(-1 0 0 1 75 5)" stroke="lch(90.084% 1 139.088 / 1)" stroke-width="1.5"></ellipse>
+<path d="M18 73C8.61 73 1 67.04 1 59.7v-5.2h34v5.2C35 67.03 27.39 73 18 73Z" fill="lch(5.882% 0 139.088 / 1)" stroke="lch(34.555% 1 139.088 / 1)" stroke-width="1.5"></path>
+<ellipse cx="17" cy="13.05" rx="17" ry="13.05" transform="matrix(-1 0 0 1 35 40.5)" fill="lch(5.882% 0 139.088 / 1)" stroke="lch(34.555% 1 139.088 / 1)" stroke-width="1.5"></ellipse>
+<ellipse cx="13" cy="9" rx="13" ry="9" transform="matrix(-1 0 0 1 31 44.5)" stroke="lch(90.084% 1 139.088 / 1)" stroke-width="1.5"></ellipse>
+<path d="M28 53.5c0 3.31-4.48 6-10 6v-12c5.52 0 10 2.69 10 6Z" fill="lch(60.336% 1 139.088 / 1)"></path>
+</svg>
