@@ -8,7 +8,7 @@
  * E is a variable used by some query$ methods to reference an element, node or node list the method returns.
  * Use this only when you want to do something on the returned item.
  * 
- * Not all query$ methods sets a value for E
+ * Not all query$ methods sets a value for E. Only those needing a function as a parameter
  */
 export let E;
 
@@ -45,7 +45,7 @@ class query$ {
 
     on(event, callback, delay = 0) {
         this.nodes.forEach(node => {
-            document.body.addEventListener(event, e => {
+            E = node; document.body.addEventListener(event, e => {
                 if (e.target.matches(node)) setTimeout(() => callback, delay)
             })
         })
@@ -64,7 +64,7 @@ class query$ {
     delegate(eventType, handler, selector = "") {
         if (selector === "" || undefined) {
             this.nodes.forEach(node => {
-                node.addEventListener(eventType, handler); E = node
+                node.addEventListener(eventType, handler); E = node;
             })
         }
         else {
@@ -77,6 +77,7 @@ class query$ {
     }
 
     hover(enter, leave, enterDelay = 0, leaveDelay = 0) {
+        E = this.nodes;
         this.on("mouseenter", () => enter, enterDelay)
         this.on("mouseleave", () => leave, leaveDelay)
 
@@ -84,7 +85,7 @@ class query$ {
     }
 
     hover0(enter, leave, enterDelay = 0, leaveDelay = 0) {
-        let t = this.nodes.at(0); E = t
+        let t = this.nodes.at(0); E = t;
         t.addEventListener("mouseenter", () => setTimeout(() => enter, enterDelay))
         t.addEventListener("mouseleave", () => setTimeout(() => leave, leaveDelay))
 
