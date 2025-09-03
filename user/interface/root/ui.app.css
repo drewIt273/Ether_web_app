@@ -82,6 +82,7 @@ aside#sidebar-nav {
     position: fixed;
     z-index: 56;
     overflow: hidden;
+    width: 290px;
     border: 1px solid var(--cr-transparent);
     transition: all .3s var(--ease-in-quad);
 }
@@ -90,6 +91,9 @@ html[aside-state="fixed"] aside#sidebar-nav {
     bottom: 0px;
     height: 100dvh;
 }
+html[aside-state="fixed"] #h01 {
+    width: 290px;
+}
 html[aside-state="absolute"] aside#sidebar-nav {
     border-radius: 9px;
     margin-left: 10px;
@@ -97,6 +101,9 @@ html[aside-state="absolute"] aside#sidebar-nav {
     bottom: 20px;
     height: calc(100dvh - 40px);
     background-color: var(--bg-aside-color);
+}
+html[aside-state="absolute"] #h01 {
+    width: 10px;
 }
 html[aside-state="sticky"] aside#sidebar-nav {
     border-radius: 14px;
