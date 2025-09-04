@@ -27,17 +27,17 @@ var h = dom("[aside-state]").at(0), d = dom("#h01").at(0), e = dom("aside#sideba
 
     dom("[event-hover]")
 
-        .delegate("mouseleave", () => {
-            var a = A(h, "aside-state")
-            if (a === "absolute") {
-                SP(e, "transform", "translateX(-300px)")
-            }
-        }, "#h01")
-
         .delegate("mouseenter", () => {
             var a = A(h, "aside-state")
             if (a === "absolute") {
                 SP(e, "transform", "translateX(0px)")
+            }
+        }, "#h01")
+
+        .delegate("mouseleave", () => {
+            var a = A(h, "aside-state")
+            if (a === "absolute") {
+                SP(e, "transform", "translateX(-300px)")
             }
         }, "#h01")
 
