@@ -5,6 +5,8 @@
  * co-built with GPT-5
  */
 
+"use strict";
+
 const SVG_NAMESPACE = `http://www.W3.org/2000/svg`;
 const SVG_TAGS = new Set(["svg", "g", "path", "circle", "line", "polyline", "polygon", "ellipse", "text", "defs", "use", "mask", "clipPath", "linearGradient", "radialGradient", "stop"]);
 
@@ -252,16 +254,89 @@ export function vector(tag = "g", attrs = {}, children = []) {
     return E
 }
 
-// Usage examples
-const svg1 = vector("svg", { width: 200, height: 200, viewBox: "0 0 100 100", style: { border: "1px solid #ddd" } }, [
-    { tag: "circle", attrs: { cx: 50, cy: 50, r: 40, fill: "tomato" } },
-    { tag: "text", attrs: { x: 50, y: 55, "text-anchor": "middle", "font-size": "12px", fill: "#fff" }, textContent: "OK" }
-]);
-const defs = vector("defs", {}, [
-    { tag: "image", attrs: { id: "img1", width: 50, height: 50, "xlink:href": "https://example.com/icon.png" } }
-  ]);
-  const svg2 = vector("svg", { width: 100, height: 100, viewBox: "0 0 100 100" }, [
-    defs,
-    { tag: "use", attrs: { "x": 10, "y": 10, "xlink:href": "#img1" } }
-]);
-document.querySelector("aside").append(svg1, svg2)
+/**  Usage examples
+    const svg1 = vector("svg", { width: 200, height: 200, viewBox: "0 0 100 100", style: { border: "1px solid #ddd" } }, [
+        { tag: "circle", attrs: { cx: 50, cy: 50, r: 40, fill: "tomato" } },
+        { tag: "text", attrs: { x: 50, y: 55, "text-anchor": "middle", "font-size": "12px", fill: "#fff" }, textContent: "OK" }
+    ]);
+    const defs = vector("defs", {}, [
+        { tag: "image", attrs: { id: "img1", width: 50, height: 50, "xlink:href": "https://example.com/icon.png" } }
+    ]);
+    const svg2 = vector("svg", { width: 100, height: 100, viewBox: "0 0 100 100" }, [
+        defs,
+        { tag: "use", attrs: { "x": 10, "y": 10, "xlink:href": "#img1" } }
+    ]);
+*/
+
+/**
+ * @param {string} e 
+ */
+var e = e => document.createElement(e);
+
+class HTMLBase extends HTMLElement {
+    addClass = (...t) => {
+        t.forEach(t => this.classList.add(t))
+    }
+}
+
+class SpanElementConstructor extends HTMLBase {
+    constructor () {
+        return e("span")
+    }
+}
+
+class DivElementConstructor extends HTMLBase {
+    constructor () {
+        return e("div")
+    }
+}
+
+class LiElementConstructor extends HTMLBase {
+    constructor () {
+        return e("li")
+    }
+}
+
+class HeadingElementConstructor extends HTMLBase {
+    constructor (s) {
+        return e(`h${s}`)
+    }
+}
+
+class QuoteElementConstructor extends HTMLBase {
+    constructor () {
+        return e("blockquote")
+    }
+}
+
+class InputElementContructor extends HTMLBase {
+    constructor () {
+        return e('input')
+    }
+}
+
+class LinkElementConstructor extends HTMLBase {
+    constructor () {
+        return e('link')
+    }
+}
+
+class AnchorElementConstructor extends HTMLBase {
+    constructor () {
+        return e('a')
+    }
+}
+
+class BrElementConstructor extends HTMLBase {
+    constructor () {
+        return e('br')
+    }
+}
+
+class ParagraphElementConstructor extends HTMLBase {
+    constructor () {
+        return e('p')
+    }
+}
+
+export var span = SpanElementConstructor, div = DivElementConstructor, li = LiElementConstructor, heading = HeadingElementConstructor, quote = QuoteElementConstructor, input = InputElementContructor, link = LinkElementConstructor, anchor = AnchorElementConstructor, br = BrElementConstructor, Paragraph = ParagraphElementConstructor;
