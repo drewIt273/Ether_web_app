@@ -49,3 +49,5 @@ To be determined.
 
 Questions or suggestions?  
 Email: [instantdrewIt@gmail.com](mailto:instantdrewIt@gmail.com)
+
+Join the [discussions](https://github.com/drewIt273/Ether_web_app/discussions/3#discussion-8823067)
