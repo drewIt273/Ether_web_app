@@ -5,17 +5,21 @@
  */
 
 @import url("ui.roots.css");
+@import url("ui.keyframes.css");
+@import url("ui.themes.css");
 
 .o\[9\] {opacity: .9;} .o\[7\] {opacity: .7;} .o\[5\] {opacity: .5;} .o\[3\] {opacity: .3;}
 .d-flex {display: flex;} .d-flex-col {display: flex; flex-direction: column !important;} .d-block {display: block;}
-.items-center {display: flex; align-items: center;} 
-.sm-gap {gap: 3px;} .sl-gap {gap: 5px;} .md-gap {gap: 9px;}
+.items-center {display: flex; align-items: center;} .self-end {align-self: flex-end;}
+.sm-gap {gap: 3px;} .sl-gap {gap: 5px;} .md-gap {gap: 9px;} .lg-gap {gap: 20px;}
 .uppercase {text-transform: uppercase;} .capitalize {text-transform: capitalize;} .lowercase {text-transform: lowercase;}
-.relative {position: relative;} .absolute {position: absolute;} .fixed {position: fixed;}
+.relative {position: relative;} .absolute {position: absolute;} .fixed {position: fixed;} .sticky {position: sticky;}
+.sm-round {border-radius: 20px;}
 .b-0 {bottom: 0;} .t-0 {top: 0;} .l-0 {left: 0;} .r-0 {right: 0;}
 .px\.5 {padding-inline: 6px;} .px-1 {padding-inline: .9rem;} .py\.5 {padding-block: 6px;} .py-1 {padding-block: .9rem;}
 .h-full {height: 100%;}
-.w-full {width: 100%;}
+.w-full {width: 100%;} .max-w-\[230px\] {max-width: 230px;} .max-w-\[1000px\] {max-width: 1000px;}
+.weight-400 {font-weight: 400;} .weight-500 {font-weight: 500;}
 .cross-center {
     display: flex;
     align-items: center;
@@ -30,6 +34,10 @@
     width: 32px;
     height: 32px;
 }
+.size-1 {
+    width: .8rem;
+    height: .8rem;
+}
 .size-4 {
     width: 1.2rem;
     height: 1.2rem;
@@ -41,6 +49,11 @@
 .size-6 {
     width: 1.5rem;
     height: 1.5rem;
+}
+.lg-header {
+    font-size: 1.6em;
+    padding-top: 2em;
+    padding-bottom: 1em;
 }
 #nav-bar {
     border-bottom: 1px solid var(--cr-transparent);
@@ -59,6 +72,9 @@
 }
 .hover-incr-opacity:hover {
     opacity: 1;
+}
+.hover-affects-color:hover {
+    color: var(--accent-color);
 }
 #workspace-label {
     font-size: var(--font-size-small);
@@ -157,6 +173,10 @@
 .dtab:hover {
     opacity: 1;
 }
+.empty-label {
+    opacity: .4;
+    font-size: 12px;
+}
 [data-main-transition-effects="opacity"] {
     transition: opacity .6s var(--ease-in-cubic);
 }
@@ -177,10 +197,16 @@
 [data-sidebar-section-type="collapsable-area"][open] [data-sidebar-section-type="header"] button item- {
     transform: rotate(90deg);
 }
+[data-sidebar-section-type="collapsable-area"][open] [data-sidebar-section-type="collapsable-body"] {
+    height: auto;
+}
 [data-sidebar-section-type="collapsable-body"] {
     transition: all .3s var(--ease-in-cubic);
     padding-inline: 5px;
     overflow: hidden;
+}
+[data-sidebar-section-type="collapsable-area"][close] [data-sidebar-section-type="collapsable-body"] {
+    height: 0px;
 }
 [data-sidebar-section-type="collapsable-body"] > div {
     transition: all .3s ease-in-out;
@@ -199,6 +225,20 @@
 }
 [overflow-y="auto"] {
     overflow-y: auto;
+}
+[hidden] {
+    display: none;
+}
+[data-type="link"] {
+    color: var(--accent-color);
+    font-weight: 500;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    transition: all .2s var(--ease-in-cubic);
+    width: fit-content;
 }
 #n01, #n01::before, #n02, #n02::before {
     height: 17px;
@@ -230,6 +270,39 @@
     border-color: var(--cr-transparent);
     border-right-color: var(--svg-color);
     background-color: var(--cr-transparent);
+}
+#aside-bottom-container {
+    margin: 0;
+    border-top: 1px solid transparent;
+}
+.flex-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.meta-link-box {
+    padding: 15px 20px;
+    border: 2px solid var(--meta-color);
+    border-radius: 15px;
+    width: 320px;
+}
+.meta-link-box .d-flex {
+    align-items: center;
+}
+.meta-link-box p {
+    opacity: .6;
+    font-size: 14px;
+}
+.meta-link-box title {
+    display: block;
+    font-size: 1em;
+}
+.meta-link-box .bt {
+    margin-top: 10px;
+}
+.meta-link-box [data-type="link"]:hover {
+    gap: 7px;
 }
 *:not([default-scrollbar])::-webkit-scrollbar {
     width: 4px; height: 4px;
