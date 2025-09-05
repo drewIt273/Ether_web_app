@@ -26,11 +26,11 @@ class query$ {
 
             get(target, prop) {
 
-                // If prop exist on methods$, use it
+                // If prop exist on query$, use it
                     if (prop in target) return target[prop]
 
                 // Otherwise, return the first property from the first element
-                    return target.nodes[0]?.prop
+                    return target.nodes[0]?.[prop]
             },
 
             set(target, prop, value) {
@@ -46,7 +46,7 @@ class query$ {
     on(event, callback, delay = 0) {
         this.nodes.forEach(node => {
             E = node; document.body.addEventListener(event, e => {
-                if (e.target.matches(node)) setTimeout(() => callback, delay)
+                if (e.target.matches(node)) setTimeout(callback, delay)
             })
         })
 
@@ -69,7 +69,7 @@ class query$ {
         }
         else {
             document.querySelectorAll(`${this.selector}${selector}`).forEach(s => {
-                s.addEventListener(eventType, handler); E = s;
+                E = s; E.addEventListener(eventType, handler);
             })
         }
 
@@ -224,7 +224,7 @@ class query$ {
     }
 
     is(selector) {
-        let g = this.nodes.filter(selector), b;
+        let g = this.nodes.filter(node => node.matches(selector)), b;
         if (g.length > 0) b = true
         else b = false
 
@@ -258,7 +258,7 @@ class query$ {
 
             // Set property for all elements
                 this.nodes.forEach(node => {
-                    node.setProperty(n, v)
+                    node[n] = v
                 })
         }
 
