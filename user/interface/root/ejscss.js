@@ -26,8 +26,7 @@ eocs = {
 function insert(node, ...css) {
     css.forEach(o => {
         for (let prop in o) {
-            var val = String(o[prop]);
-            node.style[prop] = val
+            node.style[prop] = String(o[prop])
         }
     })
 }
