@@ -105,17 +105,6 @@ html[aside-state="absolute"] aside#sidebar-nav {
 html[aside-state="absolute"] #h01 {
     width: 10px;
 }
-html[aside-state="sticky"] aside#sidebar-nav {
-    border-radius: 14px;
-    border-color: var(--bg-border-color);
-    height: calc(100dvh - 100px);
-    max-height: 560px;
-    margin: 20px;
-    position: absolute;
-}
-html[aside-state="sticky"] aside#sidebar-nav #nav-bar > .h-center {
-    padding-inline: 7px;
-}
 html va-tooltip {
     background-color: var(--bg-tooltip-color);
     border: 1px solid var(--bg-border-color);

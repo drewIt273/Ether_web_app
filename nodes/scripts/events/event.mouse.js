@@ -17,12 +17,10 @@ var h = dom("[aside-state]").at(0), d = dom("#h01").at(0), e = dom("aside#sideba
 
         .delegate("click", () => {
             var a = A(h, "aside-state")
-            if (a !== "sticky") {
-                if (a == "fixed") 
-                    toggle_aside_state("absolute")
-                if (a == "absolute")
-                    toggle_aside_state("fixed")
-            }
+            if (a == "fixed") 
+                toggle_aside_state("absolute")
+            if (a == "absolute")
+                toggle_aside_state("fixed")
         }, '[data-event="toggle-aside-state"]')
 
     dom("[event-hover]")
