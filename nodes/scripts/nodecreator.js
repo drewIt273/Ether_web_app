@@ -224,6 +224,13 @@ export function vector(tag = "g", attrs = {}, children = []) {
                     E.id = String(rawValue);
                     continue;
                 }
+            
+            // data-attributes handle
+                if (/^data[A-Z]/.test(rawKey) || /^aria[A-Z]/.test(rawKey)) {
+                    let a = toKebab(rawKey);
+                    E.setAttribute(a, String(rawValue))
+                    continue;
+                }
 
             // default: SVG attributes — keep original casing (important)
                 setSVGAttr(E, rawKey, rawValue);
