@@ -6,7 +6,7 @@
 
 import {dom, E} from "../domquery.js"
 
-var h = dom("[aside-state]").at(0), d = dom("#h01").at(0), e = dom("aside#sidebar-nav").at(0), da = dom('[data-event="toggle-aside-state"]').at(0), SP = (e, p, v) => e.style.setProperty(p, v), A = (e, a) => e.getAttribute(a);
+var mainBody = dom('#mainBody').at(0), h = dom("[aside-state]").at(0), e = dom("aside#sidebar-nav").at(0), da = dom('[data-event="toggle-aside-state"]').at(0), SP = (e, p, v) => e.style.setProperty(p, v), A = (e, a) => e.getAttribute(a), fade = (e) => {let c = e.classList; if (c.contains('o[5]')) {c.remove('o[5]')} else if (!c.contains('o[5]')) {c.add('o[5]')}}, mc = (e) => e.classList;
 
 /**
  * Sidebar local function handler
@@ -20,7 +20,7 @@ var h = dom("[aside-state]").at(0), d = dom("#h01").at(0), e = dom("aside#sideba
             if (a == "fixed") 
                 toggle_aside_state("absolute")
             if (a == "absolute")
-                toggle_aside_state("fixed")
+                {toggle_aside_state("fixed"); mc(mainBody).remove('o[5]')}
         }, '[data-event="toggle-aside-state"]')
 
     dom("[event-hover]")
@@ -28,14 +28,14 @@ var h = dom("[aside-state]").at(0), d = dom("#h01").at(0), e = dom("aside#sideba
         .delegate("mouseenter", () => {
             var a = A(h, "aside-state")
             if (a === "absolute") {
-                SP(e, "transform", "translateX(0px)")
+                SP(e, "transform", "translateX(0px)"); mc(mainBody).add('o[5]')
             }
         }, "#h01")
 
         .delegate("mouseleave", () => {
             var a = A(h, "aside-state")
             if (a === "absolute") {
-                SP(e, "transform", "translateX(-300px)")
+                SP(e, "transform", "translateX(-300px)"); mc(mainBody).remove('o[5]')
             }
         }, "#h01")
 
