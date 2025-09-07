@@ -106,7 +106,6 @@ html[aside-state="absolute"] aside#sidebar-nav {
 }
 html[aside-state="absolute"] #h01 {
     width: 10px;
-    position: absolute;
     height: 100%;
     z-index: 1;
 }
@@ -122,6 +121,7 @@ html va-tooltip {
 }
 html #mainBody {
     flex: 1;
+    transition: all .3s var(--ease-in-out-circ);
 }
 html #mainBody app-layer {
     width: 100%; height: 100%;
