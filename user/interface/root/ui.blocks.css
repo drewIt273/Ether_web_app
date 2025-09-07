@@ -292,7 +292,7 @@
 }
 .meta-link-box .em-icon svg, .meta-link-box .em-icon path {
     stroke: var(--cr-blue);
-    stroke-width: 1;
+    stroke-width: 1.5;
 }
 .meta-link-box .meta-options {
     opacity: 0;
