@@ -240,6 +240,9 @@
     transition: all .2s var(--ease-in-cubic);
     width: fit-content;
 }
+#h01 {
+    transition: all .3s ease-in;
+}
 #n01, #n01::before, #n02, #n02::before {
     height: 17px;
     display: block;
