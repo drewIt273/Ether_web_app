@@ -290,7 +290,7 @@
     border-radius: 15px;
     width: 320px;
 }
-.meta-link-box .em-icon svg, .meta-link-box .em-icon path {
+.meta-link-box .em-icon svg, .meta-link-box .em-icon svg[data-slot="icon"] path {
     stroke: var(--cr-blue);
     stroke-width: 1.5;
 }
