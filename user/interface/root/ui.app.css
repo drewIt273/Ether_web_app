@@ -145,3 +145,18 @@ html #mainBody #absolute-topbar>* * {
 html #mainBody #absolute-topbar>* {
     display: flex;
 }
+app-layer[data-layer-type="nocontent"] {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+}
+app-vector {
+    height: 100px;
+    width: 100px;
+    display: block;
+    position: static;
+}
+app-vector svg {
+    height: 100%;
+    width: 100%;
+}
