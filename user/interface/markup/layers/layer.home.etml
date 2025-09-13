@@ -1,4 +1,4 @@
-<app-layer id="Home">
+<app-layer id="Home" overflow-y="auto">
     <div class="d-flex-col items-center">
         <div class="lg-header">What's going on Today?</div>
         <div class="flex-wrapper sm-gap max-w-[1000px]">
