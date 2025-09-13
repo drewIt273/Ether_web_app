@@ -7,8 +7,9 @@
 
 "use strict";
 
-const SVG_NAMESPACE = `http://www.W3.org/2000/svg`;
+const SVG_NAMESPACE = `http://www.w3.org/2000/svg`;
 const SVG_TAGS = new Set(["svg", "g", "path", "circle", "line", "polyline", "polygon", "ellipse", "text", "defs", "use", "mask", "clipPath", "linearGradient", "radialGradient", "stop"]);
+const casiveAttrs = new Set(["viewBox"]);
 
 function isNode(v) {return v instanceof Node}
 
@@ -108,8 +109,11 @@ export function jsx(tag = "div", obj = {}) {
             }
 
         // Converts camelCase to kebab-case for attributes (dataTest -> data-test)
-            const attr = toKebab(key)
-            if (attr !== "tag") setAttr(attr, value)
+            if (casiveAttrs.has(key)) setAttr(key, value)
+            else {
+                const attr = toKebab(key)
+                if (attr !== "tag") setAttr(attr, value)
+            }
     }
 
     return E
