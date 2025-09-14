@@ -150,9 +150,13 @@ app-layer[data-layer-type="nocontent"] {
     justify-content: center;
     align-items: center;
 }
+html #layer-name {
+    font-size: 14px;
+    opacity: .7;
+}
 app-vector {
-    height: 100px;
-    width: 100px;
+    height: 90px;
+    width: 90px;
     display: block;
     position: static;
 }
