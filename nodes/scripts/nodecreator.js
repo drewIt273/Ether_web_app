@@ -108,6 +108,15 @@ export function jsx(tag = "div", obj = {}) {
                 continue
             }
 
+        // Attributes set as objects
+            if (key === "attrs" && typeof value === "object") {
+                for (const [a, v] of Object.entries(value)) {
+                    if (casiveAttrs.has(a)) setAttr(a, v)
+                    else setAttr(toKebab(a), v)
+                }
+                continue;
+            }
+
         // Converts camelCase to kebab-case for attributes (dataTest -> data-test)
             if (casiveAttrs.has(key)) setAttr(key, value)
             else {
