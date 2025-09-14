@@ -30,7 +30,7 @@ function createFromSpec(spec) {
     return jsx(spec.tag, spec)
 }
 
-export function jsx(tag = "div", obj = {}) {
+export function jsx(tag = "div", props = {}) {
     if (!tag) tag = "div"
 
     // Create elements with SVG namespace when appropriate
@@ -42,7 +42,7 @@ export function jsx(tag = "div", obj = {}) {
             E.setAttribute(name, value)
         }
 
-    for (const [key, value] of Object.entries(obj || {})) {
+    for (const [key, value] of Object.entries(props || {})) {
 
         // Skip null/undefined
             if (value == null) continue;
@@ -124,7 +124,9 @@ export function jsx(tag = "div", obj = {}) {
                 if (attr !== "tag") setAttr(attr, value)
             }
     }
-
+    
+    if (E.hasAttribute('attrs')) E.removeAttribute('attrs')
+    
     return E
 }
 
