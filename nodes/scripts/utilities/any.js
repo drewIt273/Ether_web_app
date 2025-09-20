@@ -74,3 +74,42 @@ export const web_app = find('web-app')
  * @param {NodeListOf<Node>} nodes should be a query result @param {string} ev @param {Function} handler 
  */
 export const removeListeners = (nodes, ev, handler) => Array.from(nodes).forEach(node => {node.removeEventListener(ev, handler)})
+
+export const activeListeners = []
+
+export const backlogListeners = []
+
+/**
+ * Adds event listeners to all matching selectors for each given handler and registers their listeners into the listenerRegister
+ * @param {string} ev @param {Function[]} handlers @param {string} selector 
+ */
+export function on(ev, selector, ...handlers) {
+    findAll(selector).forEach(node => {
+        let fns = [], fn = [];
+        handlers.forEach(handler => {node.addEventListener(ev, handler); fns.push(handler.name); fn.push(handler)})
+
+        activeListeners.push({node, ev, fns, fn, in: 'active'});
+        backlogListeners.forEach(b => {
+            if (b.node === node) backlogListeners.splice(backlogListeners.indexOf(b), 1)
+        })
+    })
+    
+}
+
+/**
+ * offs all matching selectors by removing all their event listeners
+ * @param {string} selector 
+ */
+export function off(selector) {
+    findAll(selector).forEach(node => {
+        activeListeners.forEach(o => {
+            if (o.node === node) {
+                o.fn.forEach(f => {node.removeEventListener(o.ev, f)});
+
+                if (!backlogListeners.includes(o)) backlogListeners.push(o);
+                activeListeners.splice(activeListeners.indexOf(o), 1); o.in = 'backlog'
+            }
+        })
+    })
+    console.log(activeListeners);console.log(backlogListeners)
+}
