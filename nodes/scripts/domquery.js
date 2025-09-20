@@ -65,13 +65,11 @@ class query$ {
     delegate(eventType, handler, selector = "") {
         if (selector === "" || undefined) {
             this.nodes.forEach(node => {
-                node.addEventListener(eventType, handler); E = node;
+                on(eventType, this.selector, handler);
             })
         }
         else {
-            document.querySelectorAll(`${this.selector}${selector}`).forEach(s => {
-                E = s; E.addEventListener(eventType, handler);
-            })
+            on(eventType, `${this.selector}${selector}`, handler)
         }
 
         return this
