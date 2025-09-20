@@ -41,8 +41,8 @@ var mainBody = dom('#mainBody').at(0), h = dom("[aside-state]").at(0), e = dom("
 
     dom("[event-scroll]")
 
-        .delegate("scroll", () => {
-            let a = E.parentElement.querySelector('#nav-bar'), b = E.parentElement.querySelector('#aside-bottom-container');
+        .delegate("scroll", (e) => {
+            let E = e.target, a = E.parentElement.querySelector('#nav-bar'), b = E.parentElement.querySelector('#aside-bottom-container');
             (E.scrollTop > 0) ? SP(a, "border-color", "var(--bg-border-color)") : SP(a, "border-color", "");
         }, '[data-sidebar-section-type="container"]')
 
