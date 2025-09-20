@@ -11,6 +11,7 @@
  * Not all query$ methods sets a value for E. Only those needing a function as a parameter
  */
 export let E;
+import {on, off} from "./utilities/any.js";
 
 class query$ {
 
