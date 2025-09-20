@@ -8,7 +8,7 @@
 import {toKebab, isNode} from "./utilities/any.js";
 
 const SVG_NAMESPACE = `http://www.w3.org/2000/svg`;
-const SVG_TAGS = new Set(["svg", "g", "path", "circle", "line", "polyline", "polygon", "ellipse", "text", "defs", "use", "mask", "clipPath", "linearGradient", "radialGradient", "stop"]);
+const SVG_TAGS = new Set(["svg", "g", "rect", "path", "circle", "line", "polyline", "polygon", "ellipse", "text", "defs", "use", "mask", "clipPath", "linearGradient", "radialGradient", "stop"]);
 const casiveAttrs = new Set(["viewBox"]);
 
 /**
