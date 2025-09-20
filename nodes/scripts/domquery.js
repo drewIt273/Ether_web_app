@@ -75,6 +75,12 @@ class query$ {
         return this
     }
 
+    removeListeners() {
+        off(this.selector)
+
+        return this
+    }
+
     hover(enter, leave, enterDelay = 0, leaveDelay = 0) {
         E = this.nodes;
         this.on("mouseenter", () => enter, enterDelay)
