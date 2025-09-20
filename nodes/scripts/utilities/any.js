@@ -21,6 +21,11 @@ export const hasNode = v => isNode(v) && document.contains(v)
 export const isString = v => typeof v === "string"
 
 /**
+ * @param {Element} e @param {string} a
+ */
+export const hasAttr = (e, a) => e.hasAttribute(a)
+
+/**
  * Returns the computed style property of an element
  * @param {Element} e @param {string} p 
  */
@@ -41,6 +46,27 @@ export const find = s => isString(s) ? document.querySelector(s) : hasNode(s) ? 
  * @param {Element} s 
  */
 export const findAll = s => isString(s) ? Array.from(document.querySelectorAll(s)) : hasNode(s) ? s : null
+
+/**
+ * @param {string} e 
+ */
+export const create = e => document.createElement(e)
+
+/**
+ * @param {Element} e @param {string} a @param {string} v 
+ */
+export const dataset = (e, a, v) => e.setAttribute(`data-${a}`, v)
+
+/**
+ * @param {Element} e @param {string} a @param {string} v 
+ */
+export const setAttr = (e, a, v) => e.setAttribute(a, v)
+
+/**
+ * @param {Element} e @param {string} a 
+ */
+export const removeAttr = (e, a) => hasAttr(e, a) ? e.removeAttribute(a) : null
+
 export const web_app = find('web-app')
 
 /**
