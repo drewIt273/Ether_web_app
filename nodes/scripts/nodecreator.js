@@ -5,21 +5,11 @@
  * co-built with GPT-5
  */
 
-"use strict";
+import {toKebab, isNode} from "./utilities/any.js";
 
 const SVG_NAMESPACE = `http://www.w3.org/2000/svg`;
 const SVG_TAGS = new Set(["svg", "g", "path", "circle", "line", "polyline", "polygon", "ellipse", "text", "defs", "use", "mask", "clipPath", "linearGradient", "radialGradient", "stop"]);
 const casiveAttrs = new Set(["viewBox"]);
-
-function isNode(v) {return v instanceof Node}
-
-/**
- * Converts camelCase or pascalCase to kebab-case: myAttrName -> my-attr-name
- * @param {string} s 
- */
-function toKebab(s) {
-    return String(s).replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
-}
 
 /**
  * @param {object} spec { tag, ...attrs, textContent, innerHTML, append, children }
@@ -296,8 +286,10 @@ export function vector(tag = "g", attrs = {}, children = []) {
 var e = e => document.createElement(e);
 
 class HTMLBase extends HTMLElement {
-    addClass = (...t) => {
-        t.forEach(t => this.classList.add(t))
+    delegate(ev, handler, selector) {
+        document.querySelectorAll(`${this.tagName.toLowerCase()}${selector}`).forEach(e => {
+            e.addEventListener(ev, handler)
+        })
     }
 }
 
