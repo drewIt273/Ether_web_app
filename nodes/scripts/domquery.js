@@ -19,7 +19,7 @@ class query$ {
      */
     constructor(selector) {
 
-        this.nodes = Array.from(document.querySelectorAll(selector)) /**todo: typeof selector === "string" ? Array.from(document.querySelectorAll(selector)) : selector instanceof Element ? [selector] : Array.isArray(selector) ? selector : []*/
+        this.nodes = selector ? Array.from(document.querySelectorAll(selector)) : Array.from(document.childNodes) /**todo: typeof selector === "string" ? Array.from(document.querySelectorAll(selector)) : selector instanceof Element ? [selector] : Array.isArray(selector) ? selector : []*/
         this.selector = selector;
 
         return new Proxy(this, {
