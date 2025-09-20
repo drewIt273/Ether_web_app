@@ -38,14 +38,14 @@ export const getStyle = (e, p) => getComputedStyle(e)?.[p]
 export const setStyle = (e, p, v) => e.style.setProperty(p, v)
 
 /**
- * @param {string | Node} s 
+ * @param {Node} s 
  */
 export const find = s => isString(s) ? document.querySelector(s) : hasNode(s) ? s : null
 
 /**
  * @param {Element} s 
  */
-export const findAll = s => isString(s) ? Array.from(document.querySelectorAll(s)) : hasNode(s) ? s : null
+export const findAll = s => isString(s) ? Array.from(document.querySelectorAll(s)) : null
 
 /**
  * @param {string} e 
