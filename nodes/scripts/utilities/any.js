@@ -85,31 +85,65 @@ export const backlogListeners = []
  */
 export function on(ev, selector, ...handlers) {
     findAll(selector).forEach(node => {
-        let fns = [], fn = [];
-        handlers.forEach(handler => {node.addEventListener(ev, handler); fns.push(handler.name); fn.push(handler)})
 
-        activeListeners.push({node, ev, fns, fn, in: 'active'});
-        backlogListeners.forEach(b => {
-            if (b.node === node) backlogListeners.splice(backlogListeners.indexOf(b), 1)
-        })
+        // Check if this node+event already exists in activeListeners
+            let existing = activeListeners.find(o => o.node === node && o.ev === ev);
+        
+        if (existing) {
+            // Only add handlers that aren’t already registered
+                handlers.forEach(handler => {
+                    if (!existing.fn.includes(handler)) {
+                        node.addEventListener(ev, handler);
+                        existing.fn.push(handler)
+                    }
+                })
+        }
+        else {
+            // New entry
+                handlers.forEach(handler => {node.addEventListener(ev, handler)});
+                activeListeners.push({node, ev, fn: [...handlers], in: 'active'})
+        }
+
+        // Ensure this node isn't still in backlog
+            backlogListeners = backlogListeners.filter(b => b.node !== node);
     })
     
 }
 
 /**
- * offs all matching selectors by removing all their event listeners
+ * Removes all event listeners from matching selectors
  * @param {string} selector 
  */
 export function off(selector) {
     findAll(selector).forEach(node => {
-        activeListeners.forEach(o => {
-            if (o.node === node) {
-                o.fn.forEach(f => {node.removeEventListener(o.ev, f)});
+        const toRemove = activeListeners.filter(o => o.node === node);
 
-                if (!backlogListeners.includes(o)) backlogListeners.push(o);
-                activeListeners.splice(activeListeners.indexOf(o), 1); o.in = 'backlog'
-            }
+        toRemove.forEach(o => {
+            o.fn.forEach(f => node.removeEventListener(o.ev, f));
+            if (!backlogListeners.includes(o)) backlogListeners.push(o);
+            o.in = 'backlog'
         })
+
+        // Filter out removed objects from activeListeners
+            activeListeners = activeListeners.filter(o => o.node !== node);
     })
-    console.log(activeListeners);console.log(backlogListeners)
+}
+
+/**
+ * Restores all event listeners from backlog for matching selectors
+ * @param {string} selector 
+ */
+export function restore(selector) {
+    findAll(selector).forEach(node => {
+        const toRestore = backlogListeners.filter(o => o.node === node);
+
+        toRestore.forEach(o => {
+            o.fn.forEach(f => node.addEventListener(o.ev, f));
+            if (!activeListeners.includes(o)) activeListeners.push(o);
+            o.in = 'active'
+        })
+
+        // Filter out restored objects from backlogListeners
+            backlogListeners = backlogListeners.filter(o => o.node !== node);
+    })
 }
