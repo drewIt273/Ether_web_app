@@ -113,20 +113,22 @@ export function on(ev, target, ...handlers) {
 
 /**
  * Removes all event listeners from matching selectors
- * @param {string} selector 
+ * @param {string|Node} target 
  */
-export function off(selector) {
-    findAll(selector).forEach(node => {
-        const toRemove = activeListeners.filter(o => o.node === node);
+export function off(target) {
+    const nodes = typeof target === 'string' ? findAll(target) : [target]
+
+    nodes.forEach(node => {
+        const toRemove = activeListeners.filter(o => o.node === node)
 
         toRemove.forEach(o => {
-            o.fn.forEach(f => node.removeEventListener(o.ev, f));
-            if (!backlogListeners.includes(o)) backlogListeners.push(o);
+            o.fn.forEach(f => o.node.removeEventListener(o.ev, f))
+            if (!backlogListeners.includes(o)) backlogListeners.push(o)
             o.in = 'backlog'
         })
 
-        // Filter out removed objects from activeListeners
-            activeListeners = activeListeners.filter(o => o.node !== node);
+        // Mutate activeListeners in place
+            activeListeners.splice(0, activeListeners.length, ...activeListeners.filter(o => o.node !== node))
     })
 }
 
