@@ -147,6 +147,25 @@ export function restore(selector) {
         })
 
         // Filter out restored objects from backlogListeners
-            backlogListeners = backlogListeners.filter(o => o.node !== node);
+            backlogListeners.splice(0, backlogListeners.length, ...backlogListeners.filter(o => o.node !== node))
+    })
+}
+
+/**
+ * Removes nodes from the DOM along with their listeners.
+ * @param {string|Node} target
+ */
+export function remove(target, log = false) {
+    const nodes = typeof target === 'string' ? findAll(target) : [target]
+
+    nodes.forEach(node => {
+        // Remove all listeners first
+            off(node)
+
+        // Remove from DOM if still attached
+            if (node.parentNode) node.parentNode.removeChild(node)
+
+        // Optionally log removed node
+            if (log) backlogNodes.push({node, in: 'backlog'})
     })
 }
