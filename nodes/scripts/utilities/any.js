@@ -75,9 +75,9 @@ export const web_app = find('web-app')
  */
 export const removeListeners = (nodes, ev, handler) => Array.from(nodes).forEach(node => {node.removeEventListener(ev, handler)})
 
-export const activeListeners = []
+export var activeListeners = []
 
-export const backlogListeners = []
+export var backlogListeners = []
 
 /**
  * Adds event listeners to all matching selectors for each given handler and registers their listeners into the listenerRegister
