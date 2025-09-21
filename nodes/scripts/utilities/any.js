@@ -83,33 +83,32 @@ export const backlogNodes = []
 
 /**
  * Adds event listeners to all matching selectors for each given handler and registers their listeners into the listenerRegister
- * @param {string} ev @param {Function[]} handlers @param {string} selector 
+ * @param {string} ev @param {Function[]} handlers @param {string|Node} target 
  */
-export function on(ev, selector, ...handlers) {
-    findAll(selector).forEach(node => {
+export function on(ev, target, ...handlers) {
+    const nodes = typeof target === 'string' ? findAll(target) : [target]
+    
+    nodes.forEach(node => {
+        let existing = activeListeners.find(o => o.node === node && o.ev === ev)
 
-        // Check if this node+event already exists in activeListeners
-            let existing = activeListeners.find(o => o.node === node && o.ev === ev);
-        
         if (existing) {
             // Only add handlers that aren’t already registered
                 handlers.forEach(handler => {
                     if (!existing.fn.includes(handler)) {
-                        node.addEventListener(ev, handler);
+                        node.addEventListener(ev, handler)
                         existing.fn.push(handler)
                     }
                 })
         }
         else {
             // New entry
-                handlers.forEach(handler => {node.addEventListener(ev, handler)});
+                handlers.forEach(handler => node.addEventListener(ev, handler))
                 activeListeners.push({node, ev, fn: [...handlers], in: 'active'})
         }
 
         // Ensure this node isn't still in backlog
-            backlogListeners = backlogListeners.filter(b => b.node !== node);
+            backlogListeners.splice(0, backlogListeners.length, ...backlogListeners.filter(o => o.node !== node))
     })
-    
 }
 
 /**
