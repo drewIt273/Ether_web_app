@@ -2,6 +2,7 @@
  * Instance by DrewIt
  * 
  * any.js
+ * co-built with GPT-5
  */
 
 /**
