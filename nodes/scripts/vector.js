@@ -34,6 +34,10 @@ const v24 = {
     fill: 'var(--vector-border)',
     fillRule: 'evenodd',
     clipRule: 'evenodd'
+}, vA3 = {
+    fillRule: 'evenodd',
+    clipRule: 'evenodd',
+    strokeWidth: 1.5
 }, vN = {
     fill: 'var(--vector-bg)',
     strokeWidth: 1.5
