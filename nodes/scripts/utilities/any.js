@@ -30,9 +30,9 @@ export const hasAttr = (e, a) => e.hasAttribute(a)
 
 /**
  * Returns true if o is an object and not an array
- * @param {any} o 
+ * @param {*} o 
  */
-export const strictObject = o => !Array.isArray(o) && o instanceof Object
+export const strictObject = o => o !== null && typeof o === "object" && o?.constructor === Object
 
 /**
  * Returns the computed style property of an element
