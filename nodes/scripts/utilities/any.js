@@ -49,7 +49,7 @@ export const setStyle = (e, p, v) => e.style.setProperty(p, v)
 export class Registry {
 
     constructor(src = []) {
-        this.register = strictObject(src) ? Array.from(src) : src
+        this.register = strictObject(src) ? Array.from(src) : !isArray(src) ? [src] : src
     }
 
     /**
