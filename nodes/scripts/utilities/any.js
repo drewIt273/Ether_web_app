@@ -67,12 +67,12 @@ export class Registry {
 }
 
 /**
- * @param {Node} s 
+ * @param {Node|string} s 
  */
 export const find = s => isString(s) ? document.querySelector(s) : hasNode(s) ? s : null
 
 /**
- * @param {Element} s 
+ * @param {string} s 
  */
 export const findAll = s => isString(s) ? Array.from(document.querySelectorAll(s)) : null
 
