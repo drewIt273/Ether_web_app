@@ -18,6 +18,8 @@ export const isNode = v => v instanceof Node
 /** @param {Node} v */
 export const hasNode = v => isNode(v) && document.contains(v)
 
+export const isArray = a => Array.isArray(a)
+
 /** @param {string} v */
 export const isString = v => typeof v === "string"
 
