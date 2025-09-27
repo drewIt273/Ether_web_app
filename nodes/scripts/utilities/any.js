@@ -47,10 +47,15 @@ export const getStyle = (e, p) => getComputedStyle(e)?.[p]
 export const setStyle = (e, p, v) => e.style.setProperty(p, v)
 
 export class Registry {
+
     constructor(src = []) {
         this.register = strictObject(src) ? Array.from(src) : src
     }
 
+    /**
+     * Adds new items to the end of the register.
+     * @param  {...any} items 
+     */
     add(...items) {
         items.forEach(item => {
             this.register.push(item)
@@ -59,6 +64,7 @@ export class Registry {
     }
 
     /**
+     * Returns the value of the first element in the registry where predicate is true, and undefined otherwise.
      * @param {(Value: any, index: number, obj: [])} predicate 
      */
     find(predicate) {
