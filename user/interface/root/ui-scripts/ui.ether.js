@@ -34,7 +34,7 @@ class UIComponent {
     }
 
     /**
-     * @param {Function} callback 
+     * @param {(value: ChildNode, index: number, array: ChildNode[]) => void} callback 
      */
     forEach(callback) {
         this.children.forEach(callback)
