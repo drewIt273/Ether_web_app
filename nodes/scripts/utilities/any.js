@@ -70,6 +70,32 @@ export class Registry {
     find(predicate) {
         return this.register.find(predicate)
     }
+
+    /**
+     * Returns the elements of the registry that meet the condition specified in a callback function.
+     * @param {(value: any, index: number)} predicate 
+     */
+    filter(predicate) {
+        return this.register.filter(predicate)
+    }
+
+    /**
+     * Returns the length of the registry
+     */
+    count() {
+        return this.register.length
+    }
+
+    /**
+     * Merge other registries to this one
+     * @param {...Registry} others 
+     */
+    merge(...others) {
+        others.forEach(other => {
+            this.register.concat(other.register)
+        })
+        return this
+    }
 }
 
 /**
