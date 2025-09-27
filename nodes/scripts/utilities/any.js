@@ -64,7 +64,7 @@ export const create = e => document.createElement(e)
 /**
  * @param {Element} e @param {string} a @param {string} v 
  */
-export const dataset = (e, a, v) => e.setAttribute(`data-${a}`, v)
+export const dataset = (e, a, v) => e.setAttribute(`data-${toKebab(a)}`, v)
 
 /**
  * @param {Element} e @param {string} a @param {string} v 
