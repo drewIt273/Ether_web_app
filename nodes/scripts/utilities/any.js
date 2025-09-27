@@ -29,6 +29,12 @@ export const isString = v => typeof v === "string"
 export const hasAttr = (e, a) => e.hasAttribute(a)
 
 /**
+ * Returns true if o is an object and not an array
+ * @param {any} o 
+ */
+export const strictObject = o => !Array.isArray(o) && o instanceof Object
+
+/**
  * Returns the computed style property of an element
  * @param {Element} e @param {string} p 
  */
