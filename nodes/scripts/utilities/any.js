@@ -46,6 +46,26 @@ export const getStyle = (e, p) => getComputedStyle(e)?.[p]
  */
 export const setStyle = (e, p, v) => e.style.setProperty(p, v)
 
+export class Registry {
+    constructor(src = []) {
+        this.register = strictObject(src) ? Array.from(src) : src
+    }
+
+    add(...items) {
+        items.forEach(item => {
+            this.register.push(item)
+        })
+        return this
+    }
+
+    /**
+     * @param {(Value: any, index: number, obj: [])} predicate 
+     */
+    find(predicate) {
+        return this.register.find(predicate)
+    }
+}
+
 /**
  * @param {Node} s 
  */
