@@ -48,52 +48,111 @@ export const setStyle = (e, p, v) => e.style.setProperty(p, v)
 
 export class Registry {
 
+    /**
+     * @param {{}} src 
+     */
     constructor(src = {}) {
-        this.register = strictObject(src) ? src : {}
+        this.register = strictObject(src) ? {...src} : {}
+    }
+
+    #generatekey() {
+        const chars = 'ABCDabcdef1234567890'
+        let key;
+        do {
+            key = Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+        }
+        while (this.register.hasOwnProperty(key))
+        return key
     }
 
     /**
-     * Adds new items to the end of the register.
-     * @param  {...any} items 
+     * Write data into the registry and returns its key.
+     * @param {*} data @param {string} key 
      */
-    add(...items) {
-        items.forEach(item => {
-            this.register.push(item)
+    write(data, key = '') {
+        if (!isString(key) || !key || key === '') key = this.#generatekey()
+        this.register[key] = data
+        return key
+    }
+
+    /**
+     * @param {Function} callback 
+     */
+    forEach(callback) {
+        Object.entries(this.register).forEach(([key, value]) => callback(value, key));
+        return this
+    }
+
+    /**
+     * @param {string} key 
+     */
+    get(key) {
+        return this.register[key]
+    }
+
+    /**
+     * @param {string} key 
+     */
+    remove(key) {
+        delete this.register[key]
+        return this
+    }
+
+    /**
+     * Find first value where predicate returns true
+     * @param {(value: any, key: string) => boolean} predicate 
+     */
+    find(predicate) {
+        for (const [key, value] of Object.entries(this.register)) {
+            if (predicate(value, key)) return value;
+        }
+        return undefined
+    }
+
+    /**
+     * Filter enteries where predicate returns true.
+     * @param {(value: any, key: string)} predicate 
+     */
+    filter(predicate) {
+        const filtered = {}
+        Object.entries(this.register).forEach(([key, value]) => {
+            if (predicate(value, key)) filtered[key] = value
+        })
+        return new Registry(filtered)
+    }
+
+    /**
+     * Merge other Registries into this one
+     * @param  {...Registry} others 
+     */
+    merge(...others) {
+        others.forEach(other => {
+            if (other instanceof Registry) {
+                Object.entries(other.register).forEach(([key, value]) => {
+                    this.register[key] = value;
+                })
+            }
         })
         return this
     }
 
     /**
-     * Returns the value of the first element in the registry where predicate is true, and undefined otherwise.
-     * @param {(Value: any, index: number, obj: [])} predicate 
+     * Determines whether this registry includes a certain element, returning true or false as appropriate.
+     * @param {string} key 
      */
-    find(predicate) {
-        return this.register.find(predicate)
+    includes(key) {
+        return this.register.hasOwnProperty(key)
+    }
+
+    get size() {
+        return Object.keys(this.register).length
     }
 
     /**
-     * Returns the elements of the registry that meet the condition specified in a callback function.
-     * @param {(value: any, index: number)} predicate 
+     * Clear all enteries
      */
-    filter(predicate) {
-        return this.register.filter(predicate)
-    }
-
-    /**
-     * Returns the length of the registry
-     */
-    count() {
-        return this.register.length
-    }
-
-    /**
-     * Merge other registries to this one
-     * @param {...Registry} others 
-     */
-    merge(...others) {
-        others.forEach(other => {
-            this.register.concat(other.register)
-        })
+    clear() {
+        this.register = {}
         return this
     }
 }
