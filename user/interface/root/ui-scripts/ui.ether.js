@@ -4,7 +4,7 @@
  * ui.ether.js
  */
 
-import {isNode, isString, create, find, toKebab, setAttr, hasAttr, removeAttr, dataset} from "../../../../nodes/scripts/utilities/any.js";
+import {isNode, isString, create, find, toKebab, setAttr, hasAttr, removeAttr, dataset, on} from "../../../../nodes/scripts/utilities/any.js";
 import {div} from "../../../../nodes/scripts/nodecreator.js";
 
 class UIComponent {
@@ -89,6 +89,14 @@ class UIComponent {
      */
     dataset(attr, val) {
         dataset(this.node, attr, val)
+        return this
+    }
+
+    /**
+     * @param {string} ev @param {string} selector @param {Function} handler 
+     */
+    delegate(ev, selector, handler) {
+        on(ev, this.find(selector), handler)
         return this
     }
 }
