@@ -124,6 +124,19 @@ export class Registry {
     }
 
     /**
+     * 
+     * @param {(value: any, key: string)} predicate 
+     */
+    mutate(predicate) {
+        for (const [k, v] of Object.entries(this.register)) {
+            if (predicate(v, k)) {
+                this.register = Object.defineProperty(this.register, k, v)
+            }
+        }
+        return this.register
+    }
+
+    /**
      * Merge other Registries into this one
      * @param  {...Registry} others 
      */
