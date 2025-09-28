@@ -261,11 +261,11 @@ export function on(ev, target, ...handlers) {
         else {
             // New entry
                 handlers.forEach(handler => node.addEventListener(ev, handler))
-                activeListeners.push({node, ev, fn: [...handlers], in: 'active'})
+                activeListeners.write({node, ev, fn: [...handlers], in: 'active'})
         }
 
         // Ensure this node isn't still in backlog
-            backlogListeners.splice(0, backlogListeners.length, ...backlogListeners.filter(o => o.node !== node))
+            backlogListeners.splice(0, backlogListeners.size, backlogListeners.filter(o => o.node !== node))
     })
 }
 
@@ -281,12 +281,12 @@ export function off(target) {
 
         toRemove.forEach(o => {
             o.fn.forEach(f => o.node.removeEventListener(o.ev, f))
-            if (!backlogListeners.includes(o)) backlogListeners.push(o)
+            if (!backlogListeners.includesValue(o)) backlogListeners.write(o)
             o.in = 'backlog'
         })
 
         // Mutate activeListeners in place
-            activeListeners.splice(0, activeListeners.length, ...activeListeners.filter(o => o.node !== node))
+            activeListeners.mutate(o => o.node !== node)
     })
 }
 
@@ -300,7 +300,7 @@ export function restore(selector) {
 
         toRestore.forEach(o => {
             o.fn.forEach(f => node.addEventListener(o.ev, f));
-            if (!activeListeners.includes(o)) activeListeners.push(o);
+            if (!activeListeners.includesValue(o)) activeListeners.write(o);
             o.in = 'active'
         })
 
@@ -324,6 +324,6 @@ export function remove(target, log = false) {
             if (node.parentNode) node.parentNode.removeChild(node)
 
         // Optionally log removed node
-            if (log) backlogNodes.push({node, in: 'backlog'})
+            if (log) backlogNodes.write({node, in: 'backlog'})
     })
 }
