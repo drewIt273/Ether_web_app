@@ -147,6 +147,10 @@ export class Registry {
                     this.register[key] = value;
                 })
             }
+            else {
+                let k = this.#generatekey();
+                Object.assign(this.register, {[k]: other})
+            }
         })
         return this
     }
