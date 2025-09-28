@@ -66,8 +66,9 @@ export class Registry {
     }
 
     /**
-     * Write data into the registry and returns its key.
-     * @param {*} data @param {string} key 
+     * Writes data into the registry and returns its key.
+     * @param {*} data The data of any type which needs to be written in the registry.
+     * @param {string} key The key to which the data will be attached. Generated automatically if not specified.
      */
     write(data, key = '') {
         if (!isString(key) || !key || key === '') key = this.#generatekey()
@@ -76,7 +77,7 @@ export class Registry {
     }
 
     /**
-     * @param {Function} callback 
+     * @param {(value: any, key: string)} callback 
      */
     forEach(callback) {
         Object.entries(this.register).forEach(([key, value]) => callback(value, key));
@@ -84,6 +85,7 @@ export class Registry {
     }
 
     /**
+     * Returns the value at a given key.
      * @param {string} key 
      */
     get(key) {
@@ -106,7 +108,7 @@ export class Registry {
         for (const [key, value] of Object.entries(this.register)) {
             if (predicate(value, key)) return value;
         }
-        return undefined
+        return null
     }
 
     /**
