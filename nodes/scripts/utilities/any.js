@@ -156,8 +156,16 @@ export class Registry {
     }
 
     /**
-     * Determines whether this registry includes a certain element, returning true or false as appropriate.
-     * @param {string} key 
+     * Removes elements from this registry and, if necessary, inserts new elements in their place.
+     * @param {number} start @param {number} deleteCount @param {...any} items 
+     */
+    splice(start, deleteCount, ...items) {
+        return Object.entries(this.register).splice(start, deleteCount, ...items)
+    }
+
+    /**
+     * Determines whether this registry includes a certain key, returning true or false as appropriate.
+     * @param {string} key The key to check in the registry
      */
     includes(key) {
         return this.register.hasOwnProperty(key)
