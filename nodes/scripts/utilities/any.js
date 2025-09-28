@@ -167,8 +167,19 @@ export class Registry {
      * Determines whether this registry includes a certain key, returning true or false as appropriate.
      * @param {string} key The key to check in the registry
      */
-    includes(key) {
-        return this.register.hasOwnProperty(key)
+    includesKey(key) {
+        return Object.keys(this.register).includes(key)
+    }
+
+    /**
+     * Determines whether this registry includes a certain value, returning true or false as appropriate.
+     * @param {*} value 
+     */
+    includesValue(value) {
+        for (const [k, v] of Object.entries(this.register)) {
+            if (value === v) return !0
+        }
+        return !1
     }
 
     get size() {
