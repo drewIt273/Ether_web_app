@@ -17,38 +17,33 @@ export function stylesheet(style = {}, id = "css-js", overwrite = false) {
 
             // Handle nested objects (not @media or @keyframes though)
                 if (typeof value === "object" && value !== null) {
-                    processblock(`${selector} ${block}`.trim(), value);
+                    processblock(`${selector} ${prop}`.trim(), value);
                     continue
                 }
 
                 if (typeof value === "string" && value.endsWith("!important")) {
                     value = value.replace(/!important$/, "".trim())
-                    declarations.push(`${prop}: ${value} !important;`)
+                    declarations.push(`${toKebab(prop)}: ${value} !important;`)
                 }
                 else {
-                    declarations.push(`${prop}: ${value};`)
+                    declarations.push(`${toKebab(prop)}: ${value};`)
                 }
         }
 
-        if (declarations.length) {
-            rules.push(`${selector} {\n  ${declarations.join('\n  ')}\n}`);
-        }
+        if (declarations.length) rules.push(`${selector} {\n  ${declarations.join('\n  ')}\n}`);
     }
 
     for (const key in style) {
         const value = style[key];
 
-        if (key.startsWith('@import')) {
-            rules.push(`@import '${value}';`);
-        }
+        if (key.startsWith('@import')) rules.push(`@import '${value}';`)
+    
         else if (key.startsWith('@keyframes')) {
             const frames = [];
 
             for (const frame in value) {
                 const props = value[frame];
-                const decls = Object.entries(props)
-                    .map(([prop, val]) => `${prop}: ${val};`)
-                    .join('\n');
+                const decls = Object.entries(props).map(([prop, val]) => `${prop}: ${val};`).join('\n');
                 frames.push(`${frame} {\n   ${decls}\n  }`);
             }
             rules.push(`${key} {\n  ${frames.join('\n ')}\n}`)
@@ -61,7 +56,10 @@ export function stylesheet(style = {}, id = "css-js", overwrite = false) {
                     .map(([prop, val]) => {
                         if (typeof val === "string" && val.endsWith('!important')) {
                             val = val.replace(/!important$/, "").trim();
-                            return `${prop}: ${val} !important`
+                            return `  ${prop}: ${val} !important;`
+                        }
+                        else {
+                            return `  ${prop}: ${val};`
                         }
                     })
                     .join('\n ');
