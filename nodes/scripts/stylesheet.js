@@ -5,6 +5,7 @@
  */
 
 /** */
+import {toKebab} from "./utilities/any.js";
 export function stylesheet(style = {}, id = "css-js", overwrite = false) {
     const rules = [];
 
