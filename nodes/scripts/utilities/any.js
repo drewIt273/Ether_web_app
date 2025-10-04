@@ -218,6 +218,7 @@ export class Registry {
 
 /**
  * @param {Node|string} s 
+ * @returns {Node|null}
  */
 export const find = s => isString(s) ? document.querySelector(s) : hasNode(s) ? s : null
 
@@ -254,10 +255,13 @@ export const web_app = find('web-app')
  */
 export const removeListeners = (nodes, ev, handler) => Array.from(nodes).forEach(node => {node.removeEventListener(ev, handler)})
 
+/**A registry for nodes still having active listeners in the DOM */
 export const activeListeners = new Registry
 
+/**A registry for nodes whose event listeners where removed from the DOM */
 export const backlogListeners = new Registry
 
+/**A registry for deleted nodes */
 export const backlogNodes = new Registry
 
 /**
