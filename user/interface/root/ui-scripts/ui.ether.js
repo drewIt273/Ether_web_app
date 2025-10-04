@@ -15,6 +15,7 @@ class UIComponent {
     constructor(node, append = []) {
         this.node = isString(node) ? create(node) : isNode(node) ? node : new div
         this.ID = ranstring(1)
+        this.innerHTML = this.node.innerHTML
         for (const e of append) {
             this.node.appendChild(e)
         }
