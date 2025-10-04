@@ -104,7 +104,22 @@ class UIComponent {
     }
 
     /**
-     * @param {string} ev @param {string} selector @param {Function} handler 
+     * @param {"add"|"remove"|"toggle"} action 
+     * @param {...string} tokens 
+     */
+    class(action, ...tokens) {
+        tokens.forEach(token => {
+            switch (action) {
+                case 'add': this.node.classList.add(token); break;
+                case 'remove': this.node.classList.remove(token); break;
+                case 'toggle': this.node.classList.toggle(token); break;
+            }
+        })
+        return this
+    }
+
+    /**
+     * @param {string} ev @param {string|Node} target @param {Function} handler 
      */
     delegate(ev, selector, handler) {
         on(ev, this.find(selector), handler)
