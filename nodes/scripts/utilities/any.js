@@ -29,6 +29,25 @@ export const isString = v => typeof v === "string"
 export const hasAttr = (e, a) => e.hasAttribute(a)
 
 /**
+ * Returns a random whole number between min and max inclusively.
+ * @param {number} min @param {number} max 
+ */
+export const $ran = (min, max) => Math.round(Math.random() * (max - min) + min)
+
+/**
+ * 
+ * @param {number} length 
+ * @param {string} end 
+ */
+export const ranstring = (length, end = '') => {
+    const chars = 'abcdefd1234567890';
+    let key, f = () => Array.from({length: 6}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    key = Array.from({length: length}, () => f()).join('-')
+
+    return (end.length) ? key += end : key
+}
+
+/**
  * Returns true if o is strictly an object
  * @param {*} o 
  */
