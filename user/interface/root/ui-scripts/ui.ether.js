@@ -4,7 +4,7 @@
  * ui.ether.js
  */
 
-import {isNode, isString, create, find, toKebab, setAttr, hasAttr, removeAttr, dataset, on} from "../../../../nodes/scripts/utilities/any.js";
+import {isNode, isString, create, find, toKebab, setAttr, hasAttr, removeAttr, dataset, on, ranstring} from "../../../../nodes/scripts/utilities/any.js";
 import {div} from "../../../../nodes/scripts/nodecreator.js";
 
 class UIComponent {
@@ -14,6 +14,7 @@ class UIComponent {
      */
     constructor(node, append = []) {
         this.node = isString(node) ? create(node) : isNode(node) ? node : new div
+        this.ID = ranstring(1)
         for (const e of append) {
             this.node.appendChild(e)
         }
