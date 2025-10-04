@@ -121,8 +121,13 @@ class UIComponent {
     /**
      * @param {string} ev @param {string|Node} target @param {Function} handler 
      */
-    delegate(ev, selector, handler) {
-        on(ev, this.find(selector), handler)
+    delegate(ev, target, handler) {
+        on(ev, target, handler)
+        return this
+    }
+
+    on(ev, handler) {
+        on(ev, this.node, handler)
         return this
     }
 }
