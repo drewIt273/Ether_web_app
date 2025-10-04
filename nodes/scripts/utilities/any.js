@@ -29,7 +29,7 @@ export const isString = v => typeof v === "string"
 export const hasAttr = (e, a) => e.hasAttribute(a)
 
 /**
- * Returns true if o is an object and not an array
+ * Returns true if o is strictly an object
  * @param {*} o 
  */
 export const strictObject = o => o !== null && typeof o === "object" && o?.constructor === Object
@@ -77,6 +77,7 @@ export class Registry {
     }
 
     /**
+     * Performs the specified action for each element in the registry.
      * @param {(value: any, key: string)} callback 
      */
     forEach(callback) {
@@ -93,6 +94,7 @@ export class Registry {
     }
 
     /**
+     * Removes the specifed key from the registry.
      * @param {string} key 
      */
     remove(key) {
@@ -101,7 +103,7 @@ export class Registry {
     }
 
     /**
-     * Find first value where predicate returns true
+     * Find first value where predicate returns true.
      * @param {(value: any, key: string) => boolean} predicate 
      */
     find(predicate) {
@@ -240,7 +242,7 @@ export const backlogListeners = new Registry
 export const backlogNodes = new Registry
 
 /**
- * Adds event listeners to all matching selectors for each given handler and registers their listeners into the listenerRegister
+ * Adds event listeners to all matching selectors for each given handler and registers their listeners into the activeListeners registry, removing them from backlogListeners if found.
  * @param {string} ev @param {Function[]} handlers @param {string|Node} target 
  */
 export function on(ev, target, ...handlers) {
@@ -270,7 +272,8 @@ export function on(ev, target, ...handlers) {
 }
 
 /**
- * Removes all event listeners from matching selectors
+ * Removes all event listeners from matching selectors and registers their listeners into the backlogListeners registry, removing them from activeListeners.
+ * This function only works for targets that where registered in activeListeners.
  * @param {string|Node} target 
  */
 export function off(target) {
@@ -294,7 +297,7 @@ export function off(target) {
  * Restores all event listeners from backlog for matching selectors
  * @param {string} selector 
  */
-export function restore(selector) {
+export function restoreListeners(selector) {
     findAll(selector).forEach(node => {
         const toRestore = backlogListeners.filter(o => o.node === node);
 
@@ -310,10 +313,10 @@ export function restore(selector) {
 }
 
 /**
- * Removes nodes from the DOM along with their listeners.
+ * Removes nodes matching target from the DOM along with their listeners.
  * @param {string|Node} target
  */
-export function remove(target, log = false) {
+export function removeNode(target, log = false) {
     const nodes = typeof target === 'string' ? findAll(target) : [target]
 
     nodes.forEach(node => {
