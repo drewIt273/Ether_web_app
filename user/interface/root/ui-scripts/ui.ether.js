@@ -43,9 +43,18 @@ class UIComponent {
 
     /**
      * @param {string} s 
+     * @returns {Node|null}
      */
     find(s) {
-        return isString(s) ? this.node.querySelector(s) : null
+        return (this.node.contains(find(s))) ? find(s) : null
+    }
+
+    /**
+     * Returns true if other is a descendent of this.
+     * @param {Node|string} other 
+     */
+    contains(other) {
+        return isNode(other) ? this.node.contains(other) : this.node.querySelector(other) ? !0 : !1
     }
 
     /**
