@@ -186,14 +186,58 @@ class UIComponent {
      * @param {"add"|"remove"|"toggle"} action 
      * @param {...string} tokens 
      */
-    class(action, ...tokens) {
-        tokens.forEach(token => {
-            switch (action) {
-                case 'add': this.node.classList.add(token); break;
-                case 'remove': this.node.classList.remove(token); break;
-                case 'toggle': this.node.classList.toggle(token); break;
-            }
-        })
+    classList(action, ...tokens) {
+        for (const token of tokens) {
+            this.node.classList[action]?.(token)
+        }
+        return this
+    }
+
+    /**
+     * Hides this node after a given timeout by setting a hidden attribute.
+     * @param {number} timeout 
+     */
+    hide(timeout = 0) {
+        setTimeout(() => setAttr(this.node, 'hidden', ''), timeout)
+        return this
+    }
+
+    /**
+     * Displays back this node if initially hidden.
+     * @param {number} timeout 
+     */
+    display(timeout = 0) {
+        if (hasAttr(this.node, 'hidden')) setTimeout(() => removeAttr(this.node, 'hidden'), timeout)
+        return this
+    }
+
+    /**
+     * Sets the pointer-events CSS property as an attribute to this node.
+     * @param {"all"|"none"} v 
+     */
+    pointerEvents(v) {
+        let a = (v === "all") ? 'all' : 'none'
+        setAttr(this.node, 'pointer-events', a)
+        return this
+    }
+
+    /**
+     * Executes a callback after a given timeout ones the DOM has fully loaded.
+     * @param {()} callback 
+     * @param {number} timeout 
+     */
+    DOMLoaded(callback, timeout = 0) {
+        on("DOMContentLoaded", document, () => {setTimeout(callback, timeout)})
+        return this
+    }
+
+    /**
+     * @param {string} ev @param {string|Node} target @param {...Function} handlers 
+     */
+    delegate(ev, target, ...handlers) {
+        handlers.forEach(handler => {
+            on(ev, target, handler)
+        }) 
         return this
     }
 
