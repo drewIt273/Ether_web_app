@@ -93,7 +93,15 @@ class UIComponent {
      * @returns {Node|null}
      */
     find(s) {
-        return (this.node.contains(find(s))) ? find(s) : null
+        return find(`${this.selector()} ${s}`)
+    }
+
+    /**
+     * 
+     * @param {string} s 
+     */
+    findAll(s) {
+        return findAll(`${this.selector()} ${s}`)
     }
 
     /**
