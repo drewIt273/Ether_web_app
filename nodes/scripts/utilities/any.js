@@ -40,11 +40,11 @@ export const $ran = (min, max) => Math.round(Math.random() * (max - min) + min)
  * @param {string} end 
  */
 export const ranstring = (length, end = '') => {
-    const chars = 'abcdefd1234567890';
-    let key, f = () => Array.from({length: 6}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-    key = Array.from({length: length}, () => f()).join('-')
+    const chars = 'abcdefd', vchars = chars + '1234567890';
+    let f = (s, c) => Array.from({length: c}, () => s[Math.floor(Math.random() * s.length)]).join(''), key = f(chars, 1);
+    key += Array.from({length: length}, () => f(vchars, 6)).join('-')
 
-    return (end.length) ? key += end : key
+    return (end.length) ? key += `-${end}` : key
 }
 
 /**
@@ -353,3 +353,5 @@ export function removeNode(target, log = false) {
             if (log) backlogNodes.write({node, in: 'backlog'})
     })
 }
+
+console.log($ran(3, 10), ranstring(3, 'domain'));
