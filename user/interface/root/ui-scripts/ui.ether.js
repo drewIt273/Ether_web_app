@@ -120,6 +120,32 @@ class UIComponent {
         return this
     }
 
+    /**
+     * 
+     * @param {string|{}} styleObjOrProp 
+     */
+    css(styleObjOrProp) {
+        const e = this.node
+        if (typeof styleObjOrProp === "string") {
+            return getComputedStyle(e).getPropertyValue(styleObjOrProp)
+        }
+
+        for (const key in styleObjOrProp) {
+            const v = styleObjOrProp[key];
+            if (strictObject(v)) {
+                const targets = document.querySelectorAll(`${this.selector()} ${key}`);
+                targets.forEach(target => {
+                    Object.assign(target.style, v)
+                })
+            }
+            else if (typeof v !== 'object') {
+                this.node.style[toKebab(key)] = v
+            }
+        }
+
+        return this
+    }
+
     attrs(obj = {}) {
         for (const [prop, val] of Object.entries(obj)) {
             setAttr(this.node, toKebab(prop), val)
