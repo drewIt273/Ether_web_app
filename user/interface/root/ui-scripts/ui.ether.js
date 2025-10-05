@@ -242,10 +242,13 @@ class UIComponent {
     }
 
     /**
-     * @param {string} ev @param {string|Node} target @param {Function} handler 
+     * Add event listeners to this node and writes them into the activeListeners registry.
+     * @param {string} ev @param  {...Function} handlers 
      */
-    delegate(ev, target, handler) {
-        on(ev, target, handler)
+    on(ev, ...handlers) {
+        handlers.forEach(handler => {
+            on(ev, this.node, handler)
+        }) 
         return this
     }
 
