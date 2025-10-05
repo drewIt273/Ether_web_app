@@ -174,6 +174,7 @@ class UIComponent {
         removeAttr(this.node, a)
         return this
     }
+
     /**
      * @param {string} attr @param {string} val 
      */
@@ -252,8 +253,15 @@ class UIComponent {
         return this
     }
 
-    on(ev, handler) {
-        on(ev, this.node, handler)
+    /**
+     * Removes event listeners from this node if no selector is given and writes them into the backlogListeners registry. Does same for all descendants matching selector if selector is given.
+     * @param {string} s selector
+     */
+    off(s = '') {
+        if (s === '' || undefined) off(this.node)
+        else if (typeof s === 'string') {
+            findAll(`${this.selector()} ${s}`).forEach(n => off(n))
+        }
         return this
     }
 }
