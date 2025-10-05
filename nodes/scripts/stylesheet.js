@@ -4,9 +4,17 @@
  * stylesheet.js
  */
 
-/** */
 import {toKebab} from "./utilities/any.js";
-export function stylesheet(style = {}, id = "css-js", overwrite = false) {
+
+class CSSConstructor {
+    constructor() {
+        this.sheet = document.createElement('style')
+    }
+}
+
+export const stylesheet = CSSConstructor
+
+export function sheet(style = {}, id = "css-js", overwrite = false) {
     const rules = [];
 
     const processblock = (selector, block) => {
