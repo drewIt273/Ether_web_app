@@ -50,6 +50,37 @@ class UIComponent {
     }
 
     /**
+     * Removes this node from it's parent and appends it into target as a new child of target.
+     * @param {Node | string} target 
+     */
+    appendTo(target) {
+        this.node.parentElement?.removeChild(this.node);
+        find(target)?.appendChild(this.node)
+        return this 
+    }
+
+    /**
+     * Removes this node if no value is set to n. Otherwise, removes all descendants of this node which matches selector n.
+     * @param {string} n 
+     */
+    remove(n = '') {
+        if (n === "" || undefined) {
+            removeNode(this.node)
+        }
+        else if (typeof n === "string") {
+            findAll(`${this.selector()} ${n}`).forEach(e => {
+                removeNode(e)
+            })
+        }
+        return this
+    }
+
+    empty() {
+        this.children.forEach(c => removeNode(c))
+        return this
+    }
+
+    /**
      * @param {(value: ChildNode, index: number, array: ChildNode[]) => void} callback 
      */
     forEach(callback) {
