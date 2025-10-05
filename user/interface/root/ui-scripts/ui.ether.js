@@ -26,6 +26,20 @@ class UIComponent {
     }
 
     /**
+     * Returns this node as a selector string that can be used later in searching this node using find, findAll, etc.
+     */
+    selector() {
+        let s = '', n = this.node, c = n.classList
+        if (n.id.length > 0) s += `#${n.id}`
+        if (c.length > 0) {
+            for (let i = 0; i < c.length; i++) {
+                s += `.${c.item(i)}`
+            }
+        }
+        return `${this.node.tagName.toLowerCase()}${s}`
+    }
+
+    /**
      * @param {...Node} nodes
      */
     append(...nodes) {
