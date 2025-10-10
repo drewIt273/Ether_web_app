@@ -122,6 +122,16 @@ export class Registry {
     }
 
     /**
+     * Returns the key of the specified value v if found in the registry.
+     * @param {any} v 
+     */
+    keyOf(v) {
+        for (const [k, a] of Object.entries(this.register)) {
+            if (v === a) return k
+        }
+    }
+
+    /**
      * Find first value where predicate returns true.
      * @param {(value: any, key: string) => boolean} predicate 
      */
@@ -354,4 +364,3 @@ export function removeNode(target, log = false) {
     })
 }
 
-console.log($ran(3, 10), ranstring(3, 'domain'));
