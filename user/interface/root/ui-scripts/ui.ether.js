@@ -116,14 +116,6 @@ class UIComponent {
     }
 
     /**
-     * @param {string|Node} parent 
-     */
-    mount(parent) {
-        (find(parent) || document.body).appendChild(this.node)
-        return this
-    }
-
-    /**
      * 
      * @param {string|{}} styleObjOrProp 
      */
