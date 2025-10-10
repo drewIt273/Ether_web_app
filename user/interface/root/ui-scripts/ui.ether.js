@@ -23,6 +23,14 @@ class UIComponent {
         }
     }
 
+    #registered0
+
+    #write = () => {
+        const O = {node: this.node, this: this}
+        if (this.node && !ActiveUIComponents.includesValue(O)) this.registeredKey = ActiveUIComponents.write(O)
+        this.#registered0 = O;
+    }
+
     get children() {
         return Array.from(this.node.childNodes)
     }
@@ -38,7 +46,7 @@ class UIComponent {
                 s += `.${c.item(i)}`
             }
         }
-        
+
         return `${this.node.tagName.toLowerCase()}${s}`
     }
 
