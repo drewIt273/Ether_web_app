@@ -38,7 +38,7 @@ class UIComponent {
     /**
      * Returns this node as a selector string that can be used later in searching this node using find, findAll, etc.
      */
-    selector() {
+    get selector() {
         let s = '', n = this.node, c = n.classList
         if (n.id.length > 0) s += `#${n.id}`
         if (c.length > 0) {
@@ -82,7 +82,7 @@ class UIComponent {
             ActiveUIComponents.remove(this.registeredKey)
         }
         else if (typeof n === "string") {
-            findAll(`${this.selector()} ${n}`).forEach(e => {
+            findAll(`${this.selector} ${n}`).forEach(e => {
                 removeNode(e)
             })
         }
@@ -107,7 +107,7 @@ class UIComponent {
      * @returns {Node|null}
      */
     find(s) {
-        return find(`${this.selector()} ${s}`)
+        return find(`${this.selector} ${s}`)
     }
 
     /**
@@ -115,7 +115,7 @@ class UIComponent {
      * @param {string} s 
      */
     findAll(s) {
-        return findAll(`${this.selector()} ${s}`)
+        return findAll(`${this.selector} ${s}`)
     }
 
     /**
@@ -139,7 +139,7 @@ class UIComponent {
         for (const key in styleObjOrProp) {
             const v = styleObjOrProp[key];
             if (strictObject(v)) {
-                const targets = document.querySelectorAll(`${this.selector()} ${key}`);
+                const targets = document.querySelectorAll(`${this.selector} ${key}`);
                 targets.forEach(target => {
                     Object.assign(target.style, v)
                 })
@@ -266,7 +266,7 @@ class UIComponent {
     off(s = '') {
         if (s === '' || undefined) off(this.node)
         else if (typeof s === 'string') {
-            findAll(`${this.selector()} ${s}`).forEach(n => off(n))
+            findAll(`${this.selector} ${s}`).forEach(n => off(n))
         }
         return this
     }
