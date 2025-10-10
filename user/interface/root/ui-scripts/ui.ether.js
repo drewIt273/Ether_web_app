@@ -4,7 +4,7 @@
  * ui.ether.js
  */
 
-import {isNode, isString, create, find, findAll, toKebab, setAttr, hasAttr, removeAttr, dataset, on, off, ranstring, strictObject, removeNode} from "../../../../nodes/scripts/utilities/any.js";
+import {isNode, isString, create, find, findAll, toKebab, setAttr, hasAttr, removeAttr, dataset, on, off, ranstring, strictObject, removeNode, setStyle} from "../../../../nodes/scripts/utilities/any.js";
 import {div} from "../../../../nodes/scripts/nodecreator.js";
 
 class UIComponent {
@@ -36,6 +36,7 @@ class UIComponent {
                 s += `.${c.item(i)}`
             }
         }
+        
         return `${this.node.tagName.toLowerCase()}${s}`
     }
 
@@ -262,6 +263,76 @@ class UIComponent {
         else if (typeof s === 'string') {
             findAll(`${this.selector()} ${s}`).forEach(n => off(n))
         }
+        return this
+    }
+
+    /**
+     * 
+     * @param {Function} callback @param {number} duration 
+     */
+    fadeIn(callback, duration = 400) {
+        const computed = getComputedStyle(this.node);
+        if (computed.display !== "none" || computed.opacity === 1) {
+            if (callback) callback.call(this.node);
+            return;
+        }
+        if (!this.node._fadeOriginalDisplay)
+            this.node._fadeOriginalDisplay = computed.display === "none" ? "block" : computed.display
+
+        setStyle(this.node, 'opacity', 0); setStyle(this.node, 'display', this.node._fadeOriginalDisplay); setStyle(this.node, 'transition', `opacity ${duration}ms ease`);
+
+        this.node.offsetWidth;
+
+        const handler = () => {
+            this.node.style.transition = '';
+            this.node.removeEventListener("transitionend", handler)
+            if (callback) callback.call(this.node)
+        }
+
+        this.node.addEventListener("transitionend", handler)
+
+        return this
+    }
+
+    /**
+     * 
+     * @param {Function} callback @param {number} duration 
+     */
+    fadeOut(callback, duration = 400) {
+        const computed = getComputedStyle(this.node);
+        if (computed.display === 'none') {
+            if (callback) callback.call(this.node)
+            return;
+        }
+
+        setStyle(this.node, 'transition', `opacity ${duration}ms ease`); setStyle(this.node, 'opacity', 1);
+
+        this.node.offsetWidth; this.node.style.opacity = 0;
+
+        const handler = (e) => {
+            if (e.propertyName !== 'opacity') return;
+            this.node.style.transition = ''; this.node.style.display = 'none';
+            this.node.removeEventListener('transitionend', handler);
+            if (callback) callback.call(this.node)
+        }
+
+        this.node.addEventListener('transitionend', handler)
+
+        return this
+    }
+
+    /**
+     * 
+     * @param {Function} callback @param {number} duration 
+     */
+    fadeToggle(callback, duration = 400) {
+        const computed = getComputedStyle(this.node);
+        if (computed.display === 'none' || computed.opacity === 0) {
+            this.fadeIn.call({node: this.node}, callback, duration)
+        } else {
+            this.fadeOut.call({node: this.node}, callback, duration)
+        }
+
         return this
     }
 }
