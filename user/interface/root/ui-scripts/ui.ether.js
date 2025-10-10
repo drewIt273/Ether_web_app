@@ -66,25 +66,37 @@ class UIComponent {
      */
     appendTo(target) {
         this.node.parentElement?.removeChild(this.node);
-        find(target)?.appendChild(this.node)
-        this.#write()
+        this.mount(target)
 
         return this 
     }
 
     /**
-     * Removes this node if no value is set to n. Otherwise, removes all descendants of this node which matches selector n.
+     * Mounts this by appending it into target and registering it into ActiveUIComponents.
+     * @param {Node | string} target 
+     */
+    mount(target) {
+        find(target)?.appendChild(this.node)
+        this.#write()
+        return this
+    }
+
+    /**
+     * Unmounts this by removing it from the DOM and from the ActiveUIComponents registry.
+     */
+    unmount() {
+        removeNode(this.node)
+        ActiveUIComponents.remove(this.registeredKey)
+        return this
+    }
+
+    /**
+     * Removes all descendants of this node which matches n if n is a string.
      * @param {string} n 
      */
-    remove(n = '') {
-        if (n === "" || undefined) {
-            removeNode(this.node)
-            ActiveUIComponents.remove(this.registeredKey)
-        }
-        else if (typeof n === "string") {
-            findAll(`${this.selector} ${n}`).forEach(e => {
-                removeNode(e)
-            })
+    remove(n) {
+        if (typeof n === "string") {
+            findAll(`${this.selector} ${n}`).forEach(e => removeNode(e))
         }
         return this
     }
