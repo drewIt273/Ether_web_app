@@ -67,6 +67,8 @@ class UIComponent {
     appendTo(target) {
         this.node.parentElement?.removeChild(this.node);
         find(target)?.appendChild(this.node)
+        this.#write()
+
         return this 
     }
 
@@ -77,6 +79,7 @@ class UIComponent {
     remove(n = '') {
         if (n === "" || undefined) {
             removeNode(this.node)
+            ActiveUIComponents.remove(this.registeredKey)
         }
         else if (typeof n === "string") {
             findAll(`${this.selector()} ${n}`).forEach(e => {
