@@ -291,7 +291,7 @@ class query$ {
         return this
     }
 
-    fadeIn(duration = 400, callback) {
+    fadeIn(callback, duration = 400) {
         this.nodes.forEach(node => {
             
             // Ignore if already visible an opacity is 1
@@ -325,7 +325,7 @@ class query$ {
         return this
     }
 
-    fadeOut(duration = 400, callback) {
+    fadeOut(callback, duration = 400) {
         this.nodes.forEach(node => {
             const computed = getComputedStyle(node);
             if (computed.display === 'none') {
@@ -358,7 +358,7 @@ class query$ {
         return this;
     }
 
-    fadeToggle(duration = 400, callback) {
+    fadeToggle(callback, duration = 400) {
         this.nodes.forEach(node => {
             const computed = getComputedStyle(node);
             if (computed.display === 'none' || computed.opacity === 0) {
