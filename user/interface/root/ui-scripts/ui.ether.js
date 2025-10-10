@@ -51,11 +51,11 @@ class UIComponent {
     }
 
     /**
-     * @param {...Node} nodes
+     * @param {...Node|UIComponent} nodes
      */
     append(...nodes) {
         nodes.forEach(n => {
-            if (n instanceof Node) this.node.appendChild(n)
+            isNode(n) ? this.node.appendChild(n) : n instanceof UIComponent ? this.node.appendChild(n.node) : this.append(new div)
         })
         return this
     }
