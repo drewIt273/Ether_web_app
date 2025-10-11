@@ -92,13 +92,12 @@ class UIComponent {
     }
 
     /**
-     * Removes all descendants of this node which matches n if n is a string.
-     * @param {string} n 
+     * Removes all descendants of this node which matches n.
+     * @param {string|Node} n 
      */
     remove(n) {
-        if (typeof n === "string") {
-            findAll(`${this.selector} ${n}`).forEach(e => removeNode(e))
-        }
+        if (typeof n === 'string') removeNode(`${this.selector} ${n}`)
+        else if (isNode(n)) removeNode(n)
         return this
     }
 
