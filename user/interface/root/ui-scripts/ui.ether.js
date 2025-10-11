@@ -276,7 +276,7 @@ class UIComponent {
      * @param {string} s selector
      */
     off(s = '') {
-        if (s === '' || undefined) off(this.node)
+        if (!s) off(this.node)
         else if (typeof s === 'string') {
             findAll(`${this.selector} ${s}`).forEach(n => off(n))
         }
