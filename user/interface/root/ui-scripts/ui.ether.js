@@ -78,6 +78,7 @@ class UIComponent {
     mount(target) {
         find(target)?.appendChild(this.node)
         this.#write()
+        if (typeof this.init === 'function') this.init()
         return this
     }
 
