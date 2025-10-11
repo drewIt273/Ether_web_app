@@ -217,6 +217,10 @@ export class Registry {
         return Object.keys(this.register).length
     }
 
+    get values() {
+        return Object.values(this.register)
+    }
+
     /**
      * Clear all enteries
      */
