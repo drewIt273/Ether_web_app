@@ -108,11 +108,13 @@ class UIComponent {
 
     /**
      * Updates the content of one or more descendant nodes of this UIComponent.
-     * @param {string|Node} target @param {{append?: Node|Node[], content?: string, replace?: Node|Node[], render?: Boolean|[Boolean, Function]}} options 
+     * @param {string|Node} target Can be a node or a string. Can take a special character, '$' which refers to this UIComponent's root node.
+     * @param {{append?: Node|Node[], content?: string, replace?: Node|Node[], render?: Boolean|[Boolean, Function]}} options 
      */
     update(target, options) {
         let nodes;
-        if (isNode(target)) {
+        if (target === '$') nodes = [this.node]
+        else if (isNode(target)) {
             if (!this.node.contains(target)) return undefined
             nodes = [target]
         }
