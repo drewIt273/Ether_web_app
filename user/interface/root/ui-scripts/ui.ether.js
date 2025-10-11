@@ -4,7 +4,7 @@
  * ui.ether.js
  */
 
-import {isNode, isString, create, find, findAll, toKebab, setAttr, hasAttr, removeAttr, dataset, on, off, ranstring, strictObject, removeNode, setStyle, Registry} from "../../../../nodes/scripts/utilities/any.js";
+import {isNode, isString, create, find, findAll, toKebab, setAttr, hasAttr, removeAttr, dataset, on, off, ranstring, strictObject, removeNode, setStyle, Registry, isArray} from "../../../../nodes/scripts/utilities/any.js";
 import {div} from "../../../../nodes/scripts/nodecreator.js";
 
 export const ActiveUIComponents = new Registry;
