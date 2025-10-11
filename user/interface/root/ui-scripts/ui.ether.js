@@ -96,13 +96,61 @@ class UIComponent {
      * @param {string|Node} n 
      */
     remove(n) {
-        if (typeof n === 'string') removeNode(`${this.selector} ${n}`)
+        if (isString(n)) removeNode(`${this.selector} ${n}`)
         else if (isNode(n)) removeNode(n)
         return this
     }
 
     empty() {
         this.children.forEach(c => removeNode(c))
+        return this
+    }
+
+    /**
+     * Updates the content of one or more descendant nodes of this UIComponent.
+     * @param {string|Node} target @param {{append?: Node|Node[], content?: string, replace?: Node|Node[]}} options 
+     */
+    update(target, options) {
+        let nodes;
+        if (isNode(target)) {
+            if (!this.node.contains(target)) return undefined
+            nodes = [target]
+        }
+        else if (isString(target)) {
+            nodes = this.findAll(target)
+            if (!nodes.length) return undefined
+        }
+        else return undefined
+
+        const allowed = ['append', 'content', 'replace'];
+
+        for (const key of allowed) {
+
+            if (!(key in options)) continue;
+            const value = options[key];
+
+            switch (key) {
+                case allowed[0]:
+                    nodes.forEach(n => {
+                        isArray(value) ? value.forEach(v => n.appendChild(v)) : n.appendChild(value)
+                    })
+                    break;
+
+                case allowed[1]:
+                    nodes.forEach(n => n.textContent = String(value))
+                    break;
+
+                case allowed[2]:
+                    nodes.forEach(n => {
+                        const parent = n.parentNode;
+                        if (!parent) return;
+                        isArray(value) ? value.forEach(v => parent.insertBefore(v, n)) : parent.insertBefore(value, n)
+                        parent.removeChild(n)
+                    })
+                    break;
+            }
+        }
+
         return this
     }
 
