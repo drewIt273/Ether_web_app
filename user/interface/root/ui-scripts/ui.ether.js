@@ -108,7 +108,7 @@ class UIComponent {
 
     /**
      * Updates the content of one or more descendant nodes of this UIComponent.
-     * @param {string|Node} target @param {{append?: Node|Node[], content?: string, replace?: Node|Node[]}} options 
+     * @param {string|Node} target @param {{append?: Node|Node[], content?: string, replace?: Node|Node[], render?: Boolean|[Boolean, Function]}} options 
      */
     update(target, options) {
         let nodes;
@@ -122,7 +122,7 @@ class UIComponent {
         }
         else return undefined
 
-        const allowed = ['append', 'content', 'replace'];
+        const allowed = ['append', 'content', 'replace', 'render'];
 
         for (const key of allowed) {
 
@@ -146,6 +146,30 @@ class UIComponent {
                         if (!parent) return;
                         isArray(value) ? value.forEach(v => parent.insertBefore(v, n)) : parent.insertBefore(value, n)
                         parent.removeChild(n)
+                    })
+                    break;
+                
+                case allowed[3]:
+                    nodes.forEach(n => {
+                        const parent = n.parentNode;
+                        if (!parent) return;
+
+                        let shouldRender, callback;
+                        if (isArray(value)) {
+                            shouldRender = Boolean(value[0]);
+                            callback = typeof value[1] === 'function' ? value[1] : null
+                        }
+                        else {
+                            shouldRender = Boolean(value)
+                        }
+
+                        if (shouldRender) {
+                            if (!parent.contains(n)) parent.appendChild(n)
+                            if (callback) callback()
+                        }
+                        else {
+                            if (parent.contains(n)) parent.removeChild(n)
+                        }
                     })
                     break;
             }
