@@ -27,7 +27,7 @@ class UIComponent {
 
     #write = () => {
         const O = {node: this.node, this: this}
-        if (this.node && !ActiveUIComponents.includesValue(O)) this.registeredKey = ActiveUIComponents.write(O)
+        if (!ActiveUIComponents.values.some(v => v.node ===  this.node)) this.registeredKey = ActiveUIComponents.write(O)
         this.#registered0 = O;
     }
 
