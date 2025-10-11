@@ -246,7 +246,7 @@ class UIComponent {
      * @param {number} timeout 
      */
     DOMLoaded(callback, timeout = 0) {
-        on("DOMContentLoaded", document, () => {setTimeout(callback, timeout)})
+        (document.readyState === "complete") ? setTimeout(callback, timeout) : on("DOMContentLoaded", document, () => {setTimeout(callback, timeout)})
         return this
     }
 
