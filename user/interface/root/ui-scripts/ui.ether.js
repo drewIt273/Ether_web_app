@@ -14,7 +14,7 @@ class UIComponent {
     /**
      * @param {string|HTMLElement} node @param {HTMLElement[]} append 
      */
-    constructor(node, append = []) {
+    constructor(node, ...append) {
         this.node = isString(node) ? create(node) : isNode(node) ? node : new div
         this.ID = ranstring(1)
         this.innerHTML = this.node.innerHTML
@@ -24,6 +24,8 @@ class UIComponent {
     }
 
     #registered0
+
+    #states = {}
 
     #write = () => {
         const O = {node: this.node, this: this}
@@ -103,6 +105,17 @@ class UIComponent {
 
     empty() {
         this.children.forEach(c => removeNode(c))
+        return this
+    }
+
+    /**
+     * Define a new state and its behavior.
+     * @param {'active'|'inactive'|'enable'|'disable'} state 
+     * @param {()} handler 
+     */
+    defineState(state, handler) {
+        if (!isString(state) || typeof handler !== 'function') return this
+        this.#states[state] = handler
         return this
     }
 
