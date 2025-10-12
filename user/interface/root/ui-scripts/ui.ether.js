@@ -479,4 +479,14 @@ class UIComponent {
 
         return this
     }
+
+    /**
+     * Caution. Use only for permanently removing the UIComponent.
+     */
+    destroy() {
+        this.unmount().off().node = null
+        this.#states = {}
+        this.#onstatechange = null
+        return this
+    }
 }
