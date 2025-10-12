@@ -384,6 +384,16 @@ class UIComponent {
         return this
     }
 
+    focus() {
+        this.node.focus()
+        return this
+    }
+
+    blur() {
+        this.node.blur()
+        return this
+    }
+
     /**
      * Sets the pointer-events CSS property as an attribute to this node.
      * @param {"all"|"none"} v 
