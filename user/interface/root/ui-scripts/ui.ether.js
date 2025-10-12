@@ -345,6 +345,17 @@ class UIComponent {
     }
 
     /**
+     * Set aria attributes for accessibility.
+     * @param {{}} attrs 
+     */
+    ariaset(attrs) {
+        for (const [key, val] of Object.entries(attrs)) {
+            setAttr(this.node, `aria-${key}`, String(v))
+        }
+        return this
+    }
+
+    /**
      * @param {"add"|"remove"|"toggle"} action 
      * @param {...string} tokens 
      */
