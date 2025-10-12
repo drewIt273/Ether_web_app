@@ -27,6 +27,8 @@ class UIComponent {
 
     #states = {}
 
+    #currentstate = null
+
     #write = () => {
         const O = {node: this.node, this: this}
         if (!ActiveUIComponents.values.some(v => v.node ===  this.node)) this.registeredKey = ActiveUIComponents.write(O)
@@ -50,6 +52,14 @@ class UIComponent {
         }
 
         return `${this.node.tagName.toLowerCase()}${s}`
+    }
+
+    /**
+     * Get the currently active state name.
+     * @returns {string|null}
+     */
+    get state() {
+        return this.#currentstate
     }
 
     /**
@@ -111,11 +121,26 @@ class UIComponent {
     /**
      * Define a new state and its behavior.
      * @param {'active'|'inactive'|'enable'|'disable'} state 
-     * @param {()} handler 
+     * @param {(this: Node)} handler 
      */
     defineState(state, handler) {
         if (!isString(state) || typeof handler !== 'function') return this
         this.#states[state] = handler
+        return this
+    }
+
+    /**
+     * Set (or trigger) a defined state.
+     * @param {'active'|'inactive'|'enable'|'disable'} state 
+     */
+    setState(state) {
+        if (!(state in this.#states)) {
+            console.warn(`State "${state}" not defined for component`, this);
+            return this
+        }
+        this.#currentstate = state
+        this.#states[state].call(this, this.node)
+
         return this
     }
 
