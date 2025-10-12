@@ -24,9 +24,9 @@ class UIComponent {
     }
 
     #registered0
+    #onstatechange
 
     #states = {}
-
     #currentstate = null
 
     #write = () => {
@@ -141,6 +141,21 @@ class UIComponent {
         this.#currentstate = state
         this.#states[state].call(this, this.node)
 
+        if (this.#onstatechange) this.#onstatechange.call(this, state, this.node)
+
+        return this
+    }
+
+    hasState(s) {
+        return s in this.#states
+    }
+
+    /**
+     * Register a callback for when the component's state changes.
+     * @param {(state: string, this: Node) => void} callback 
+     */
+    onStateChange(callback) {
+        (typeof callback === 'function') ? this.#onstatechange = callback : console.warn('onStateChange expects a function callback.')
         return this
     }
 
