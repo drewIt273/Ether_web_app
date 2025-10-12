@@ -90,6 +90,7 @@ class UIComponent {
     mount(target) {
         find(target)?.appendChild(this.node)
         this.#write()
+        this.#children.forEach(c => c.mount(this.node));
         if (typeof this.init === 'function') this.init()
         return this
     }
@@ -98,8 +99,23 @@ class UIComponent {
      * Unmounts this by removing it from the DOM and from the ActiveUIComponents registry.
      */
     unmount() {
+        this.#children.forEach(c => c.unmount());
         removeNode(this.node)
         ActiveUIComponents.remove(this.registeredKey)
+        return this
+    }
+
+    /**
+     * Appends one or more child UIComponents.
+     * @param  {...UIComponent} comps 
+     */
+    compose(...comps) {
+        comps.forEach(c => {
+            if (c instanceof UIComponent) {
+                this.#children.push(c)
+                this.node.appendChild(c.node)
+            }
+        })
         return this
     }
 
@@ -487,6 +503,7 @@ class UIComponent {
         this.unmount().off().node = null
         this.#states = {}
         this.#onstatechange = null
+        this.#children.forEach(c => c.destroy())
         return this
     }
 }
