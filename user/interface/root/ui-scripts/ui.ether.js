@@ -25,9 +25,9 @@ class UIComponent {
 
     #registered0
     #onstatechange
-
     #states = {}
     #currentstate = null
+    #children = []
 
     #write = () => {
         const O = {node: this.node, this: this}
