@@ -6,6 +6,7 @@
 
 import {isNode, isString, create, find, findAll, toKebab, setAttr, hasAttr, removeAttr, dataset, on, off, ranstring, strictObject, removeNode, setStyle, Registry, isArray} from "../../../../nodes/scripts/utilities/any.js";
 import {div} from "../../../../nodes/scripts/nodecreator.js";
+import {stylesheet} from "../../../../nodes/scripts/stylesheet.js";
 
 export const ActiveUIComponents = new Registry;
 
@@ -16,11 +17,13 @@ class UIComponent {
      */
     constructor(node, ...append) {
         this.node = isString(node) ? create(node) : isNode(node) ? node : new div
-        this.ID = ranstring(1)
+        this.ID = ranstring(4, 1)
         this.innerHTML = this.node.innerHTML
         for (const e of append) {
             this.node.appendChild(e)
         }
+        this.node.setAttribute('ui-component-id', this.ID)
+        this.#sheet.base = `[ui-component-id="${this.ID}"]`
     }
 
     #registered0
@@ -28,6 +31,7 @@ class UIComponent {
     #states = {}
     #currentstate = null
     #children = []
+    #sheet = new stylesheet
 
     #write = () => {
         const O = {node: this.node, this: this}
