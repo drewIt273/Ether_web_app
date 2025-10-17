@@ -4,11 +4,78 @@
  * stylesheet.js
  */
 
-import {toKebab} from "./utilities/any.js";
+import {isString, strictObject, toKebab} from "./utilities/any.js";
 
 class CSSConstructor {
     constructor() {
         this.sheet = document.createElement('style')
+    }
+
+    #base = ''
+    #declarations = []
+    #processBlock(selector, block) {
+        const decls = []
+        for (const prop in block) {
+            const value = block[prop]
+
+            // Nested selector (like ".parent": { ".child": {...} })
+                if (strictObject(value)) {
+                    let ch = prop.startsWith('&') ? prop.replace('&', selector) : `${selector} ${prop}`.trim()
+                    this.#processBlock(ch, value)
+                    continue
+                }
+
+            // Convert property names to kebab-case
+                if (isString(value) || typeof value === 'number') {
+                    decls.push(`${toKebab(prop)}: ${value}`)
+                }
+        }
+
+            // Only push if the block has at least one property
+                if (decls.length) this.#declarations.push(`${selector} {${decls.join('; ')};}`);
+    }
+
+    /**
+     * Sets the string selector that prefixes all rules.
+     * @param {string} s 
+     */
+    set base(s) {
+        this.#base = s
+    }
+
+    /**
+     * Optional: sets the style tag id.
+     * @param {string} i 
+     */
+    set id(i) {
+        this.sheet.id = i
+    }
+
+    /**
+     * Generates CSS text from an object and writes it to the style tag.
+     * @param {{}} o 
+     */
+    set CSS(o) {
+        this.#declarations = []
+        for (const [selector, block] of Object.entries(o)) {
+            const fs = this.#base ? `${this.#base} ${selector}`.trim() : selector
+            this.#processBlock(fs, block)
+        }
+        this.sheet.innerHTML = this.#declarations.join('\n');
+    }
+
+    /**
+     * Appends this stylesheet into the document head.
+     */
+    append() {
+        !this.sheet.isConnected ? document.head.append(this.sheet) : null
+    }
+
+    /**
+     * Removes this stylesheet from the document.
+     */
+    remove() {
+        this.sheet.isConnected ? this.sheet.remove() : null
     }
 }
 
