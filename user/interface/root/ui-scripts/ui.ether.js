@@ -67,6 +67,14 @@ class UIComponent {
     }
 
     /**
+     * @param {{}} o 
+     */
+    set CSS(o) {
+        this.#sheet.CSS = o
+        this.#sheet.append()
+    }
+
+    /**
      * @param {...Node|UIComponent} nodes
      */
     append(...nodes) {
