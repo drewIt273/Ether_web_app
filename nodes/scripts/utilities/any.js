@@ -35,14 +35,15 @@ export const hasAttr = (e, a) => e.hasAttribute(a)
 export const $ran = (min, max) => Math.round(Math.random() * (max - min) + min)
 
 /**
- * 
- * @param {number} length 
- * @param {string} end 
+ * Returns a random string whose length is specified.
+ * @param {number} length The length of each string block.
+ * @param {number} count The number of string blocks seperated with '-'.
+ * @param {string} end The optional string to be added at the end.
  */
-export const ranstring = (length, end = '') => {
+export const ranstring = (length, count, end = '') => {
     const chars = 'abcdefd', vchars = chars + '1234567890';
     let f = (s, c) => Array.from({length: c}, () => s[Math.floor(Math.random() * s.length)]).join(''), key = f(chars, 1);
-    key += Array.from({length: length}, () => f(vchars, 6)).join('-')
+    key += Array.from({length: count}, () => f(vchars, length)).join('-')
 
     return (end.length) ? key += `-${end}` : key
 }
@@ -367,4 +368,3 @@ export function removeNode(target, log = false) {
             if (log) backlogNodes.write({node, in: 'backlog'})
     })
 }
-
