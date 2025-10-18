@@ -6,7 +6,7 @@
 
 import {isString, strictObject, toKebab} from "./utilities/any.js";
 
-class CSSConstructor {
+class StylesheetConstructor {
     constructor() {
         this.sheet = document.createElement('style')
     }
@@ -79,7 +79,7 @@ class CSSConstructor {
     }
 }
 
-export const stylesheet = CSSConstructor
+export const stylesheet = StylesheetConstructor
 
 export function sheet(style = {}, id = "css-js", overwrite = false) {
     const rules = [];
