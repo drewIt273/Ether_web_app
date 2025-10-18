@@ -58,10 +58,10 @@ class StylesheetConstructor {
     set CSS(o) {
         this.#declarations = []
         for (const [selector, block] of Object.entries(o)) {
-            const fs = this.#base ? `${this.#base} ${selector}`.trim() : selector
+            const fs = this.#base ? `${this.#base} ${selector === '&' ? '' : selector}`.trim() : selector
             this.#processBlock(fs, block)
         }
-        this.sheet.innerHTML = this.#declarations.join('\n');
+        this.sheet.innerHTML += this.#declarations.join('\n');
     }
 
     /**
