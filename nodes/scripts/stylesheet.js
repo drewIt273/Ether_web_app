@@ -77,6 +77,15 @@ class StylesheetConstructor {
     remove() {
         this.sheet.isConnected ? this.sheet.remove() : null
     }
+
+    /**
+     * Overwrites the stylesheet with the object o.
+     * @param {{}} o 
+     */
+    overwrite(o) {
+        this.sheet.innerHTML = ''
+        this.CSS = o
+    }
 }
 
 export const stylesheet = StylesheetConstructor
