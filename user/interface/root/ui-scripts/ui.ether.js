@@ -10,7 +10,7 @@ import {stylesheet} from "../../../../nodes/scripts/stylesheet.js";
 
 export const ActiveUIComponents = new Registry;
 
-class UIComponent {
+export class UIComponent {
 
     /**
      * @param {string|HTMLElement} node @param {HTMLElement[]} append 
@@ -174,6 +174,10 @@ class UIComponent {
         return this
     }
 
+    /**
+     * Returns true if s was defined as a state of this UIComponent.
+     * @param {string} s 
+     */
     hasState(s) {
         return s in this.#states
     }
