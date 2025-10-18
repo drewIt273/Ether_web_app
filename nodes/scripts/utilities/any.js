@@ -262,8 +262,6 @@ export const setAttr = (e, a, v) => e.setAttribute(a, v)
  */
 export const removeAttr = (e, a) => hasAttr(e, a) ? e.removeAttribute(a) : null
 
-export const web_app = find('web-app')
-
 /**
  * Removes event listeners from nodes in the DOM
  * @param {NodeListOf<Node>} nodes should be a query result @param {string} ev @param {Function} handler 
@@ -368,3 +366,10 @@ export function removeNode(target, log = false) {
             if (log) backlogNodes.write({node, in: 'backlog'})
     })
 }
+
+// CSS Helpers
+
+/**
+ * @param {string} v 
+ */
+export const cvar = v => `var(--${toKebab(v)})`, px = n => `${n}px`, dvh = n => `${n}dvh`
