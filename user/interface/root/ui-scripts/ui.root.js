@@ -542,6 +542,7 @@ export class UIComponent {
         this.#states = {}
         this.#onstatechange = null
         this.#children.forEach(c => c.destroy())
+        this.#sheet.remove()
         return this
     }
 }
