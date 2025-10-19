@@ -33,6 +33,7 @@ export class UIComponent {
     #currentstate = null
     #children = []
     #sheet = new stylesheet
+    #keybinds = []
 
     #write = () => {
         const O = {node: this.node, this: this}
@@ -534,6 +535,54 @@ export class UIComponent {
         return this
     }
 
+    /**
+     * Executes a handler function when the keys are fired (e.g ctrl + P) to a node descendant of this UIComponent if given. Otherwise, this UIComponent.
+     * @param {string} keys The key or keys to be pressed joined with a '+'.
+     * @param {(this: this, e: KeyboardEvent)} handler The Function to be fired.
+     * @param {string|Node} node The node targeted if set.
+     */
+    keybind(keys, handler, node = '', global = false) {
+        if (!isString(keys) || typeof handler !== 'function') return this
+
+        let targetNode  = isString(node) ? this.find(node) : isNode(node) ? node : this.node
+
+        // Normalize key string: "ctrl + shift + p" -> ['ctrl', 'shift', 'p']
+            const keyParts = keys.toLowerCase().split('+').map(k => k.trim());
+
+        const listener = e => {
+            const ctrl = keyParts.includes('ctrl') ? e.ctrlKey : true;
+            const shift = keyParts.includes('shift') ? e.shiftKey : true;
+            const alt = keyParts.includes('alt') ? e.altKey : true;
+            const meta = keyParts.includes('meta') ? e.metaKey : true;
+            const mainKey = keyParts.find(k => !['ctrl','shift','alt','meta'].includes(k));
+            if (ctrl && shift && alt && meta && e.key.toLowerCase() === mainKey) {
+                e.preventDefault();
+                handler.call(this, e);
+            }    
+        }
+
+        global ? on('keydown', document, listener) : on('keydown', targetNode, listener)
+
+        this.#keybinds.push({keys, handler, listener, node: targetNode, global: global})
+
+        return this
+    }
+
+    /**
+     * 
+     * @param {string|Node} node 
+     */
+    unbindkeys(node = '') {
+        let target = isString(node) ? this.find(node) : isNode(node) ? node : null
+        this.#keybinds = this.#keybinds.filter(k => {
+            if (k.node === target) {
+                off(target)
+            }
+        })
+
+        return this
+    }
+    
     /**
      * Caution. Use only for permanently removing the UIComponent.
      */
