@@ -47,7 +47,7 @@ const v24 = {
     strokeWidth: 1.5
 }
 
-const vector = {
+export const vector = {
     app: {
         blocks: jsx('app-vector', {
             append: [
