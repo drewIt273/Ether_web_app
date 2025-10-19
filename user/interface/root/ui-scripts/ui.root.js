@@ -24,6 +24,7 @@ export class UIComponent {
         }
         this.node.setAttribute('ui-component-id', this.ID)
         this.#sheet.base = `[ui-component-id="${this.ID}"]`
+        this.#sheet.id = this.ID
     }
 
     #registered0
