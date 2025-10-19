@@ -58,7 +58,7 @@ class StylesheetConstructor {
     set CSS(o) {
         this.#declarations = []
         for (const [selector, block] of Object.entries(o)) {
-            const fs = this.#base ? `${this.#base} ${selector === '&' ? '' : selector}`.trim() : selector
+            const fs = this.#base ? (selector === '&' ? `${this.#base}` : selector.startsWith('&') ? `${this.#base}${selector.replace('&', '')}` : `${this.#base} ${selector}`) : selector
             this.#processBlock(fs, block)
         }
         this.sheet.innerHTML += this.#declarations.join('\n');
