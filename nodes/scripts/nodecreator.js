@@ -6,6 +6,7 @@
  */
 
 import {toKebab, isNode} from "./utilities/any.js";
+import {on} from "./utilities/any.js";
 
 const SVG_NAMESPACE = `http://www.w3.org/2000/svg`;
 const SVG_TAGS = new Set(["svg", "g", "rect", "path", "circle", "line", "polyline", "polygon", "ellipse", "text", "defs", "use", "mask", "clipPath", "linearGradient", "radialGradient", "stop"]);
@@ -20,8 +21,12 @@ function createFromSpec(spec) {
     return jsx(spec.tag, spec)
 }
 
+/**
+ * 
+ * @param {string} tag 
+ * @param {{class: string, id: string, style: {}|string, innerHTML: string, textContent: string, append: Node[], on: Function, attrs: {}}} props 
+ */
 export function jsx(tag = "div", props = {}) {
-    if (!tag) tag = "div"
 
     // Create elements with SVG namespace when appropriate
         const useNS = SVG_TAGS.has(tag)
@@ -88,7 +93,7 @@ export function jsx(tag = "div", props = {}) {
         // Event listeners onClick -> click
             if (/^on[A-Z]/.test(key) && typeof value === "function") {
                 const ev = key.slice(2).toLowerCase()
-                E.addEventListener(ev, value)
+                on(ev, E, value)
                 continue;
             }
 
