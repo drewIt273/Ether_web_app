@@ -4,11 +4,11 @@
  * stylesheet.js
  */
 
-import {isString, strictObject, toKebab} from "./utilities/any.js";
+import {isString, strictObject, toKebab, create} from "./utilities/any.js";
 
 class StylesheetConstructor {
     constructor() {
-        this.sheet = document.createElement('style')
+        this.sheet = create('style')
     }
 
     #base = ''
