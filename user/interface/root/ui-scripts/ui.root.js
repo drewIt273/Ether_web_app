@@ -36,8 +36,8 @@ export class UIComponent {
     #keybinds = []
 
     #write = () => {
-        const O = {node: this.node, this: this}
-        if (!ActiveUIComponents.values.some(v => v.node ===  this.node)) this.registeredKey = ActiveUIComponents.write(O)
+        const O = {componentId: this.ID, node: this.node, constructor: this}
+        if (!ActiveUIComponents.values.some(v => v.node === this.node)) this.registeredKey = ActiveUIComponents.write(O)
         this.#registered0 = O;
     }
 
@@ -56,6 +56,7 @@ export class UIComponent {
                 s += `.${c.item(i)}`
             }
         }
+        s += `[ui-component-id="${this.ID}"]`
 
         return `${this.node.tagName.toLowerCase()}${s}`
     }
@@ -444,11 +445,11 @@ export class UIComponent {
 
     /**
      * Add event listeners to this node and writes them into the activeListeners registry.
-     * @param {string} ev @param  {...Function} handlers 
+     * @param {string} ev @param  {...(node: Node)} handlers 
      */
     on(ev, ...handlers) {
         handlers.forEach(handler => {
-            on(ev, this.node, handler)
+            on(ev, this.node, handler.call(this, this.node))
         }) 
         return this
     }
@@ -549,6 +550,7 @@ export class UIComponent {
         // Normalize key string: "ctrl + shift + p" -> ['ctrl', 'shift', 'p']
             const keyParts = keys.toLowerCase().split('+').map(k => k.trim());
 
+        /** @param {KeyboardEvent} e */
         const listener = e => {
             const ctrl = keyParts.includes('ctrl') ? e.ctrlKey : true;
             const shift = keyParts.includes('shift') ? e.shiftKey : true;
