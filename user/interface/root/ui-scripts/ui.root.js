@@ -9,6 +9,7 @@ import {div} from "../../../../nodes/scripts/nodecreator.js";
 import {stylesheet} from "../../../../nodes/scripts/stylesheet.js";
 
 export const ActiveUIComponents = new Registry;
+export const ActiveUICells = new Registry;
 
 export class UICell {
 
@@ -18,11 +19,17 @@ export class UICell {
     constructor(node) {
         this.node = isString(node) ? create(node) : isNode(node) ? node : new div
         this.classList = this.node.classList
-        this.className = this.node.className
         this.textContent = this.node.textContent
         this.childNodes = this.node.childNodes
         this.parent = this.node.parentNode
-        this.id = this.node.id
+        this.ID = ranstring(4, 1)
+        this.registeredKey = ActiveUICells.write({node: this.node, id: this.ID, mounted: false})
+        this.attrs({'ui-cell-id': this.ID})
+    }
+
+    /** @param {string} s */
+    set className(s) {
+        this.node.className = s
     }
 
     /**
@@ -31,7 +38,7 @@ export class UICell {
      */
     attrs(o) {
         for (const [k, v] of Object.entries(o)) {
-            this.node.setAttribute(k, String(v))
+            this.node.setAttribute(toKebab(k), String(v))
         }
         return this
     }
@@ -72,11 +79,13 @@ export class UICell {
      */
     mount(target) {
         find(target)?.appendChild(this.node)
+        ActiveUICells.get(this.registeredKey).mounted = !0
         return this
     }
 
     unmount() {
         removeNode(this.node)
+        ActiveUICells.get(this.registeredKey).mounted = !1
         return this
     }
 
