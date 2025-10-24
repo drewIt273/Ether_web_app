@@ -10,6 +10,108 @@ import {stylesheet} from "../../../../nodes/scripts/stylesheet.js";
 
 export const ActiveUIComponents = new Registry;
 
+export class UICell {
+
+    /**
+     * @param {Element|string} node 
+     */
+    constructor(node) {
+        this.node = isString(node) ? create(node) : isNode(node) ? node : new div
+        this.classList = this.node.classList
+        this.className = this.node.className
+        this.textContent = this.node.textContent
+        this.childNodes = this.node.childNodes
+        this.parent = this.node.parentNode
+        this.id = this.node.id
+    }
+
+    /**
+     * 
+     * @param {{}} o 
+     */
+    attrs(o) {
+        for (const [k, v] of Object.entries(o)) {
+            this.node.setAttribute(k, String(v))
+        }
+        return this
+    }
+
+    /**
+     * 
+     * @param  {...Node} nodes 
+     */
+    append(...nodes) {
+        nodes.forEach(node => this.node.appendChild(node))
+        return this
+    }
+
+    /**
+     * Returns a copy of node. If deep is true, the copy also includes the node's descendants.
+     */
+    clone(subtree = false) {
+        return this.node.cloneNode(subtree)
+    }
+
+    /**
+     * Returns the first node that is a descendant of this UICell that matches selector s.
+     * @param {string} s 
+     */
+    find(s) {
+        return this.node.querySelector(s)
+    }
+
+    /**
+     * @param {Node} node @param {Node|null} child 
+     */
+    insertBefore(node, child) {
+        return this.node.insertBefore(node, child)
+    }
+
+    /**
+     * @param {Node|string} target 
+     */
+    mount(target) {
+        find(target)?.appendChild(this.node)
+        return this
+    }
+
+    unmount() {
+        removeNode(this.node)
+        return this
+    }
+
+    /**
+     * Add event listeners to this node and writes them into the activeListeners registry.
+     * @param {string} ev @param  {...(node: Node)} handlers 
+     */
+    on(ev, ...handlers) {
+        handlers.forEach(handler => {
+            on(ev, this.node, handler.call(this, this.node))
+        }) 
+        return this
+    }
+
+    /**
+     * Removes event listeners from this UICell and registers them into the backlogListeners registry.
+     */
+    off() {
+        off(this.node)
+        return this
+    }
+
+    /**
+     * 
+     * @param {{}} o 
+     */
+    style(o) {
+        for (const [p] of Object.entries(o)) {
+            const v = o[p]
+            this.node.style[toKebab(p)] = v
+        }
+        return this
+    }
+}
+
 export class UIComponent {
 
     /**
