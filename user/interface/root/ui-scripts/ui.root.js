@@ -33,6 +33,14 @@ export class UICell {
     }
 
     /**
+     * Returns true if this UICell is still mounted.
+     * @returns {boolean}
+     */
+    get mounted() {
+        return ActiveUICells.get(this.registeredKey)?.mounted ?? false
+    }
+
+    /**
      * 
      * @param {{}} o 
      */
@@ -94,9 +102,7 @@ export class UICell {
      * @param {string} ev @param  {...(node: Node)} handlers 
      */
     on(ev, ...handlers) {
-        handlers.forEach(handler => {
-            on(ev, this.node, handler.call(this, this.node))
-        }) 
+        handlers.forEach(handler => on(ev, this.node, handler.bind(this, this.node)))
         return this
     }
 
@@ -113,8 +119,7 @@ export class UICell {
      * @param {{}} o 
      */
     style(o) {
-        for (const [p] of Object.entries(o)) {
-            const v = o[p]
+        for (const [p, v] of Object.entries(o)) {
             this.node.style[toKebab(p)] = v
         }
         return this
@@ -383,7 +388,7 @@ export class UIComponent {
      * @param {(value: ChildNode, index: number, array: ChildNode[]) => void} callback 
      */
     forEach(callback) {
-        this.children.forEach(callback)
+        this.children.forEach(c => callback.call(this, c, this.children.indexOf(c), this.children))
         return this
     }
 
