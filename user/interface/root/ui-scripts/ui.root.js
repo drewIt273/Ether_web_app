@@ -24,6 +24,8 @@ export class UICell {
         this.parent = this.node.parentNode
         this.ID = ranstring(4, 1)
         this.registeredKey = ActiveUICells.write({node: this.node, id: this.ID, mounted: false})
+        this.emittedData = new Registry
+        this.receivedData = new Registry
         this.attrs({'ui-cell-id': this.ID})
     }
 
@@ -123,6 +125,23 @@ export class UICell {
             this.node.style[toKebab(p)] = v
         }
         return this
+    }
+
+    /**
+     * Emits data to another UICell.
+     * @param {*} data 
+     * @returns {{to: (targetCell: UICell, callback: (targetCell: UICell, data?: *)) => UICell}}
+     */
+    emit(data) {
+        return {
+            to: (targetCell, callback) => {
+                if (!(targetCell instanceof UICell)) throw new TypeError("targetCell must be an instance of UICell.")
+                this.emittedData.write({data, targetID: targetCell.ID})
+                targetCell.receivedData.write({sourceID: this.ID, data})
+                if (typeof callback === 'function') callback.call(this, targetCell, data)
+                return targetCell
+            }
+        }
     }
 }
 
