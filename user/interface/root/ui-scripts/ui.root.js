@@ -130,18 +130,33 @@ export class UICell {
     /**
      * Emits data to another UICell.
      * @param {*} data 
-     * @returns {{to: (targetCell: UICell, callback: (targetCell: UICell, data?: *)) => UICell}}
      */
     emit(data) {
-        return {
-            to: (targetCell, callback) => {
-                if (!(targetCell instanceof UICell)) throw new TypeError("targetCell must be an instance of UICell.")
-                this.emittedData.write({data, targetID: targetCell.ID})
-                targetCell.receivedData.write({sourceID: this.ID, data})
-                if (typeof callback === 'function') callback.call(this, targetCell, data)
-                return targetCell
+        const emitterProxy = {
+
+            /**
+             * @param {UICell|UICell[]} targetCells 
+             * @param {(targetCell: UICell, data?: *) => *} callback 
+             */
+            to: (targetCells, callback) => {
+                const targets = isArray(targetCells) ? targetCells : [targetCells];
+                for (const target of targets) {
+                    if (!(target instanceof UICell)) throw new TypeError("targetCell must be an instance of UICell.")
+                    this.emittedData.write({data, targetID: target.ID})
+                    target.receivedData.write({sourceID: this.ID, data})
+                    if (typeof callback === 'function') {
+                        try {
+                            callback.call(this, target, data)
+                        } catch(err) {
+                            console.error(`Error during emit callback for target ${target.ID}:`, err);
+                        }
+                    }
+                }
+                return emitterProxy
             }
         }
+
+        return emitterProxy
     }
 }
 
