@@ -8,8 +8,9 @@ import {isNode, isString, create, find, findAll, toKebab, setAttr, hasAttr, remo
 import {div} from "../../../../nodes/scripts/nodecreator.js";
 import {stylesheet} from "../../../../nodes/scripts/stylesheet.js";
 
-export const ActiveUIComponents = new Registry;
 export const ActiveUICells = new Registry;
+export const ActiveUIBlocks = new Registry;
+export const ActiveUIComponents = new Registry;
 
 export class UICell {
 
