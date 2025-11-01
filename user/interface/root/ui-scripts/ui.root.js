@@ -237,13 +237,6 @@ export class UICell extends UIBase {
         return this.node.cloneNode(subtree)
     }
 
-    /**
-     * Returns the first node that is a descendant of this UICell that matches selector s.
-     * @param {string} s 
-     */
-    find(s) {
-        return this.node.querySelector(s)
-    }
 
     /**
      * @param {Node} node @param {Node|null} child 
@@ -271,7 +264,7 @@ export class UICell extends UIBase {
         if (this.mounted) {
             removeNode(this.node)
             ActiveUICells.get(this.registeredKey).mounted = !1
-            this.#T.childCells.filter(n => n !== this.node)
+            this.#T.childCells = this.#T.childCells.filter(n => n !== this.node)
         }
         return this
     }
@@ -290,17 +283,6 @@ export class UICell extends UIBase {
      */
     off() {
         off(this.node)
-        return this
-    }
-
-    /**
-     * 
-     * @param {{}} o 
-     */
-    style(o) {
-        for (const [p, v] of Object.entries(o)) {
-            this.node.style[toKebab(p)] = v
-        }
         return this
     }
 
@@ -337,41 +319,21 @@ export class UICell extends UIBase {
     }
 }
 
-export class UIBlock {
+export class UIBlock extends UIBase {
 
     /**
      * 
      * @param {HTMLElement|string} node 
      */
     constructor(node) {
-        this.node = isString(node) ? create(node) : isNode(node) ? node : new div
+        this.ID = ranstring(3, 1)
+        super(node, ActiveUIBlocks)
         this.parentComponent = null
         this.childCells = []
-        this.ID = ranstring(3, 1)
-        this.registeredKey = ActiveUIBlocks.write({node: this.node, id: this.ID, mounted: false})
         this.attrs({'ui-block-id': this.ID})
     }
 
     #T = null
-
-    /**
-     * Returns true if this UIBlock is still mounted.
-     * @returns {boolean}
-     */
-    get mounted() {
-        return ActiveUIBlocks.get(this.registeredKey)?.mounted ?? false
-    }
-
-    /**
-     * 
-     * @param {{}} o 
-     */
-    attrs(o) {
-        for (const [k, v] of Object.entries(o)) {
-            this.node.setAttribute(toKebab(k), String(v))
-        }
-        return this
-    }
 
     /**
      * 
@@ -382,7 +344,7 @@ export class UIBlock {
         if (target instanceof UIComponent) {
             target.node.appendChild(this.node)
             target.childBlocks.push(this.node)
-            this.parentComponent = this.node
+            this.parentBlock = target.node
             this.#T = target
         }
         else if (target instanceof Node) find(target)?.appendChild(this.node)
@@ -394,22 +356,21 @@ export class UIBlock {
         if (this.mounted) {
             removeNode(this.node)
             ActiveUIBlocks.get(this.registeredKey).mounted = !1
-            this.#T.childBlocks.filter(n => n !== this.node)
+            this.#T.childBlocks = this.#T.childBlocks.filter(n => n !== this.node)
         }
         return this
     }
     
 }
 
-export class UIComponent {
+export class UIComponent extends UIBase {
 
     /**
      * @param {string|HTMLElement} node @param {HTMLElement[]} append 
      */
     constructor(node, ...append) {
-        this.node = isString(node) ? create(node) : isNode(node) ? node : new div
+        super(node, ActiveUIComponents)
         this.ID = ranstring(4, 1)
-        this.innerHTML = this.node.innerHTML
         for (const e of append) {
             this.node.appendChild(e)
         }
@@ -417,16 +378,13 @@ export class UIComponent {
         this.node.setAttribute('ui-component-id', this.ID)
         this.#sheet.base = `[ui-component-id="${this.ID}"]`
         this.#sheet.id = this.ID
-        this.registeredKey = ActiveUIComponents.write(this.#registered0)
     }
 
-    #registered0 = {node: this.node, id: this.ID, mounted: false}
     #onstatechange
     #states = {}
     #currentstate = null
     #children = []
     #sheet = new stylesheet
-    #keybinds = []
 
     get children() {
         return Array.from(this.node.childNodes)
@@ -851,125 +809,6 @@ export class UIComponent {
         else if (typeof s === 'string') {
             findAll(`${this.selector} ${s}`).forEach(n => off(n))
         }
-        return this
-    }
-
-    /**
-     * 
-     * @param {Function} callback @param {number} duration 
-     */
-    fadeIn(callback, duration = 400) {
-        const computed = getComputedStyle(this.node);
-        if (computed.display !== "none" || computed.opacity === 1) {
-            if (callback) callback.call(this.node);
-            return;
-        }
-        if (!this.node._fadeOriginalDisplay)
-            this.node._fadeOriginalDisplay = computed.display === "none" ? "block" : computed.display
-
-        setStyle(this.node, 'opacity', 0); setStyle(this.node, 'display', this.node._fadeOriginalDisplay); setStyle(this.node, 'transition', `opacity ${duration}ms ease`);
-
-        this.node.offsetWidth;
-
-        const handler = () => {
-            this.node.style.transition = '';
-            this.node.removeEventListener("transitionend", handler)
-            if (callback) callback.call(this.node)
-        }
-
-        this.node.addEventListener("transitionend", handler)
-
-        return this
-    }
-
-    /**
-     * 
-     * @param {Function} callback @param {number} duration 
-     */
-    fadeOut(callback, duration = 400) {
-        const computed = getComputedStyle(this.node);
-        if (computed.display === 'none') {
-            if (callback) callback.call(this.node)
-            return;
-        }
-
-        setStyle(this.node, 'transition', `opacity ${duration}ms ease`); setStyle(this.node, 'opacity', 1);
-
-        this.node.offsetWidth; this.node.style.opacity = 0;
-
-        const handler = (e) => {
-            if (e.propertyName !== 'opacity') return;
-            this.node.style.transition = ''; this.node.style.display = 'none';
-            this.node.removeEventListener('transitionend', handler);
-            if (callback) callback.call(this.node)
-        }
-
-        this.node.addEventListener('transitionend', handler)
-
-        return this
-    }
-
-    /**
-     * 
-     * @param {Function} callback @param {number} duration 
-     */
-    fadeToggle(callback, duration = 400) {
-        const computed = getComputedStyle(this.node);
-        if (computed.display === 'none' || computed.opacity === 0) {
-            this.fadeIn.call({node: this.node}, callback, duration)
-        } else {
-            this.fadeOut.call({node: this.node}, callback, duration)
-        }
-
-        return this
-    }
-
-    /**
-     * Executes a handler function when the keys are fired (e.g ctrl + P) to a node descendant of this UIComponent if given. Otherwise, this UIComponent.
-     * @param {string} keys The key or keys to be pressed joined with a '+'.
-     * @param {(this: this, e: KeyboardEvent)} handler The Function to be fired.
-     * @param {string|Node} node The node targeted if set.
-     */
-    keybind(keys, handler, node = '', global = false) {
-        if (!isString(keys) || typeof handler !== 'function') return this
-
-        let targetNode  = isString(node) ? this.find(node) : isNode(node) ? node : this.node
-
-        // Normalize key string: "ctrl + shift + p" -> ['ctrl', 'shift', 'p']
-            const keyParts = keys.toLowerCase().split('+').map(k => k.trim());
-
-        /** @param {KeyboardEvent} e */
-        const listener = e => {
-            const ctrl = keyParts.includes('ctrl') ? e.ctrlKey : true;
-            const shift = keyParts.includes('shift') ? e.shiftKey : true;
-            const alt = keyParts.includes('alt') ? e.altKey : true;
-            const meta = keyParts.includes('meta') ? e.metaKey : true;
-            const mainKey = keyParts.find(k => !['ctrl','shift','alt','meta'].includes(k));
-            if (ctrl && shift && alt && meta && e.key.toLowerCase() === mainKey) {
-                e.preventDefault();
-                handler.call(this, e);
-            }    
-        }
-
-        global ? on('keydown', document, listener) : on('keydown', targetNode, listener)
-
-        this.#keybinds.push({keys, handler, listener, node: targetNode, global: global})
-
-        return this
-    }
-
-    /**
-     * 
-     * @param {string|Node} node 
-     */
-    unbindkeys(node = '') {
-        let target = isString(node) ? this.find(node) : isNode(node) ? node : null
-        this.#keybinds = this.#keybinds.filter(k => {
-            if (k.node === target) {
-                off(target)
-            }
-        })
-
         return this
     }
     
