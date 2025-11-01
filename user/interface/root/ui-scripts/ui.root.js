@@ -162,6 +162,67 @@ export class UICell {
     }
 }
 
+export class UIBlock {
+
+    /**
+     * 
+     * @param {HTMLElement|string} node 
+     */
+    constructor(node) {
+        this.node = isString(node) ? create(node) : isNode(node) ? node : new div
+        this.parentComponent = null
+        this.childCells = []
+        this.ID = ranstring(3, 1)
+        this.registeredKey = ActiveUIBlocks.write({node: this.node, id: this.ID, mounted: false})
+        this.attrs({'ui-block-id': this.ID})
+    }
+
+    /**
+     * Returns true if this UIBlock is still mounted.
+     * @returns {boolean}
+     */
+    get mounted() {
+        return ActiveUIBlocks.get(this.registeredKey)?.mounted ?? false
+    }
+
+    /**
+     * 
+     * @param {{}} o 
+     */
+    attrs(o) {
+        for (const [k, v] of Object.entries(o)) {
+            this.node.setAttribute(toKebab(k), String(v))
+        }
+        return this
+    }
+
+    /**
+     * 
+     * @param {Node|UIComponent} target 
+     */
+    mount(target) {
+        if (target instanceof UICell || find(target)?.hasAttribute('ui-cell-id') || find(target)?.parentElement.hasAttribute('ui-cell-id')) throw new Error('A block cannot mount a cell')
+        if (target instanceof UIComponent) {
+            target.node.appendChild(this.node)
+            target.childBlocks.push(this.node)
+            this.parentComponent = {node: target.node, component: target}
+        }
+        else if (target instanceof Node) find(target)?.appendChild(this.node)
+        ActiveUIBlocks.get(this.registeredKey).mounted = !0
+        return this
+    }
+
+    unmount() {
+        if (this.mounted) {
+            removeNode(this.node)
+            ActiveUIBlocks.get(this.registeredKey).mounted = !1
+            this.parentComponent.component.childBlocks.filter(n => n !== this.node)
+        }
+        return this
+    }
+    
+}
+
 export class UIComponent {
 
     /**
