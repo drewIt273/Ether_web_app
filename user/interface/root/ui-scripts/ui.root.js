@@ -239,21 +239,16 @@ export class UIComponent {
         this.node.setAttribute('ui-component-id', this.ID)
         this.#sheet.base = `[ui-component-id="${this.ID}"]`
         this.#sheet.id = this.ID
+        this.registeredKey = ActiveUIComponents.write(this.#registered0)
     }
 
-    #registered0
+    #registered0 = {node: this.node, id: this.ID, mounted: false}
     #onstatechange
     #states = {}
     #currentstate = null
     #children = []
     #sheet = new stylesheet
     #keybinds = []
-
-    #write = () => {
-        const O = {componentId: this.ID, node: this.node, constructor: this}
-        if (!ActiveUIComponents.values.some(v => v.node === this.node)) this.registeredKey = ActiveUIComponents.write(O)
-        this.#registered0 = O;
-    }
 
     get children() {
         return Array.from(this.node.childNodes)
@@ -318,7 +313,7 @@ export class UIComponent {
      */
     mount(target) {
         find(target)?.appendChild(this.node)
-        this.#write()
+        ActiveUIComponents.get(this.registeredKey).mounted = !0
         this.#children.forEach(c => c.mount(this.node));
         if (typeof this.init === 'function') this.init()
         return this
@@ -330,6 +325,7 @@ export class UIComponent {
     unmount() {
         this.#children.forEach(c => c.unmount());
         removeNode(this.node)
+        ActiveUIComponents.get(this.registeredKey).mounted = !1
         ActiveUIComponents.remove(this.registeredKey)
         return this
     }
