@@ -31,6 +31,8 @@ export class UICell {
         this.attrs({'ui-cell-id': this.ID})
     }
 
+    #T = null
+
     /** @param {string} s */
     set className(s) {
         this.node.className = s
@@ -87,17 +89,26 @@ export class UICell {
     }
 
     /**
-     * @param {Node|string} target 
+     * @param {Node|UIBlock} target 
      */
     mount(target) {
-        find(target)?.appendChild(this.node)
+        if (target instanceof UIBlock) {
+            target.node.appendChild(this.node)
+            target.childCells.push(this.node)
+            this.parentBlock = target.node
+            this.#T = target
+        }
+        else if (target instanceof Node) find(target)?.appendChild(this.node)
         ActiveUICells.get(this.registeredKey).mounted = !0
         return this
     }
 
     unmount() {
-        removeNode(this.node)
-        ActiveUICells.get(this.registeredKey).mounted = !1
+        if (this.mounted) {
+            removeNode(this.node)
+            ActiveUICells.get(this.registeredKey).mounted = !1
+            this.#T.childCells.filter(n => n !== this.node)
+        }
         return this
     }
 
@@ -177,6 +188,8 @@ export class UIBlock {
         this.attrs({'ui-block-id': this.ID})
     }
 
+    #T = null
+
     /**
      * Returns true if this UIBlock is still mounted.
      * @returns {boolean}
@@ -205,7 +218,8 @@ export class UIBlock {
         if (target instanceof UIComponent) {
             target.node.appendChild(this.node)
             target.childBlocks.push(this.node)
-            this.parentComponent = {node: target.node, component: target}
+            this.parentComponent = this.node
+            this.#T = target
         }
         else if (target instanceof Node) find(target)?.appendChild(this.node)
         ActiveUIBlocks.get(this.registeredKey).mounted = !0
@@ -216,7 +230,7 @@ export class UIBlock {
         if (this.mounted) {
             removeNode(this.node)
             ActiveUIBlocks.get(this.registeredKey).mounted = !1
-            this.parentComponent.component.childBlocks.filter(n => n !== this.node)
+            this.#T.childBlocks.filter(n => n !== this.node)
         }
         return this
     }
