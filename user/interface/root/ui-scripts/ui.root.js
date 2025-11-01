@@ -23,6 +23,7 @@ export class UICell {
         this.textContent = this.node.textContent
         this.childNodes = this.node.childNodes
         this.parent = this.node.parentNode
+        this.parentBlock = null
         this.ID = ranstring(4, 1)
         this.registeredKey = ActiveUICells.write({node: this.node, id: this.ID, mounted: false})
         this.emittedData = new Registry
@@ -173,6 +174,7 @@ export class UIComponent {
         for (const e of append) {
             this.node.appendChild(e)
         }
+        this.childBlocks = []
         this.node.setAttribute('ui-component-id', this.ID)
         this.#sheet.base = `[ui-component-id="${this.ID}"]`
         this.#sheet.id = this.ID
