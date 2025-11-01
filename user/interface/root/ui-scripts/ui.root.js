@@ -12,26 +12,25 @@ export const ActiveUICells = new Registry;
 export const ActiveUIBlocks = new Registry;
 export const ActiveUIComponents = new Registry;
 
-export class UICell {
+export class UIBase {
 
     /**
-     * @param {Element|string} node 
+     * @param {string|HTMLElement} node 
+     * @param {Registry} registry 
+     * @param {string} prefix 
      */
-    constructor(node) {
+    constructor(node, registry) {
         this.node = isString(node) ? create(node) : isNode(node) ? node : new div
         this.classList = this.node.classList
-        this.textContent = this.node.textContent
+        this.innerHTML = this.node.innerHTML
         this.childNodes = this.node.childNodes
         this.parent = this.node.parentNode
-        this.parentBlock = null
-        this.ID = ranstring(4, 1)
-        this.registeredKey = ActiveUICells.write({node: this.node, id: this.ID, mounted: false})
-        this.emittedData = new Registry
-        this.receivedData = new Registry
-        this.attrs({'ui-cell-id': this.ID})
+        this.registeredKey = registry.write({node: this.node, id: this.ID, mounted: false})
+        this.#reg = registry
     }
 
-    #T = null
+    #reg
+    #keybinds = []
 
     /** @param {string} s */
     set className(s) {
@@ -39,15 +38,15 @@ export class UICell {
     }
 
     /**
-     * Returns true if this UICell is still mounted.
+     * Returns true if this is still mounted
      * @returns {boolean}
      */
     get mounted() {
-        return ActiveUICells.get(this.registeredKey)?.mounted ?? false
+        return this.#reg.get(this.registeredKey)?.mounted ?? false
     }
 
     /**
-     * 
+     * Sets attributes by an object o.
      * @param {{}} o 
      */
     attrs(o) {
@@ -55,6 +54,171 @@ export class UICell {
             this.node.setAttribute(toKebab(k), String(v))
         }
         return this
+    }
+
+    /**
+     * Sets styles by an object o.
+     * @param {{}} o 
+     */
+    style(o) {
+        for (const [p, v] of Object.entries(o)) {
+            this.node.style[toKebab(p)] = v
+        }
+        return this
+    }    
+
+    /**
+     * Returns the first node that is a descendant of this UIGene that matches selector s.
+     * @param {string} s 
+     */
+    find(s) {
+        return this.node.querySelector(s)
+    }
+
+    /**
+     * 
+     * @param {Function} callback @param {number} duration 
+     */
+    fadeIn(callback, duration = 400) {
+        const computed = getComputedStyle(this.node);
+        if (computed.display !== "none" || computed.opacity === 1) {
+            if (callback) callback.call(this.node);
+            return;
+        }
+        if (!this.node._fadeOriginalDisplay)
+            this.node._fadeOriginalDisplay = computed.display === "none" ? "block" : computed.display
+
+        setStyle(this.node, 'opacity', 0); setStyle(this.node, 'display', this.node._fadeOriginalDisplay); setStyle(this.node, 'transition', `opacity ${duration}ms ease`);
+
+        this.node.offsetWidth;
+
+        const handler = () => {
+            this.node.style.transition = '';
+            this.node.removeEventListener("transitionend", handler)
+            if (callback) callback.call(this.node)
+        }
+
+        this.node.addEventListener("transitionend", handler)
+
+        return this
+    }
+
+    /**
+     * 
+     * @param {Function} callback @param {number} duration 
+     */
+    fadeOut(callback, duration = 400) {
+        const computed = getComputedStyle(this.node);
+        if (computed.display === 'none') {
+            if (callback) callback.call(this.node)
+            return;
+        }
+
+        setStyle(this.node, 'transition', `opacity ${duration}ms ease`); setStyle(this.node, 'opacity', 1);
+
+        this.node.offsetWidth; this.node.style.opacity = 0;
+
+        const handler = (e) => {
+            if (e.propertyName !== 'opacity') return;
+            this.node.style.transition = ''; this.node.style.display = 'none';
+            this.node.removeEventListener('transitionend', handler);
+            if (callback) callback.call(this.node)
+        }
+
+        this.node.addEventListener('transitionend', handler)
+
+        return this
+    }
+
+    /**
+     * 
+     * @param {Function} callback @param {number} duration 
+     */
+    fadeToggle(callback, duration = 400) {
+        const computed = getComputedStyle(this.node);
+        if (computed.display === 'none' || computed.opacity === 0) {
+            this.fadeIn.call({node: this.node}, callback, duration)
+        } else {
+            this.fadeOut.call({node: this.node}, callback, duration)
+        }
+
+        return this
+    }
+
+    /**
+     * Executes a handler function when the keys are fired (e.g ctrl + P) to a node descendant of this UIComponent if given. Otherwise, this UIComponent.
+     * @param {string} keys The key or keys to be pressed joined with a '+'.
+     * @param {(this: this, e: KeyboardEvent)} handler The Function to be fired.
+     * @param {string|Node} node The node targeted if set.
+     */
+    keybind(keys, handler, node = '', global = false) {
+        if (!isString(keys) || typeof handler !== 'function') return this
+
+        let targetNode  = isString(node) ? this.find(node) : isNode(node) ? node : this.node
+
+        // Normalize key string: "ctrl + shift + p" -> ['ctrl', 'shift', 'p']
+            const keyParts = keys.toLowerCase().split('+').map(k => k.trim());
+
+        /** @param {KeyboardEvent} e */
+        const listener = e => {
+            const ctrl = keyParts.includes('ctrl') ? e.ctrlKey : true;
+            const shift = keyParts.includes('shift') ? e.shiftKey : true;
+            const alt = keyParts.includes('alt') ? e.altKey : true;
+            const meta = keyParts.includes('meta') ? e.metaKey : true;
+            const mainKey = keyParts.find(k => !['ctrl','shift','alt','meta'].includes(k));
+            if (ctrl && shift && alt && meta && e.key.toLowerCase() === mainKey) {
+                e.preventDefault();
+                handler.call(this, e);
+            }    
+        }
+
+        global ? on('keydown', document, listener) : on('keydown', targetNode, listener)
+
+        this.#keybinds.push({keys, handler, listener, node: targetNode, global: global})
+
+        return this
+    }
+
+    /**
+     * 
+     * @param {string|Node} node 
+     */
+    unbindkeys(node = '') {
+        let target = isString(node) ? this.find(node) : isNode(node) ? node : null
+        this.#keybinds = this.#keybinds.filter(k => {
+            if (k.node === target) {
+                off(target)
+                return !1
+            }
+            return !0
+        })
+
+        return this
+    }    
+}
+
+export class UICell extends UIBase {
+
+    /**
+     * @param {Element|string} node 
+     */
+    constructor(node) {
+        this.ID = ranstring(4, 1)
+        super(node, ActiveUICells)
+        this.parentBlock = null
+        this.emittedData = new Registry
+        this.receivedData = new Registry
+        this.attrs({'ui-cell-id': this.ID})
+    }
+
+    #T = null
+
+    /**
+     * Returns true if this UICell is still mounted.
+     * @returns {boolean}
+     */
+    get mounted() {
+        return ActiveUICells.get(this.registeredKey)?.mounted ?? false
     }
 
     /**
