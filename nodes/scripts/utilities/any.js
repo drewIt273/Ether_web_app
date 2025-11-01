@@ -45,7 +45,7 @@ export const ranstring = (length, count, end = '') => {
     let f = (s, c) => Array.from({length: c}, () => s[Math.floor(Math.random() * s.length)]).join(''), key = f(chars, 1);
     key += Array.from({length: count}, () => f(vchars, length)).join('-')
 
-    return (end.length) ? key += `-${end}` : key
+    return (end.length) ? key += `${end}` : key
 }
 
 /**
