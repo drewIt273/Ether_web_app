@@ -430,7 +430,9 @@ export class UIBlock extends UIBase {
         if (this.mounted) {
             removeNode(this.node)
             ActiveUIBlocks.get(this.registeredKey).mounted = !1
-            this.#T.childBlocks = this.#T.childBlocks.filter(n => n !== this.node)
+            this.parentBlock = null, this.parentComponent = null
+            let p = this.#T.childBlocks || this.#T.subBlocks
+            p = p.filter(n => n !== this.node)
         }
         return this
     }
