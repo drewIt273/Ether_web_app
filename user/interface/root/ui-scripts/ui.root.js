@@ -329,10 +329,22 @@ export class UIBlock extends UIBase {
         this.ID = ranstring(3, 1)
         this.parentComponent = null
         this.childCells = []
+        this.subBlocks = []
         this.attrs({'ui-block-id': this.ID})
     }
 
     #T = null
+
+    /**
+     * Appends multiple nodes, UICells and UIBlocks into this UIBlock.
+     * @param {(Node|UICell|UIBlock)[]} nodes 
+     */
+    append(...nodes) {
+        nodes.forEach(n => {
+            isNode(n) ? this.node.appendChild(n) : (cellOrBlock(n), this.node.appendChild(n.node), n instanceof UICell ? this.childCells.push(n.node) : this.subBlocks.push(n.node))
+        })
+        return this
+    }
 
     /**
      * 
@@ -346,7 +358,7 @@ export class UIBlock extends UIBase {
             this.parentBlock = target.node
             this.#T = target
         }
-        else if (target instanceof Node) find(target)?.appendChild(this.node)
+        else if (isNode(target)) find(target)?.appendChild(this.node)
         ActiveUIBlocks.get(this.registeredKey).mounted = !0
         return this
     }
