@@ -446,6 +446,7 @@ export class UIComponent extends UIBase {
         this.node.setAttribute('ui-component-id', this.ID)
         this.#sheet.base = `[ui-component-id="${this.ID}"]`
         this.#sheet.id = this.ID
+        this.subcomponents = []
     }
 
     #sheet = new stylesheet
@@ -506,7 +507,7 @@ export class UIComponent extends UIBase {
     mount(target) {
         find(target)?.appendChild(this.node)
         ActiveUIComponents.get(this.registeredKey).mounted = !0
-        this.#children.forEach(c => c.mount(this.node));
+        this.subcomponents.forEach(c => c.mount(this.node));
         if (typeof this.init === 'function') this.init()
         return this
     }
@@ -515,7 +516,7 @@ export class UIComponent extends UIBase {
      * Unmounts this by removing it from the DOM and from the ActiveUIComponents registry.
      */
     unmount() {
-        this.#children.forEach(c => c.unmount());
+        this.subcomponents.forEach(c => c.unmount());
         removeNode(this.node)
         ActiveUIComponents.get(this.registeredKey).mounted = !1
         ActiveUIComponents.remove(this.registeredKey)
@@ -529,7 +530,7 @@ export class UIComponent extends UIBase {
     compose(...comps) {
         comps.forEach(c => {
             if (c instanceof UIComponent) {
-                this.#children.push(c)
+                this.subcomponents.push(c)
                 this.node.appendChild(c.node)
             }
         })
@@ -828,9 +829,7 @@ export class UIComponent extends UIBase {
      */
     destroy() {
         this.unmount().off().node = null
-        this.#states = {}
-        this.#onstatechange = null
-        this.#children.forEach(c => c.destroy())
+        this.subcomponents.forEach(c => c.destroy())
         this.#sheet.remove()
         return this
     }
