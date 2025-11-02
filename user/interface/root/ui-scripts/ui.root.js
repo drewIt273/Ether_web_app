@@ -394,18 +394,17 @@ export class UIBlock extends UIBase {
 
     /**
      * Appends multiple nodes, UICells and UIBlocks into this UIBlock.
-     * @param {(Node|UICell|UIBlock)[]} nodes 
+     * @param {(Node|UICell|UIBlock)[]} o  
      */
-    append(...nodes) {
-        nodes.forEach(n => {
-            isNode(n) ? this.node.appendChild(n) : (cellOrBlock(n), this.node.appendChild(n.node), n instanceof UICell ? this.childCells.push(n.node) : this.subBlocks.push(n.node))
-        })
-        return this
+    set append(o) {
+        for (const h of o) {
+            isNode(h) ? this.node.appendChild(h) : (cellOrBlock(h), h.mount(this))
+        }
     }
 
     /**
-     * 
-     * @param {Node|UIComponent} target 
+     * Mounts this block to a node or UIComponent or to another UIBlock.
+     * @param {Node|UIBlock|UIComponent} target 
      */
     mount(target) {
         if (target instanceof UICell || find(target)?.hasAttribute('ui-cell-id') || find(target)?.parentElement.hasAttribute('ui-cell-id')) throw new Error('A block cannot mount a cell')
