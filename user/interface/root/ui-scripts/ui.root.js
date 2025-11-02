@@ -203,8 +203,8 @@ export class UICell extends UIBase {
      * @param {Element|string} node 
      */
     constructor(node) {
-        this.ID = ranstring(4, 1)
         super(node, ActiveUICells)
+        this.ID = ranstring(4, 1)
         this.parentBlock = null
         this.emittedData = new Registry
         this.receivedData = new Registry
@@ -322,12 +322,11 @@ export class UICell extends UIBase {
 export class UIBlock extends UIBase {
 
     /**
-     * 
      * @param {HTMLElement|string} node 
      */
     constructor(node) {
-        this.ID = ranstring(3, 1)
         super(node, ActiveUIBlocks)
+        this.ID = ranstring(3, 1)
         this.parentComponent = null
         this.childCells = []
         this.attrs({'ui-block-id': this.ID})
