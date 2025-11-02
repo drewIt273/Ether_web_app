@@ -384,6 +384,7 @@ export class UIBlock extends UIBase {
         super(node, ActiveUIBlocks)
         this.ID = ranstring(3, 1)
         this.parentComponent = null
+        this.parentBlock = null
         this.childCells = []
         this.subBlocks = []
         this.attrs({'ui-block-id': this.ID})
@@ -411,6 +412,12 @@ export class UIBlock extends UIBase {
         if (target instanceof UIComponent) {
             target.node.appendChild(this.node)
             target.childBlocks.push(this.node)
+            this.parentComponent = target.node
+            this.#T = target
+        }
+        else if (target instanceof UIBlock) {
+            target.node.appendChild(this.node)
+            target.subBlocks.push(this.node)
             this.parentBlock = target.node
             this.#T = target
         }
