@@ -31,6 +31,9 @@ export class UIBase {
 
     #reg
     #keybinds = []
+    #states = {}
+    #currentstate = null
+    #onstatechange
 
     /** @param {string} s */
     set className(s) {
@@ -44,6 +47,14 @@ export class UIBase {
     get mounted() {
         return this.#reg.get(this.registeredKey)?.mounted ?? false
     }
+
+    /**
+     * Get the currently active state name.
+     * @returns {string|null}
+     */
+    get state() {
+        return this.#currentstate
+    }    
 
     /**
      * Sets attributes by an object o.
@@ -194,7 +205,53 @@ export class UIBase {
         })
 
         return this
-    }    
+    }
+
+    /**
+     * Define a new state and its behavior.
+     * @param {'active'|'inactive'|'enable'|'disable'} state 
+     * @param {(this: Node)} handler 
+     */
+    defineState(state, handler) {
+        if (!isString(state) || typeof handler !== 'function') return this
+        this.#states[state] = handler
+        return this
+    }
+
+    /**
+     * Set (or trigger) a defined state.
+     * @param {'active'|'inactive'|'enable'|'disable'} state 
+     */
+    setState(state) {
+        if (!(state in this.#states)) {
+            console.warn(`State "${state}" not defined for component`, this);
+            return this
+        }
+        this.#currentstate = state
+        this.#states[state].call(this, this.node)
+
+        if (this.#onstatechange) this.#onstatechange.call(this, state, this.node)
+
+        return this
+    }
+
+    /**
+     * Returns true if s was defined as a state of this UIComponent.
+     * @param {string} s 
+     */
+    hasState(s) {
+        return s in this.#states
+    }
+
+    /**
+     * Register a callback for when the component's state changes.
+     * @param {(state: string, this: Node) => void} callback 
+     */
+    onStateChange(callback) {
+        (typeof callback === 'function') ? this.#onstatechange = callback : console.warn('onStateChange expects a function callback.')
+        return this
+    }
+    
 }
 
 export class UICell extends UIBase {
@@ -391,10 +448,6 @@ export class UIComponent extends UIBase {
         this.#sheet.id = this.ID
     }
 
-    #onstatechange
-    #states = {}
-    #currentstate = null
-    #children = []
     #sheet = new stylesheet
 
     get children() {
@@ -415,14 +468,6 @@ export class UIComponent extends UIBase {
         s += `[ui-component-id="${this.ID}"]`
 
         return `${this.node.tagName.toLowerCase()}${s}`
-    }
-
-    /**
-     * Get the currently active state name.
-     * @returns {string|null}
-     */
-    get state() {
-        return this.#currentstate
     }
 
     /**
@@ -503,51 +548,6 @@ export class UIComponent extends UIBase {
 
     empty() {
         this.children.forEach(c => removeNode(c))
-        return this
-    }
-
-    /**
-     * Define a new state and its behavior.
-     * @param {'active'|'inactive'|'enable'|'disable'} state 
-     * @param {(this: Node)} handler 
-     */
-    defineState(state, handler) {
-        if (!isString(state) || typeof handler !== 'function') return this
-        this.#states[state] = handler
-        return this
-    }
-
-    /**
-     * Set (or trigger) a defined state.
-     * @param {'active'|'inactive'|'enable'|'disable'} state 
-     */
-    setState(state) {
-        if (!(state in this.#states)) {
-            console.warn(`State "${state}" not defined for component`, this);
-            return this
-        }
-        this.#currentstate = state
-        this.#states[state].call(this, this.node)
-
-        if (this.#onstatechange) this.#onstatechange.call(this, state, this.node)
-
-        return this
-    }
-
-    /**
-     * Returns true if s was defined as a state of this UIComponent.
-     * @param {string} s 
-     */
-    hasState(s) {
-        return s in this.#states
-    }
-
-    /**
-     * Register a callback for when the component's state changes.
-     * @param {(state: string, this: Node) => void} callback 
-     */
-    onStateChange(callback) {
-        (typeof callback === 'function') ? this.#onstatechange = callback : console.warn('onStateChange expects a function callback.')
         return this
     }
 
