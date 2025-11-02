@@ -17,7 +17,6 @@ export class UIBase {
     /**
      * @param {string|HTMLElement} node 
      * @param {Registry} registry 
-     * @param {string} prefix 
      */
     constructor(node, registry) {
         this.node = isString(node) ? create(node) : isNode(node) ? node : new div
@@ -833,4 +832,12 @@ export class UIComponent extends UIBase {
         this.#sheet.remove()
         return this
     }
+}
+
+/**
+ * 
+ * @param {UICell|UIBlock} n 
+ */
+export function cellOrBlock(n) {
+    return n instanceof UICell || UIBlock
 }
