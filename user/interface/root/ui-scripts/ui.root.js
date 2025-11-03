@@ -56,6 +56,22 @@ export class UIBase {
     }    
 
     /**
+     * Returns this node as a selector string that can be used later in searching this node using find, findAll, etc.
+     */
+    get selector() {
+        let s = '', n = this.node, c = n.classList
+        if (n.id.length > 0) s += `#${n.id}`
+        if (c.length > 0) {
+            for (let i = 0; i < c.length; i++) {
+                s += `.${c.item(i)}`
+            }
+        }
+        s += `[ui-component-id="${this.ID}"]`
+
+        return `${this.node.tagName.toLowerCase()}${s}`
+    }
+
+    /**
      * Sets attributes by an object o.
      * @param {{}} o 
      */
@@ -65,6 +81,14 @@ export class UIBase {
         }
         return this
     }
+
+    /**
+     * Returns true if other is a descendent of this node.
+     * @param {Node|string} other 
+     */
+    contains(other) {
+        return isNode(other) ? this.node.contains(other) : (isString(other), this.node.querySelector(other)) ? !0 : !1
+    }    
 
     /**
      * Sets styles by an object o.
@@ -78,11 +102,19 @@ export class UIBase {
     }    
 
     /**
-     * Returns the first node that is a descendant of this UIGene that matches selector s.
+     * Returns the first element that is a descendant of node that matches selectors.
      * @param {string} s 
      */
     find(s) {
         return this.node.querySelector(s)
+    }
+
+    /**
+     * Returns all element descendants of node that match selectors.
+     * @param {string} s 
+     */
+    findAll(s) {
+        return Array.from(this.node.querySelectorAll(s))
     }
 
     /**
@@ -248,6 +280,106 @@ export class UIBase {
      */
     onStateChange(callback) {
         (typeof callback === 'function') ? this.#onstatechange = callback : console.warn('onStateChange expects a function callback.')
+        return this
+    }
+    
+    /**
+     * @param {string} attr 
+     */
+    getAttr(attr) {
+        return this.node.getAttribute(attr)
+    }
+
+    /**
+     * @param {string} a 
+     */
+    hasAttr(a) {
+        return hasAttr(this.node, a)
+    }
+
+    /**
+     * @param {string} a 
+     */
+    removeAttr(a) {
+        removeAttr(this.node, a)
+        return this
+    }
+
+    /**
+     * @param {string} attr @param {string} val 
+     */
+    dataset(attr, val) {
+        dataset(this.node, attr, val)
+        return this
+    }
+
+    /**
+     * Set aria attributes for accessibility.
+     * @param {{}} attrs 
+     */
+    ariaset(attrs) {
+        for (const [key, val] of Object.entries(attrs)) {
+            setAttr(this.node, `aria-${key}`, String(val))
+        }
+        return this
+    }
+
+    /**
+     * @param {"add"|"remove"|"toggle"} action 
+     * @param {...string} tokens 
+     */
+    classList(action, ...tokens) {
+        for (const token of tokens) {
+            this.node.classList[action]?.(token)
+        }
+        return this
+    }
+
+    /**
+     * Hides this node after a given timeout by setting a hidden attribute.
+     * @param {number} timeout 
+     */
+    hide(timeout = 0) {
+        setTimeout(() => setAttr(this.node, 'hidden', ''), timeout)
+        return this
+    }
+
+    /**
+     * Displays back this node if initially hidden by a 'hidden' attribute.
+     * @param {number} timeout 
+     */
+    display(timeout = 0) {
+        if (hasAttr(this.node, 'hidden') || getStyle(this.node, 'display') === 'none') setTimeout(() => {removeAttr(this.node, 'hidden')}, timeout)
+        return this
+    }
+
+    focus() {
+        this.node.focus()
+        return this
+    }
+
+    blur() {
+        this.node.blur()
+        return this
+    }
+
+    /**
+     * Sets the pointer-events CSS property as an attribute to this node.
+     * @param {"all"|"none"} v 
+     */
+    pointerEvents(v) {
+        let a = (v === "all") ? 'all' : 'none'
+        setAttr(this.node, 'pointer-events', a)
+        return this
+    }
+
+    /**
+     * Executes a callback after a given timeout ones the DOM has fully loaded.
+     * @param {()} callback 
+     * @param {number} timeout 
+     */
+    DOMLoaded(callback, timeout = 0) {
+        (document.readyState === "complete") ? setTimeout(callback, timeout) : on("DOMContentLoaded", document, () => {setTimeout(callback, timeout)})
         return this
     }
     
@@ -531,20 +663,6 @@ export class UIComponent extends UIBase {
     }
 
     /**
-     * Appends one or more child UIComponents.
-     * @param  {...UIComponent} comps 
-     */
-    compose(...comps) {
-        comps.forEach(c => {
-            if (c instanceof UIComponent) {
-                this.subcomponents.push(c)
-                this.node.appendChild(c.node)
-            }
-        })
-        return this
-    }
-
-    /**
      * Removes all descendants of this node which matches n.
      * @param {string|Node} n 
      */
@@ -641,29 +759,6 @@ export class UIComponent extends UIBase {
         return this
     }
 
-    /**
-     * @param {string} s 
-     * @returns {Node|null}
-     */
-    find(s) {
-        return find(`${this.selector} ${s}`)
-    }
-
-    /**
-     * 
-     * @param {string} s 
-     */
-    findAll(s) {
-        return findAll(`${this.selector} ${s}`)
-    }
-
-    /**
-     * Returns true if other is a descendent of this.
-     * @param {Node|string} other 
-     */
-    contains(other) {
-        return isNode(other) ? this.node.contains(other) : this.node.querySelector(other) ? !0 : !1
-    }
 
     /**
      * 
@@ -697,106 +792,6 @@ export class UIComponent extends UIBase {
         }
         return this
     } 
-
-    /**
-     * @param {string} attr 
-     */
-    getAttr(attr) {
-        return this.node.getAttribute(attr)
-    }
-
-    /**
-     * @param {string} a 
-     */
-    hasAttr(a) {
-        return hasAttr(this.node, a)
-    }
-
-    /**
-     * @param {string} a 
-     */
-    removeAttr(a) {
-        removeAttr(this.node, a)
-        return this
-    }
-
-    /**
-     * @param {string} attr @param {string} val 
-     */
-    dataset(attr, val) {
-        dataset(this.node, attr, val)
-        return this
-    }
-
-    /**
-     * Set aria attributes for accessibility.
-     * @param {{}} attrs 
-     */
-    ariaset(attrs) {
-        for (const [key, val] of Object.entries(attrs)) {
-            setAttr(this.node, `aria-${key}`, String(v))
-        }
-        return this
-    }
-
-    /**
-     * @param {"add"|"remove"|"toggle"} action 
-     * @param {...string} tokens 
-     */
-    classList(action, ...tokens) {
-        for (const token of tokens) {
-            this.node.classList[action]?.(token)
-        }
-        return this
-    }
-
-    /**
-     * Hides this node after a given timeout by setting a hidden attribute.
-     * @param {number} timeout 
-     */
-    hide(timeout = 0) {
-        setTimeout(() => setAttr(this.node, 'hidden', ''), timeout)
-        return this
-    }
-
-    /**
-     * Displays back this node if initially hidden.
-     * @param {number} timeout 
-     */
-    display(timeout = 0) {
-        if (hasAttr(this.node, 'hidden')) setTimeout(() => removeAttr(this.node, 'hidden'), timeout)
-        return this
-    }
-
-    focus() {
-        this.node.focus()
-        return this
-    }
-
-    blur() {
-        this.node.blur()
-        return this
-    }
-
-    /**
-     * Sets the pointer-events CSS property as an attribute to this node.
-     * @param {"all"|"none"} v 
-     */
-    pointerEvents(v) {
-        let a = (v === "all") ? 'all' : 'none'
-        setAttr(this.node, 'pointer-events', a)
-        return this
-    }
-
-    /**
-     * Executes a callback after a given timeout ones the DOM has fully loaded.
-     * @param {()} callback 
-     * @param {number} timeout 
-     */
-    DOMLoaded(callback, timeout = 0) {
-        (document.readyState === "complete") ? setTimeout(callback, timeout) : on("DOMContentLoaded", document, () => {setTimeout(callback, timeout)})
-        return this
-    }
 
     /**
      * @param {string} ev @param {string|Node} target @param {...Function} handlers 
