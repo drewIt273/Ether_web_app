@@ -637,17 +637,6 @@ export class UIComponent extends UIBase {
     }
 
     /**
-     * Removes this node from it's parent and appends it into target as a new child of target.
-     * @param {Node | string} target 
-     */
-    appendTo(target) {
-        this.node.parentElement?.removeChild(this.node);
-        this.mount(target)
-
-        return this 
-    }
-
-    /**
      * @param {Node|UIComponent} target 
      */
     mount(target) {
