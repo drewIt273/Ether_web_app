@@ -414,7 +414,7 @@ export class UICell extends UIBase {
      * @param  {...Node} nodes 
      */
     append(...nodes) {
-        nodes.forEach(node => this.node.appendChild(node))
+        for (const n of nodes) this.node.appendChild(n)
         return this
     }
 
@@ -619,13 +619,13 @@ export class UIComponent extends UIBase {
     }
 
     /**
-     * @param {...Node|UIComponent} nodes
+     * Appends multiple nodes, UICells, UIBlocks and UIComponents into this UIComponent.
+     * @param {(Node|UICell|UIBlock|UIComponent)[]} o 
      */
-    append(...nodes) {
-        nodes.forEach(n => {
-            isNode(n) ? this.node.appendChild(n) : n instanceof UIComponent ? this.node.appendChild(n.node) : this.append(new div)
-        })
-        return this
+    set append(o) {
+        for (const h of o) {
+            isNode(h) ? this.node.appendChild(h) : (h instanceof UIBase, h.mount(this))
+        }
     }
 
     /**
