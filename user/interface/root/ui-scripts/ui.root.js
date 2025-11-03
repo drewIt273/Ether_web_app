@@ -383,6 +383,28 @@ export class UIBase {
         return this
     }
     
+    /**
+     * Add event listeners to this node and writes them into the activeListeners registry.
+     * @param {string} ev @param  {...(node: Node)} handlers 
+     */
+    on(ev, ...handlers) {
+        handlers.forEach(handler => {
+            on(ev, this.node, handler.call(this, this.node))
+        }) 
+        return this
+    }
+
+    /**
+     * Removes event listeners from this node if no selector is given and writes them into the backlogListeners registry. Does same for all descendants matching selector if selector is given.
+     * @param {string} s selector
+     */
+    off(s = '') {
+        if (!s) off(this.node)
+        else if (typeof s === 'string') {
+            this.findAll(s).forEach(e => off(e))
+        }
+        return this
+    }    
 }
 
 export class UICell extends UIBase {
@@ -803,29 +825,6 @@ export class UIComponent extends UIBase {
         handlers.forEach(handler => {
             on(ev, target, handler)
         }) 
-        return this
-    }
-
-    /**
-     * Add event listeners to this node and writes them into the activeListeners registry.
-     * @param {string} ev @param  {...(node: Node)} handlers 
-     */
-    on(ev, ...handlers) {
-        handlers.forEach(handler => {
-            on(ev, this.node, handler.call(this, this.node))
-        }) 
-        return this
-    }
-
-    /**
-     * Removes event listeners from this node if no selector is given and writes them into the backlogListeners registry. Does same for all descendants matching selector if selector is given.
-     * @param {string} s selector
-     */
-    off(s = '') {
-        if (!s) off(this.node)
-        else if (typeof s === 'string') {
-            findAll(`${this.selector} ${s}`).forEach(n => off(n))
-        }
         return this
     }
     
