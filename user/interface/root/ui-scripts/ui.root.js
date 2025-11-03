@@ -608,6 +608,7 @@ export class UIComponent extends UIBase {
         this.#sheet.base = `[ui-component-id="${this.ID}"]`
         this.#sheet.id = this.ID
         this.subcomponents = []
+        this.parentComponent = null
     }
 
     #sheet = new stylesheet
@@ -616,21 +617,6 @@ export class UIComponent extends UIBase {
         return Array.from(this.node.childNodes)
     }
 
-    /**
-     * Returns this node as a selector string that can be used later in searching this node using find, findAll, etc.
-     */
-    get selector() {
-        let s = '', n = this.node, c = n.classList
-        if (n.id.length > 0) s += `#${n.id}`
-        if (c.length > 0) {
-            for (let i = 0; i < c.length; i++) {
-                s += `.${c.item(i)}`
-            }
-        }
-        s += `[ui-component-id="${this.ID}"]`
-
-        return `${this.node.tagName.toLowerCase()}${s}`
-    }
 
     /**
      * @param {{}} o 
@@ -833,7 +819,6 @@ export class UIComponent extends UIBase {
      */
     destroy() {
         this.unmount().off().node = null
-        this.subcomponents.forEach(c => c.destroy())
         this.#sheet.remove()
         return this
     }
