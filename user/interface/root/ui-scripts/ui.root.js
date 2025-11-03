@@ -22,7 +22,7 @@ export class UIBase {
         this.node = isString(node) ? create(node) : isNode(node) ? node : new div
         this.classList = this.node.classList
         this.innerHTML = this.node.innerHTML
-        this.childNodes = this.node.childNodes
+        this.childNodes = Array.from(this.node.childNodes)
         this.parent = this.node.parentNode
         this.registeredKey = registry.write({node: this.node, id: this.ID, mounted: false})
         this.#reg = registry
