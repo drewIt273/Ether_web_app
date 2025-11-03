@@ -640,13 +640,17 @@ export class UIComponent extends UIBase {
     }
 
     /**
-     * Mounts this by appending it into target and registering it into ActiveUIComponents.
-     * @param {Node | string} target 
+     * @param {Node|UIComponent} target 
      */
     mount(target) {
         find(target)?.appendChild(this.node)
+        if (target instanceof UIComponent) {
+            target.node.appendChild(this.node)
+            target.subcomponents.push(this.node)
+            this.parentComponent = target.node
+        }
+        else if (cellOrBlock(target)) throw new Error(`A UIComponent cannot mount ${target}`)
         ActiveUIComponents.get(this.registeredKey).mounted = !0
-        this.subcomponents.forEach(c => c.mount(this.node));
         if (typeof this.init === 'function') this.init()
         return this
     }
@@ -655,7 +659,6 @@ export class UIComponent extends UIBase {
      * Unmounts this by removing it from the DOM and from the ActiveUIComponents registry.
      */
     unmount() {
-        this.subcomponents.forEach(c => c.unmount());
         removeNode(this.node)
         ActiveUIComponents.get(this.registeredKey).mounted = !1
         ActiveUIComponents.remove(this.registeredKey)
