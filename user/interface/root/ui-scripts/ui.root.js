@@ -797,13 +797,6 @@ export class UIComponent extends UIBase {
         return this
     }
 
-    attrs(obj = {}) {
-        for (const [prop, val] of Object.entries(obj)) {
-            setAttr(this.node, toKebab(prop), val)
-        }
-        return this
-    } 
-
     /**
      * @param {string} ev @param {string|Node} target @param {...Function} handlers 
      */
