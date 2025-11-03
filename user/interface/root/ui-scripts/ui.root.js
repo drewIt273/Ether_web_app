@@ -88,7 +88,12 @@ export class UIBase {
      */
     contains(other) {
         return isNode(other) ? this.node.contains(other) : (isString(other), this.node.querySelector(other)) ? !0 : !1
-    }    
+    }
+
+    empty() {
+        this.childNodes.forEach(c => c.remove())
+        return this
+    }
 
     /**
      * Sets styles by an object o.
@@ -669,11 +674,6 @@ export class UIComponent extends UIBase {
     remove(n) {
         if (isString(n)) removeNode(`${this.selector} ${n}`)
         else if (isNode(n)) removeNode(n)
-        return this
-    }
-
-    empty() {
-        this.children.forEach(c => removeNode(c))
         return this
     }
 
