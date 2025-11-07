@@ -807,9 +807,8 @@ export class UIComponent extends UIBase {
 }
 
 /**
- * 
  * @param {UICell|UIBlock} n 
  */
 export function cellOrBlock(n) {
-    return n instanceof UICell || UIBlock
+    return (n instanceof UICell) ? !0 : (n instanceof UIBlock) ? !0 : !1
 }
