@@ -24,7 +24,6 @@ export class UIBase {
         this.innerHTML = this.node.innerHTML
         this.childNodes = Array.from(this.node.childNodes)
         this.parent = this.node.parentNode
-        this.registeredKey = registry.write({node: this.node, id: this.ID, mounted: false})
         this.#reg = registry
     }
 
@@ -422,6 +421,7 @@ export class UICell extends UIBase {
         this.parentBlock = null
         this.emittedData = new Registry
         this.receivedData = new Registry
+        this.registeredKey = ActiveUICells.write({node: this.node, id: this.ID, mounted: false})
         this.attrs({'ui-cell-id': this.ID})
     }
 
@@ -545,6 +545,7 @@ export class UIBlock extends UIBase {
         this.parentBlock = null
         this.childCells = []
         this.subBlocks = []
+        this.registeredKey = ActiveUIBlocks.write({node: this.node, id: this.ID, mounted: false})
         this.attrs({'ui-block-id': this.ID})
     }
 
@@ -613,6 +614,7 @@ export class UIComponent extends UIBase {
         this.#sheet.id = this.ID
         this.subcomponents = []
         this.parentComponent = null
+        this.registeredKey = ActiveUIComponents.write({node: this.node, id: this.ID, mounted: false})
     }
 
     #sheet = new stylesheet
@@ -620,7 +622,6 @@ export class UIComponent extends UIBase {
     get children() {
         return Array.from(this.node.childNodes)
     }
-
 
     /**
      * @param {{}} o 
