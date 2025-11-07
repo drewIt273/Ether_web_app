@@ -5,6 +5,7 @@
  */
 
 import {jsx} from "./nodecreator.js";
+import {strictObject} from "./utilities/any.js";
 
 const v24 = {
     fill: 'none',
@@ -838,3 +839,14 @@ export const vector = {
         })
     }
 }
+
+function makeFreshNodes(o) {
+    for (const [key, value] of Object.entries(o)) {
+        if (strictObject(value)) {
+            makeFreshNodes(value); // recurse
+        } else {
+            o[key] = () => value.cloneNode(true);
+        }
+    }
+}
+makeFreshNodes(vector)  
