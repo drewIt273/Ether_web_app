@@ -311,10 +311,11 @@ export class UIBase {
     }
 
     /**
-     * @param {string} attr @param {string} val 
+     * Sets data attributes.
+     * @param {{}} attrs
      */
-    dataset(attr, val) {
-        dataset(this.node, attr, val)
+    dataset(attrs) {
+        for (const [k, v] of Object.entries(attrs)) setAttr(this.node, `data-${k}`, String(v))
         return this
     }
 
@@ -323,9 +324,7 @@ export class UIBase {
      * @param {{}} attrs 
      */
     ariaset(attrs) {
-        for (const [key, val] of Object.entries(attrs)) {
-            setAttr(this.node, `aria-${key}`, String(val))
-        }
+        for (const [k, v] of Object.entries(attrs)) setAttr(this.node, `aria-${k}`, String(v))
         return this
     }
 
@@ -333,7 +332,7 @@ export class UIBase {
      * @param {"add"|"remove"|"toggle"} action 
      * @param {...string} tokens 
      */
-    classList(action, ...tokens) {
+    classSet(action, ...tokens) {
         for (const token of tokens) {
             this.node.classList[action]?.(token)
         }
