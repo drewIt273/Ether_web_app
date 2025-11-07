@@ -642,10 +642,11 @@ export class UIComponent extends UIBase {
     }
 
     /**
+     * Mounts this UIComponent on to a node or to another UIComponent.
      * @param {Node|UIComponent} target 
      */
     mount(target) {
-        find(target)?.appendChild(this.node)
+        if (isNode(target)) {find(target)?.appendChild(this.node); return this}
         if (target instanceof UIComponent) {
             target.node.appendChild(this.node)
             target.subcomponents.push(this.node)
@@ -653,12 +654,11 @@ export class UIComponent extends UIBase {
         }
         else if (cellOrBlock(target)) throw new Error(`A UIComponent cannot mount ${target}`)
         ActiveUIComponents.get(this.registeredKey).mounted = !0
-        if (typeof this.init === 'function') this.init()
         return this
     }
 
     /**
-     * Unmounts this by removing it from the DOM and from the ActiveUIComponents registry.
+     * Unmounts this component by removing it from the DOM and from the ActiveUIComponents registry.
      */
     unmount() {
         removeNode(this.node)
@@ -679,12 +679,12 @@ export class UIComponent extends UIBase {
 
     /**
      * Updates the content of one or more descendant nodes of this UIComponent.
-     * @param {string|Node} target Can be a node or a string. Can take a special character, '$' which refers to this UIComponent's root node.
+     * @param {"&"|string|Node} target Can be a node or a string. Can take a special character, '&' which refers to this UIComponent's root node.
      * @param {{append?: Node|Node[], content?: string, replace?: Node|Node[], render?: Boolean|[Boolean, Function]}} options 
      */
     update(target, options) {
         let nodes;
-        if (target === '$') nodes = [this.node]
+        if (target === '&') nodes = [this.node]
         else if (isNode(target)) {
             if (!this.node.contains(target)) return undefined
             nodes = [target]
