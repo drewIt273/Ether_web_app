@@ -552,9 +552,40 @@ export class UIBlock extends UIBase {
         this.registeredKey = ActiveUIBlocks.write({node: this.node, id: this.ID, mounted: false})
         this.attrs({'ui-block-id': this.ID})
         UINodeMap.set(this.node, this)
+        const observer = new MutationObserver(mutations => {
+            for (const mutation of mutations) {
+                if (mutation.addedNodes.length) for (const added of mutation.addedNodes) this.#reg(added, 'add')
+                else if (mutation.removedNodes.length) for (const removed of mutation.removedNodes) this.#reg(removed, 'remove')
+            }
+        })
+        observer.observe(this.node, {childList: true, subtree: true})
     }
 
     #T = null
+    #reg = (n, v) => {
+        const construct = UIConstructorOf(n)
+        if (v === 'add') {
+            if (n.hasAttribute('ui-block-id')) {
+                console.log('bilin')
+                if (!this.subBlocks.includes(n)) this.subBlocks.push(n)
+                ActiveUIBlocks.get(construct.registeredKey).mounted = !0
+            }
+            else if (n.hasAttribute('ui-cell-id')) {
+                if (!this.childCells.includes(n)) this.childCells.push(n)
+                ActiveUICells.get(construct.registeredKey).mounted = !0
+            }
+        }
+        else if (v === 'remove') {
+            if (n.hasAttribute('ui-block-id')) {
+                if (this.subBlocks.includes(n)) this.subBlocks.splice(this.subBlocks.indexOf(n), 1)
+                ActiveUIBlocks.get(construct.registeredKey).mounted = !1
+            }
+            else if (n.hasAttribute('ui-cell-id')) {
+                if (this.childCells.includes(n)) this.childCells.splice(this.childCells.indexOf(n), 1)
+                ActiveUICells.get(construct.registeredKey).mounted = !1
+            }
+        }
+    }
 
     /**
      * Appends multiple nodes, UICells and UIBlocks into this UIBlock.
@@ -621,9 +652,40 @@ export class UIComponent extends UIBase {
         this.parentComponent = null
         this.registeredKey = ActiveUIComponents.write({node: this.node, id: this.ID, mounted: false})
         UINodeMap.set(this.node, this)
+        const observer = new MutationObserver(mutations => {
+            for (const mutation of mutations) {
+                if (mutation.addedNodes.length) for (const added of mutation.addedNodes) this.#reg(added, 'add')
+                else if (mutation.removedNodes.length) for (const removed of mutation.removedNodes) this.#reg(removed, 'remove')
+            }
+        })
+        observer.observe(this.node, {childList: true, subtree: true})
     }
 
     #sheet = new stylesheet
+    #reg = (n, v) => {
+        const construct = UIConstructorOf(n)
+        if (v === 'add') {
+            if (n.hasAttribute('ui-block-id')) {
+                console.log('bilin')
+                if (!this.childBlocks.includes(n)) this.childBlocks.push(n)
+                ActiveUIBlocks.get(construct.registeredKey).mounted = !0
+            }
+            else if (n.hasAttribute('ui-component-id')) {
+                if (!this.subcomponents.includes(n)) this.subcomponents.push(n)
+                ActiveUIComponents.get(construct.registeredKey).mounted = !0
+            }
+        }
+        else if (v === 'remove') {
+            if (n.hasAttribute('ui-block-id')) {
+                if (this.childBlocks.includes(n)) this.childBlocks.splice(this.childBlocks.indexOf(n), 1)
+                ActiveUIBlocks.get(construct.registeredKey).mounted = !1
+            }
+            else if (n.hasAttribute('ui-component-id')) {
+                if (this.subcomponents.includes(n)) this.subcomponents.splice(this.subcomponents.indexOf(n), 1)
+                ActiveUIComponents.get(construct.registeredKey).mounted = !1
+            }
+        }
+    }
 
     get children() {
         return Array.from(this.node.childNodes)
