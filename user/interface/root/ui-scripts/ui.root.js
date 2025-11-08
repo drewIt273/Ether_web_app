@@ -12,6 +12,9 @@ export const ActiveUICells = new Registry;
 export const ActiveUIBlocks = new Registry;
 export const ActiveUIComponents = new Registry;
 
+/**@type {WeakMap<Node, UICell|UIBlock|UIComponent>}*/
+export const UINodeMap = new WeakMap()
+
 export class UIBase {
 
     /**
@@ -423,6 +426,7 @@ export class UICell extends UIBase {
         this.receivedData = new Registry
         this.registeredKey = ActiveUICells.write({node: this.node, id: this.ID, mounted: false})
         this.attrs({'ui-cell-id': this.ID})
+        UINodeMap.set(this.node, this)
     }
 
     #T = null
@@ -547,6 +551,7 @@ export class UIBlock extends UIBase {
         this.subBlocks = []
         this.registeredKey = ActiveUIBlocks.write({node: this.node, id: this.ID, mounted: false})
         this.attrs({'ui-block-id': this.ID})
+        UINodeMap.set(this.node, this)
     }
 
     #T = null
@@ -615,6 +620,7 @@ export class UIComponent extends UIBase {
         this.subcomponents = []
         this.parentComponent = null
         this.registeredKey = ActiveUIComponents.write({node: this.node, id: this.ID, mounted: false})
+        UINodeMap.set(this.node, this)
     }
 
     #sheet = new stylesheet
@@ -637,7 +643,7 @@ export class UIComponent extends UIBase {
      */
     set append(o) {
         for (const h of o) {
-            isNode(h) ? this.node.appendChild(h) : (h instanceof UIBase, h.mount(this))
+            isNode(h) ? this.node.appendChild(h) : (h instanceof UIBase ? h.mount(this) : null)
         }
     }
 
@@ -804,6 +810,15 @@ export class UIComponent extends UIBase {
         this.#sheet.remove()
         return this
     }
+}
+
+/**
+ * Returns the UI instance associated with a node or selector.
+ * @param {string|Node} target 
+ */
+export function UIConstructorOf(target) {
+    let t; typeof target === 'string' ? t = document.querySelector(target) : target instanceof Node ? t = target : null
+    return UINodeMap.get(t) || null
 }
 
 /**
