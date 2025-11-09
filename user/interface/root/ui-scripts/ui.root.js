@@ -68,7 +68,6 @@ export class UIBase {
                 s += `.${c.item(i)}`
             }
         }
-        s += `[ui-component-id="${this.ID}"]`
 
         return `${this.node.tagName.toLowerCase()}${s}`
     }
@@ -210,11 +209,7 @@ export class UIBase {
 
         /** @param {KeyboardEvent} e */
         const listener = e => {
-            const ctrl = keyParts.includes('ctrl') ? e.ctrlKey : true;
-            const shift = keyParts.includes('shift') ? e.shiftKey : true;
-            const alt = keyParts.includes('alt') ? e.altKey : true;
-            const meta = keyParts.includes('meta') ? e.metaKey : true;
-            const mainKey = keyParts.find(k => !['ctrl','shift','alt','meta'].includes(k));
+            const ctrl = keyParts.includes('ctrl') ? e.ctrlKey : true, shift = keyParts.includes('shift') ? e.shiftKey : true, alt = keyParts.includes('alt') ? e.altKey : true, meta = keyParts.includes('meta') ? e.metaKey : true, mainKey = keyParts.find(k => !['ctrl','shift','alt','meta'].includes(k));
             if (ctrl && shift && alt && meta && e.key.toLowerCase() === mainKey) {
                 e.preventDefault();
                 handler.call(this, e);
@@ -625,8 +620,8 @@ export class UIBlock extends UIBase {
             removeNode(this.node)
             ActiveUIBlocks.get(this.registeredKey).mounted = !1
             this.parentBlock = null, this.parentComponent = null
-            let p = this.#T.childBlocks || this.#T.subBlocks
-            p = p.filter(n => n !== this.node)
+            let p = this.#T?.childBlocks || this.#T?.subBlocks
+            p = p?.filter(n => n !== this.node)
         }
         return this
     }
