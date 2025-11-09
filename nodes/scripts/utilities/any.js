@@ -341,26 +341,55 @@ export function on(ev, target, ...handlers) {
 }
 
 /**
- * Removes all event listeners from matching selectors and registers their listeners into the backlogListeners registry, removing them from activeListeners.
- * This function only works for targets that where registered in activeListeners.
- * @param {string|Node} target 
+ * Removes previously registered event listeners from targets and registers their listeners into the backlogListeners registry, removing them from activeListeners.
+ * @param {string} ev @param {string|Node} target @param {...()} handlers
  */
-export function off(target) {
-    const nodes = typeof target === 'string' ? findAll(target) : [target]
+export function off(ev, target, ...handlers) {
+    const nodes = isString(target) ? findAll(target) : [target];
+    const unbubble = new Set(['mouseenter', 'mouseleave', 'blur', 'focus', 'pointerenter', 'pointerleave']);
 
     nodes.forEach(node => {
-        const toRemove = activeListeners.filter(o => o.node === node)
+        const existing = activeListeners.find(o => o.node === node && o.ev === ev);
+        if (!existing) return;
 
-        toRemove.forEach(o => {
-            o.fn.forEach(f => o.node.removeEventListener(o.ev, f))
-            if (!backlogListeners.includesValue(o)) backlogListeners.write(o)
-            o.in = 'backlog'
-        })
+        // Remove only the specified handlers, or all if none specified
+            if (handlers.length) {
+                existing.fn = existing.fn.filter(fn => !handlers.includes(fn));
+            }
+            else {
+                existing.fn.length = 0;
+            }
 
-        // Mutate activeListeners in place
-            activeListeners.mutate(o => o.node !== node)
+        // Remove direct listeners for non-bubbling events
+            if (unbubble.has(ev)) {
+                const el = find(node);
+                if (el) {
+                    const toRemove = handlers.length ? handlers : existing.fn;
+                    toRemove.forEach(fn => el.removeEventListener(ev, fn));
+                }
+            }
+
+        // If no handlers left, remove from activeListeners
+            if (!existing.fn.length) {
+                activeListeners.splice(0, activeListeners.size, activeListeners.filter(o => o !== existing)
+                )
+            }
     })
+
+    // Remove global delegated listener if no more handlers exist for bubbling events
+        if (!unbubble.has(ev)) {
+            const stillActive = activeListeners.some(o => o.ev === ev);
+            if (!stillActive && ActiveGlobals.has(ev)) {
+                ActiveGlobals.delete(ev);
+                const listener = GlobalDelegates.get(ev);
+                if (listener) {
+                    document.body.removeEventListener(ev, listener);
+                    GlobalDelegates.delete(ev);
+                }
+            }
+        }
 }
+
 
 /**
  * Restores all event listeners from backlog for matching selectors
