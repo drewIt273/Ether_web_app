@@ -277,12 +277,20 @@ export const backlogListeners = new Registry
 /**A registry for deleted nodes */
 export const backlogNodes = new Registry
 
+/**Track which global events are already delegated @type {Set<string>} */
+export const ActiveGlobals = new Set()
+
+/**Stores references to global delegated listeners so they can be removed later @type {Map<string, ()>} */
+export const GlobalDelegates = new Map()
+
 /**
  * Adds event listeners to all matching selectors for each given handler and registers their listeners into the activeListeners registry, removing them from backlogListeners if found.
- * @param {string} ev @param {Function[]} handlers @param {string|Node} target 
+ * @param {string} ev @param {string|Node} target  @param {...(e: Event)} handlers
  */
 export function on(ev, target, ...handlers) {
-    const nodes = typeof target === 'string' ? findAll(target) : [target]
+    const nodes = isString(target) ? findAll(target) : [target]
+    const unbubble = new Set(['mouseenter', 'mouseleave', 'blur', 'focus', 'pointerenter', 'pointerleave'])
+    console.log(activeListeners, ActiveGlobals, GlobalDelegates); // Testing, don't mind.
     
     nodes.forEach(node => {
         let existing = activeListeners.find(o => o.node === node && o.ev === ev)
@@ -290,21 +298,46 @@ export function on(ev, target, ...handlers) {
         if (existing) {
             // Only add handlers that aren’t already registered
                 handlers.forEach(handler => {
-                    if (!existing.fn.includes(handler)) {
-                        node.addEventListener(ev, handler)
-                        existing.fn.push(handler)
-                    }
+                    if (!existing.fn.includes(handler)) existing.fn.push(handler)
                 })
         }
         else {
             // New entry
-                handlers.forEach(handler => node.addEventListener(ev, handler))
-                activeListeners.write({node, ev, fn: [...handlers], in: 'active'})
+                if (!unbubble.has(ev)) activeListeners.write({node, ev, fn: [...handlers], in: 'active'})
         }
 
         // Ensure this node isn't still in backlog
             backlogListeners.splice(0, backlogListeners.size, backlogListeners.filter(o => o.node !== node))
     })
+
+    if (!ActiveGlobals.has(ev)) {
+        ActiveGlobals.add(ev)
+        if (unbubble.has(ev)) {
+            nodes.forEach(n => {
+                const node = find(n)
+                handlers.forEach(handler => node.addEventListener(ev, e => handler.call(node, e)))
+            })
+        }
+        else {
+            const delegatedListener = e => {
+                activeListeners.filter(o => o.ev === ev).forEach(o => {
+                    if (isString(o.node)) {
+                        const matched = e.target.closest(o.node);
+                        if (matched && document.body.contains(matched)) {
+                            o.fn.forEach(fn => fn.call(matched, e));
+                        }
+                    }
+                    else if (isNode(o.node)) {
+                        if (o.node.contains(e.target)) {
+                            o.fn.forEach(fn => fn.call(o.node, e));
+                        }
+                    }
+                })
+            }
+            document.body.addEventListener(ev, delegatedListener)
+            GlobalDelegates.set(ev, delegatedListener)
+        }
+    }
 }
 
 /**
