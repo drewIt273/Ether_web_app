@@ -36,7 +36,7 @@ body {
     -webkit-text-size-adjust: 100%;
     line-height: 1.5;
 }
-body.layoutScrollbarObstructive [default-scrollbar] {
+body [default-scrollbar] {
     scrollbar-width: thin;
     scrollbar-color: var(--bg-scrollbar-color);
 }
@@ -79,46 +79,6 @@ html button {
         overflow: clip;
     }
 }
-aside#sidebar-nav {
-    position: fixed;
-    z-index: 56;
-    overflow: hidden;
-    width: 290px;
-    border: 1px solid var(--cr-transparent);
-    transition: all .3s var(--ease-in-quad);
-}
-html[aside-state="fixed"] aside#sidebar-nav {
-    border-right-color: var(--bg-border-color);
-    bottom: 0px;
-    height: 100dvh;
-}
-html[aside-state="fixed"] #h01 {
-    width: 290px;
-    position: relative;
-}
-html[aside-state="absolute"] aside#sidebar-nav {
-    border-radius: 9px;
-    margin-left: 10px;
-    margin-top: 20px;
-    bottom: 20px;
-    height: calc(100dvh - 40px);
-    background-color: var(--bg-aside-color);
-}
-html[aside-state="absolute"] #h01 {
-    width: 10px;
-    height: 100%;
-    z-index: 1;
-}
-html va-tooltip {
-    background-color: var(--bg-tooltip-color);
-    border: 1px solid var(--bg-border-color);
-    transition: all .4s var(--ease-in-cubic);
-    position: absolute;
-    z-index: 60;
-    border-radius: 5px;
-    font-size: 13px;
-    padding: 2px 8px;
-}
 html #mainBody {
     flex: 1;
     transition: all .3s var(--ease-in-out-circ);
@@ -139,28 +99,8 @@ html #mainBody #absolute-topbar {
     top: 0;
     z-index: 1;
 }
-html #mainBody #absolute-topbar>* * {
-    z-index: 40;
-}
-html #mainBody #absolute-topbar>* {
-    display: flex;
-}
 app-layer[data-layer-type="nocontent"] {
     display: flex !important;
     justify-content: center;
     align-items: center;
-}
-html #layer-name {
-    font-size: 14px;
-    opacity: .7;
-}
-app-vector {
-    height: 90px;
-    width: 90px;
-    display: block;
-    position: static;
-}
-app-vector svg {
-    height: 100%;
-    width: 100%;
 }
