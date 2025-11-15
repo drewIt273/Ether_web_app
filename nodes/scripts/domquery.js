@@ -39,9 +39,7 @@ class query$ {
 
     on(event, callback, delay = 0) {
         this.nodes.forEach(node => {
-            E = node; document.body.addEventListener(event, e => {
-                if (e.target.matches(node)) setTimeout(callback, delay)
-            })
+            on(event, node, (e) => {setTimeout(callback.call(this, e), delay)})
         })
 
         return this // For chaining
