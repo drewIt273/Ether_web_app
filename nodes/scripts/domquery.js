@@ -4,13 +4,6 @@
  * domquery.js
  */
 
-/**
- * E is a variable used by some query$ methods to reference an element, node or node list the method returns.
- * Use this only when you want to do something on the returned item.
- * 
- * Not all query$ methods sets a value for E. Only those needing a function as a parameter
- */
-export let E;
 import {on, off} from "./utilities/any.js";
 
 class query$ {
@@ -56,7 +49,7 @@ class query$ {
 
     onload(callback, timeout = 0) {
         document.addEventListener("DOMContentLoaded", () => {
-            setTimeout(callback, timeout); E = this.nodes
+            setTimeout(callback, timeout);
         });
 
         return this
@@ -64,7 +57,7 @@ class query$ {
 
     delegate(eventType, handler, selector = "") {
         if (selector === "" || undefined) {
-            this.nodes.forEach(node => {
+            this.nodes.forEach(() => {
                 on(eventType, this.selector, handler);
             })
         }
@@ -77,12 +70,10 @@ class query$ {
 
     removeListeners() {
         off(this.selector)
-
         return this
     }
 
     hover(enter, leave, enterDelay = 0, leaveDelay = 0) {
-        E = this.nodes;
         this.on("mouseenter", () => enter, enterDelay)
         this.on("mouseleave", () => leave, leaveDelay)
 
@@ -90,7 +81,7 @@ class query$ {
     }
 
     hover0(enter, leave, enterDelay = 0, leaveDelay = 0) {
-        let t = this.nodes.at(0); E = t;
+        let t = this.nodes.at(0);
         t.addEventListener("mouseenter", () => setTimeout(() => enter, enterDelay))
         t.addEventListener("mouseleave", () => setTimeout(() => leave, leaveDelay))
 
@@ -172,7 +163,6 @@ class query$ {
 
     append(...nodes) {
         this.nodes.forEach(node => {
-            E = node
             nodes.forEach(n => {
                 node.innerHTML += n
             })
