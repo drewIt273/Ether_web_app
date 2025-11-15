@@ -20,8 +20,14 @@ This project is also a learning journey—to help me level up my skills in **HTM
 - **Notes:**  
   Take, edit, and organize notes easily.
 
+- **Interactive UI:**  
+  Work while enjoying a well built UI.
+
 - **Flexible Local Storage:**  
   Projects and notes are saved on your device (future: sync & backup options).
+
+- **Spaces:**  
+  Create named Spaces to group related issues, projects, notes, pages...
 
 ## Tech Stack
 
