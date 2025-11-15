@@ -428,10 +428,3 @@ export function removeNode(target, log = false) {
             if (log) backlogNodes.write({node, in: 'backlog'})
     })
 }
-
-// CSS Helpers
-
-/**
- * @param {string} v 
- */
-export const cvar = v => `var(--${toKebab(v)})`, px = n => `${n}px`, dvh = n => `${n}dvh`
