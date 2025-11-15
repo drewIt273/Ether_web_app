@@ -30,9 +30,3 @@ html[data-theme="notion-light-theme"] {
     --bg-aside-color: #F8F8F6;
     --bg-secondrary-color: #FCFCFC;
 }
-html[aside-state="fixed"] aside#sidebar-nav {
-    background: var(--bg-aside-color);
-}
-html[aside-state="absolute"] aside#sidebar-nav {
-    background: var(--bg-base-color);
-}
