@@ -4,10 +4,9 @@
  * ui.root.js
  */
 
-import {isNode, isString, create, find, findAll, toKebab, setAttr, hasAttr, removeAttr, dataset, on, off, ranstring, strictObject, removeNode, setStyle, Registry, isArray, getStyle} from "../../../../nodes/scripts/utilities/any.js";
+import {isNode, isString, create, find, toKebab, setAttr, hasAttr, removeAttr, on, off, ranstring, strictObject, removeNode, setStyle, Registry, isArray, getStyle} from "../../../../nodes/scripts/utilities/any.js";
 import {div} from "../../../../nodes/scripts/nodecreator.js";
 import {stylesheet} from "../../../../nodes/scripts/stylesheet.js";
-import {runtime} from "../../../../root/core/runtime.js";
 
 export const ActiveUICells = new Registry;
 export const ActiveUIBlocks = new Registry;
@@ -126,12 +125,12 @@ export class UIBase {
 
     /**
      * 
-     * @param {Function} callback @param {number} duration 
+     * @param {(this: Node)} callback @param {number} duration 
      */
     fadeIn(callback, duration = 400) {
         const computed = getComputedStyle(this.node);
         if (computed.display !== "none" || computed.opacity === 1) {
-            if (callback) callback.call(this.node);
+            if (callback) callback.call(this, this.node);
             return;
         }
         if (!this.node._fadeOriginalDisplay)
@@ -144,7 +143,7 @@ export class UIBase {
         const handler = () => {
             this.node.style.transition = '';
             this.node.removeEventListener("transitionend", handler)
-            if (callback) callback.call(this.node)
+            if (callback) callback.call(this, this.node)
         }
 
         this.node.addEventListener("transitionend", handler)
@@ -154,12 +153,12 @@ export class UIBase {
 
     /**
      * 
-     * @param {Function} callback @param {number} duration 
+     * @param {(this: Node)} callback @param {number} duration 
      */
     fadeOut(callback, duration = 400) {
         const computed = getComputedStyle(this.node);
         if (computed.display === 'none') {
-            if (callback) callback.call(this.node)
+            if (callback) callback.call(this, this.node)
             return;
         }
 
@@ -171,7 +170,7 @@ export class UIBase {
             if (e.propertyName !== 'opacity') return;
             this.node.style.transition = ''; this.node.style.display = 'none';
             this.node.removeEventListener('transitionend', handler);
-            if (callback) callback.call(this.node)
+            if (callback) callback.call(this, this.node)
         }
 
         this.node.addEventListener('transitionend', handler)
@@ -181,14 +180,14 @@ export class UIBase {
 
     /**
      * 
-     * @param {Function} callback @param {number} duration 
+     * @param {(this: Node)} callback @param {number} duration 
      */
     fadeToggle(callback, duration = 400) {
         const computed = getComputedStyle(this.node);
         if (computed.display === 'none' || computed.opacity === 0) {
-            this.fadeIn.call({node: this.node}, callback, duration)
+            this.fadeIn.call({node: this.node}, () => callback.call(this, this.node), duration)
         } else {
-            this.fadeOut.call({node: this.node}, callback, duration)
+            this.fadeOut.call({node: this.node}, () => callback.call(this, this.node), duration)
         }
 
         return this
