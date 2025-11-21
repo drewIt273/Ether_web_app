@@ -24,7 +24,7 @@ function createFromSpec(spec) {
 /**
  * 
  * @param {string} tag 
- * @param {{class: string, id: string, style: {}|string, innerHTML: string, textContent: string, append: Node[], on: Function, attrs: {}}} props 
+ * @param {{class: string, id: string, style: {}|string, innerHTML: string, textContent: string, append: Node[], on: (e: Node), attrs: {}}} props 
  */
 export function jsx(tag = "div", props = {}) {
 
@@ -93,7 +93,7 @@ export function jsx(tag = "div", props = {}) {
         // Event listeners onClick -> click
             if (/^on[A-Z]/.test(key) && typeof value === "function") {
                 const ev = key.slice(2).toLowerCase()
-                on(ev, E, value)
+                on(ev, E, () => value.call(this, E))
                 continue;
             }
 
