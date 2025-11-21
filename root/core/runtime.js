@@ -11,7 +11,15 @@ class Kernel {
     constructor() {
         /**Returns the modules constructors */
         this.modules = {dom};
-        this.dom = new dom;
+        this.dom = new dom(this);
+    }
+
+    async boot() {
+        await this.#runstartupHooks()
+    }
+
+    #runstartupHooks() {
+        // Will call lifecycle hooks.
     }
 }
 
