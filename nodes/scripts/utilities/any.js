@@ -72,7 +72,8 @@ export class Registry {
      * @param {{}} src 
      */
     constructor(src = {}) {
-        this.register = strictObject(src) ? {...src} : {}
+        /**A reference to the registry object */
+        this.reg = strictObject(src) ? {...src} : {}
     }
 
     #generatekey() {
@@ -81,7 +82,7 @@ export class Registry {
         do {
             key = Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
         }
-        while (this.register.hasOwnProperty(key))
+        while (this.reg.hasOwnProperty(key))
         return key
     }
 
@@ -92,7 +93,7 @@ export class Registry {
      */
     write(data, key = '') {
         if (!isString(key) || !key || key === '') key = this.#generatekey()
-        this.register[key] = data
+        this.reg[key] = data
         return key
     }
 
@@ -101,7 +102,7 @@ export class Registry {
      * @param {(value: any, key: string)} callback 
      */
     forEach(callback) {
-        Object.entries(this.register).forEach(([key, value]) => callback(value, key));
+        Object.entries(this.reg).forEach(([key, value]) => callback(value, key));
         return this
     }
 
@@ -110,7 +111,7 @@ export class Registry {
      * @param {string} key 
      */
     get(key) {
-        return this.register[key]
+        return this.reg[key]
     }
 
     /**
@@ -118,7 +119,7 @@ export class Registry {
      * @param {string} key 
      */
     remove(key) {
-        delete this.register[key]
+        delete this.reg[key]
         return this
     }
 
@@ -127,7 +128,7 @@ export class Registry {
      * @param {any} v 
      */
     keyOf(v) {
-        for (const [k, a] of Object.entries(this.register)) {
+        for (const [k, a] of Object.entries(this.reg)) {
             if (v === a) return k
         }
     }
@@ -137,7 +138,7 @@ export class Registry {
      * @param {(value: any, key: string) => boolean} predicate 
      */
     find(predicate) {
-        for (const [key, value] of Object.entries(this.register)) {
+        for (const [key, value] of Object.entries(this.reg)) {
             if (predicate(value, key)) return value;
         }
         return null
@@ -149,7 +150,7 @@ export class Registry {
      */
     filter(predicate) {
         const filtered = {}
-        Object.entries(this.register).forEach(([key, value]) => {
+        Object.entries(this.reg).forEach(([key, value]) => {
             if (predicate(value, key)) filtered[key] = value
         })
         return new Registry(filtered)
@@ -160,12 +161,12 @@ export class Registry {
      * @param {(value: any, key: string)} predicate 
      */
     mutate(predicate) {
-        for (const [k, v] of Object.entries(this.register)) {
+        for (const [k, v] of Object.entries(this.reg)) {
             if (predicate(v, k)) {
-                this.register = Object.defineProperty(this.register, k, v)
+                this.reg = Object.defineProperty(this.reg, k, v)
             }
         }
-        return this.register
+        return this.reg
     }
 
     /**
@@ -175,13 +176,13 @@ export class Registry {
     merge(...others) {
         others.forEach(other => {
             if (other instanceof Registry) {
-                Object.entries(other.register).forEach(([key, value]) => {
-                    this.register[key] = value;
+                Object.entries(other.reg).forEach(([key, value]) => {
+                    this.reg[key] = value;
                 })
             }
             else {
                 let k = this.#generatekey();
-                Object.assign(this.register, {[k]: other})
+                Object.assign(this.reg, {[k]: other})
             }
         })
         return this
@@ -192,7 +193,7 @@ export class Registry {
      * @param {number} start @param {number} deleteCount @param {...any} items 
      */
     splice(start, deleteCount, ...items) {
-        return Object.entries(this.register).splice(start, deleteCount, ...items)
+        return Object.entries(this.reg).splice(start, deleteCount, ...items)
     }
 
     /**
@@ -200,7 +201,7 @@ export class Registry {
      * @param {string} key The key to check in the registry
      */
     includesKey(key) {
-        return Object.keys(this.register).includes(key)
+        return Object.keys(this.reg).includes(key)
     }
 
     /**
@@ -208,25 +209,25 @@ export class Registry {
      * @param {*} value 
      */
     includesValue(value) {
-        for (const [k, v] of Object.entries(this.register)) {
+        for (const [k, v] of Object.entries(this.reg)) {
             if (value === v) return !0
         }
         return !1
     }
 
     get size() {
-        return Object.keys(this.register).length
+        return Object.keys(this.reg).length
     }
 
     get values() {
-        return Object.values(this.register)
+        return Object.values(this.reg)
     }
 
     /**
      * Clear all enteries
      */
     clear() {
-        this.register = {}
+        this.reg = {}
         return this
     }
 }
