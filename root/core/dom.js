@@ -18,6 +18,32 @@ class dom_module {
         this.nodes = new Map();
         this.root = null
     }
+
+    /**
+     * Prepare node registry.
+     * Validate browser environment.
+     * Maybe pre-create internal helpers.
+     */
+    async onInit() {
+        if (typeof window === 'undefined') throw new Error("[DOM] Not running in browser environment.");
+        this.doc = window.document;
+        this.init = !0
+    }
+
+    /**
+     * Resolve the root element.
+     * Clear or initialize it.
+     * Prepare rendering surface.
+     */
+    async onReady() {
+        const a = this.runtime?.config.root || 'lazy-app', r = this.doc.querySelector(a);
+        if (!r) throw new Error(`[DOM] root '${a}' not found`)
+        this.root = r
+        this.#nodereg.write(r, 'root')
+        this.ready = !0
+    }
+
+    #nodereg = new Registry
 }
 
 export const dom = dom_module;
