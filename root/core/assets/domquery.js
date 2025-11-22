@@ -4,16 +4,16 @@
  * domquery.js
  */
 
-import {on, off} from "./utilities/any.js";
+import {on, off} from "../../../nodes/scripts/utilities/any.js";
 
-class query$ {
+export class query$ {
 
     /**
-     * @param {Element} selector 
+     * @param {string} selector 
      */
     constructor(selector) {
 
-        this.nodes = selector ? Array.from(document.querySelectorAll(selector)) : Array.from(document.childNodes) /**todo: typeof selector === "string" ? Array.from(document.querySelectorAll(selector)) : selector instanceof Element ? [selector] : Array.isArray(selector) ? selector : []*/
+        this.nodes = selector.startsWith('$') ? [document.querySelector(selector.replace('$',''))] : selector ? Array.from(document.querySelectorAll(selector)) : Array.from(document.childNodes)
         this.selector = selector;
 
         return new Proxy(this, {
@@ -459,12 +459,4 @@ class query$ {
         }
         else return this.nodes[index].classList
     }
-}
-
-export function dom(selector) {
-    return new query$(selector)
-}
-
-export function query$Extend(n, p) {
-    return query$.prototype[n] = p
 }
