@@ -51,7 +51,7 @@ class Kernel {
             case 'ready':
                 this.ready ? fn.call(this) : this.hooks.ready.push(fn)
                 break
-                
+
             case 'init':
                 this.init ? fn.call(this) : this.hooks.init.push(fn)
                 break
