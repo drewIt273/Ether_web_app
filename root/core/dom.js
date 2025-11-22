@@ -17,7 +17,8 @@ class dom_module {
         this.newnode = jsx;
         this.init = !1;
         this.ready = !1;
-        this.nodes = new Map();
+        this.nodes = this.#nodereg.reg;
+        this.query = a => new query$(a);
         this.root = null
     }
 
