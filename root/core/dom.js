@@ -5,6 +5,8 @@
  */
 
 import {jsx} from "../../nodes/scripts/nodecreator.js";
+import {query$} from "./assets/domquery.js";
+import {Registry} from "../../nodes/scripts/utilities/any.js";
 
 class dom_module {
 
