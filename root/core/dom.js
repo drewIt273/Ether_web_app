@@ -15,7 +15,8 @@ class dom_module {
     constructor(runtime) {
         /** Reference to the kernel for hooks, module communication, etc. */
             this.runtime = runtime;
-        this.newnode = jsx;
+        /** A registry for created nodes. */
+            this.nodereg = new Registry;
         this.init = !1;
         this.ready = !1;
         this.nodes = this.#nodereg.reg;
