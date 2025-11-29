@@ -29,6 +29,7 @@ export class UIBase {
         this.childNodes = Array.from(this.node.childNodes)
         this.parent = this.node.parentNode
         this.#reg = registry
+        runtime.dom.nodereg.write(this.node)
     }
 
     #reg
