@@ -128,9 +128,7 @@ export class Registry {
      * @param {any} v 
      */
     keyOf(v) {
-        for (const [k, a] of Object.entries(this.reg)) {
-            if (v === a) return k
-        }
+        for (const [k, a] of Object.entries(this.reg)) if (v === a) return k
     }
 
     /**
@@ -162,9 +160,7 @@ export class Registry {
      */
     mutate(predicate) {
         for (const [k, v] of Object.entries(this.reg)) {
-            if (predicate(v, k)) {
-                this.reg = Object.defineProperty(this.reg, k, v)
-            }
+            if (predicate(v, k)) this.reg = Object.defineProperty(this.reg, k, v)
         }
         return this.reg
     }
@@ -209,9 +205,7 @@ export class Registry {
      * @param {*} value 
      */
     includesValue(value) {
-        for (const [k, v] of Object.entries(this.reg)) {
-            if (value === v) return !0
-        }
+        for (const [k, v] of Object.entries(this.reg)) if (value === v) return !0
         return !1
     }
 
@@ -223,9 +217,7 @@ export class Registry {
         return Object.values(this.reg)
     }
 
-    /**
-     * Clear all enteries
-     */
+    /**Clear all enteries*/
     clear() {
         this.reg = {}
         return this
