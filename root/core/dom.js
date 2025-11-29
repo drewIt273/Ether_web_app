@@ -19,7 +19,7 @@ class dom_module {
             this.nodereg = new Registry;
         this.init = !1;
         this.ready = !1;
-        this.nodes = this.#nodereg.reg;
+        this.nodes = this.nodereg.reg;
         this.query = a => new query$(a);
         this.root = null
     }
@@ -44,7 +44,7 @@ class dom_module {
         const a = this.runtime?.config.root || 'lazy-app', r = this.doc.querySelector(a);
         if (!r) throw new Error(`[DOM] root '${a}' not found`)
         this.root = r
-        this.#nodereg.write(r, 'root')
+        this.nodereg.write(r, 'root')
         this.ready = !0
     }
 
