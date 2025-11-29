@@ -76,14 +76,25 @@ export class Registry {
         this.reg = strictObject(src) ? {...src} : {}
     }
 
-    #generatekey() {
-        const chars = 'ABCDabcdef1234567890'
-        let key;
-        do {
-            key = Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    #n = (k = '') => {
+        if (k === '') return 'a'
+        let c = k.split(''), i = c.length - 1
+        while (i >= 0) {
+            if (c[i] !== 'z') {
+                c[i] = String.fromCharCode(c[i].charCodeAt(0) + 1);
+                return c.join('')
+            }
+            c[i] = 'a'
+            i--
         }
-        while (this.reg.hasOwnProperty(key))
-        return key
+        return 'a'.repeat(k.length + 1);
+    }
+
+    #l = ''
+
+    #generatekey() {
+        this.#l = this.#n(this.#l)
+        return this.#l
     }
 
     /**
