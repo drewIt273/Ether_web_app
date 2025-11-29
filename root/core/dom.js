@@ -48,7 +48,16 @@ class dom_module {
         this.ready = !0
     }
 
-    #nodereg = new Registry
+    /**
+     * @param {string} tag 
+     * @param {{class: string; id: string; style: {} | string; innerHTML: string; textContent: string; append: Node[]; on: (e: Node) => any; attrs: {};}} props 
+     * @param {"ui-cell"|"ui-block"|"ui-comp"} type 
+     */
+    jsx(tag, props, type) {
+        const node = jsx(tag, props)
+        this.nodereg.write(node)
+        return type === 'ui-block' ? new block(node) : type === 'ui-comp' ? new comp(node) : new cell(node)
+    }
 }
 
 export const dom = dom_module;
