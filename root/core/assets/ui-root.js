@@ -5,7 +5,7 @@
  */
 
 import {isNode, isString, create, find, toKebab, setAttr, hasAttr, removeAttr, on, off, ranstring, strictObject, removeNode, setStyle, Registry, isArray, getStyle} from "../../../nodes/scripts/utilities/any.js";
-import {div} from "../../../../nodes/scripts/nodecreator.js";
+import {div} from "./nodecreator.js";
 import {stylesheet} from "../../../nodes/scripts/stylesheet.js";
 import {runtime} from "../runtime.js";
 
@@ -19,7 +19,7 @@ export const UINodeMap = new WeakMap()
 export class UIBase {
 
     /**
-     * @param {string|HTMLElement} node 
+     * @param {string|Node} node 
      * @param {Registry} registry 
      */
     constructor(node, registry) {
@@ -79,9 +79,7 @@ export class UIBase {
      * @param {{}} o 
      */
     attrs(o) {
-        for (const [k, v] of Object.entries(o)) {
-            this.node.setAttribute(toKebab(k), String(v))
-        }
+        for (const [k, v] of Object.entries(o)) this.node.setAttribute(toKebab(k), String(v))
         return this
     }
 
@@ -89,9 +87,7 @@ export class UIBase {
      * Returns true if other is a descendent of this node.
      * @param {Node|string} other 
      */
-    contains(other) {
-        return isNode(other) ? this.node.contains(other) : (isString(other), this.node.querySelector(other)) ? !0 : !1
-    }
+    contains = other => isNode(other) ? this.node.contains(other) : (isString(other), this.node.querySelector(other)) ? !0 : !1
 
     empty() {
         this.childNodes.forEach(c => c.remove())
@@ -103,9 +99,7 @@ export class UIBase {
      * @param {{}} o 
      */
     style(o) {
-        for (const [p, v] of Object.entries(o)) {
-            this.node.style[toKebab(p)] = v
-        }
+        for (const [p, v] of Object.entries(o)) this.node.style[toKebab(p)] = v
         return this
     }    
 
@@ -113,17 +107,13 @@ export class UIBase {
      * Returns the first element that is a descendant of node that matches selectors.
      * @param {string} s 
      */
-    find(s) {
-        return this.node.querySelector(s)
-    }
+    find = s => this.node.querySelector(s)
 
     /**
      * Returns all element descendants of node that match selectors.
      * @param {string} s 
      */
-    findAll(s) {
-        return Array.from(this.node.querySelectorAll(s))
-    }
+    findAll = s => Array.from(this.node.querySelectorAll(s))
 
     /**
      * 
@@ -135,8 +125,7 @@ export class UIBase {
             if (callback) callback.call(this, this.node);
             return;
         }
-        if (!this.node._fadeOriginalDisplay)
-            this.node._fadeOriginalDisplay = computed.display === "none" ? "block" : computed.display
+        if (!this.node._fadeOriginalDisplay) this.node._fadeOriginalDisplay = computed.display === "none" ? "block" : computed.display
 
         setStyle(this.node, 'opacity', 0); setStyle(this.node, 'display', this.node._fadeOriginalDisplay); setStyle(this.node, 'transition', `opacity ${duration}ms ease`);
 
@@ -188,7 +177,8 @@ export class UIBase {
         const computed = getComputedStyle(this.node);
         if (computed.display === 'none' || computed.opacity === 0) {
             this.fadeIn.call({node: this.node}, () => callback.call(this, this.node), duration)
-        } else {
+        }
+        else {
             this.fadeOut.call({node: this.node}, () => callback.call(this, this.node), duration)
         }
 
@@ -219,9 +209,7 @@ export class UIBase {
         }
 
         global ? on('keydown', document, listener) : on('keydown', targetNode, listener)
-
         this.#keybinds.push({keys, handler, listener, node: targetNode, global: global})
-
         return this
     }
 
@@ -274,9 +262,7 @@ export class UIBase {
      * Returns true if s was defined as a state of this UIComponent.
      * @param {string} s 
      */
-    hasState(s) {
-        return s in this.#states
-    }
+    hasState = s => s in this.#states
 
     /**
      * Register a callback for when the component's state changes.
@@ -290,16 +276,12 @@ export class UIBase {
     /**
      * @param {string} attr 
      */
-    getAttr(attr) {
-        return this.node.getAttribute(attr)
-    }
+    getAttr = attr => this.node.getAttribute(attr)
 
     /**
      * @param {string} a 
      */
-    hasAttr(a) {
-        return hasAttr(this.node, a)
-    }
+    hasAttr = a => hasAttr(this.node, a)
 
     /**
      * @param {string} a 
@@ -328,13 +310,10 @@ export class UIBase {
     }
 
     /**
-     * @param {"add"|"remove"|"toggle"} action 
-     * @param {...string} tokens 
+     * @param {"add"|"remove"|"toggle"} action @param {...string} tokens 
      */
     classSet(action, ...tokens) {
-        for (const token of tokens) {
-            this.node.classList[action]?.(token)
-        }
+        for (const token of tokens) this.node.classList[action]?.(token)
         return this
     }
 
@@ -507,7 +486,6 @@ export class UICell extends UIBase {
      */
     emit(data) {
         const emitterProxy = {
-
             /**
              * @param {UICell|UICell[]} targetCells 
              * @param {(targetCell: UICell, data?: *) => *} callback 
@@ -519,9 +497,8 @@ export class UICell extends UIBase {
                     this.emittedData.write({data, targetID: target.ID})
                     target.receivedData.write({sourceID: this.ID, data})
                     if (typeof callback === 'function') {
-                        try {
-                            callback.call(this, target, data)
-                        } catch(err) {
+                        try {callback.call(this, target, data)}
+                        catch(err) {
                             console.error(`Error during emit callback for target ${target.ID}:`, err);
                         }
                     }
@@ -563,7 +540,6 @@ export class UIBlock extends UIBase {
         const construct = UIConstructorOf(n)
         if (v === 'add') {
             if (n.hasAttribute('ui-block-id')) {
-                console.log('bilin')
                 if (!this.subBlocks.includes(n)) this.subBlocks.push(n)
                 ActiveUIBlocks.get(construct.registeredKey).mounted = !0
             }
@@ -663,7 +639,6 @@ export class UIComponent extends UIBase {
         const construct = UIConstructorOf(n)
         if (v === 'add') {
             if (n.hasAttribute('ui-block-id')) {
-                console.log('bilin')
                 if (!this.childBlocks.includes(n)) this.childBlocks.push(n)
                 ActiveUIBlocks.get(construct.registeredKey).mounted = !0
             }
@@ -769,9 +744,7 @@ export class UIComponent extends UIBase {
 
             switch (key) {
                 case allowed[0]:
-                    nodes.forEach(n => {
-                        isArray(value) ? value.forEach(v => n.appendChild(v)) : n.appendChild(value)
-                    })
+                    nodes.forEach(n => isArray(value) ? value.forEach(v => n.appendChild(v)) : n.appendChild(value))
                     break;
 
                 case allowed[1]:
@@ -797,17 +770,13 @@ export class UIComponent extends UIBase {
                             shouldRender = Boolean(value[0]);
                             callback = typeof value[1] === 'function' ? value[1] : null
                         }
-                        else {
-                            shouldRender = Boolean(value)
-                        }
+                        else shouldRender = Boolean(value)
 
                         if (shouldRender) {
                             if (!parent.contains(n)) parent.appendChild(n)
                             if (callback) callback()
                         }
-                        else {
-                            if (parent.contains(n)) parent.removeChild(n)
-                        }
+                        else if (parent.contains(n)) parent.removeChild(n)
                     })
                     break;
             }
@@ -831,9 +800,7 @@ export class UIComponent extends UIBase {
      */
     css(styleObjOrProp) {
         const e = this.node
-        if (typeof styleObjOrProp === "string") {
-            return getComputedStyle(e).getPropertyValue(styleObjOrProp)
-        }
+        if (typeof styleObjOrProp === "string") return getComputedStyle(e).getPropertyValue(styleObjOrProp)
 
         for (const key in styleObjOrProp) {
             const v = styleObjOrProp[key];
@@ -843,9 +810,7 @@ export class UIComponent extends UIBase {
                     Object.assign(target.style, v)
                 })
             }
-            else if (typeof v !== 'object') {
-                this.node.style[toKebab(key)] = v
-            }
+            else if (typeof v !== 'object') this.node.style[toKebab(key)] = v
         }
 
         return this
@@ -855,9 +820,7 @@ export class UIComponent extends UIBase {
      * @param {string} ev @param {string|Node} target @param {...Function} handlers 
      */
     delegate(ev, target, ...handlers) {
-        handlers.forEach(handler => {
-            on(ev, target, handler)
-        }) 
+        handlers.forEach(handler => on(ev, target, handler)) 
         return this
     }
     
