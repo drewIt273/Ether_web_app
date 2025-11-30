@@ -373,7 +373,7 @@ export class query$ {
     }
 
     find(selector, all = false) {
-        if (!all) return this.filter(selector).item(0)
+        if (!all) return this.filter(selector)[0]
         else return this.filter(selector)
     }
 
