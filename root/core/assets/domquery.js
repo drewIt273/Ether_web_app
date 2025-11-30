@@ -399,58 +399,14 @@ export class query$ {
         return this;
     }
 
-    classlist = {
-
-        add: (...tokens) => {
-            this.nodes.forEach(node => tokens.forEach(t => node.classList.add(t)))
-            return this
-        },
-
-        remove: (...tokens) => {
-            this.nodes.forEach(node => tokens.forEach(t => node.classList.remove(t)))
-            return this
-        },
-
-        replace: (token, newToken) => {
-            this.nodes.forEach(node => {
-                if (Array.isArray(token)) {
-                    if (typeof newToken === "string") {
-                        node.classList.add(newToken);
-                        token.forEach(t => node.classList.remove(t))
-                    }
-                    else if (Array.isArray(newToken)) {
-                        token.forEach(t => node.classList.remove(t));
-                        newToken.forEach(t => node.classList.add(t))
-                    }
-                }
-                else if (typeof token === "string") {
-                    if (Array.isArray(newToken)) {
-                        node.classList.remove(token)
-                        newToken.forEach(t => node.classList.add(t))
-                    }
-                    else if (typeof newToken === "string") {
-                        node.classList.replace(token, newToken)
-                    }
-                }
-                else return 0
-            })
-
-            return this
-        },
-
-        toggle: (token) => {
-            this.nodes.forEach(node => {
-                if (typeof token === "string") {
-                    node.classList.toggle(token)
-                }
-                else if (Array.isArray(token)) {
-                    token.forEach(t => node.classList.toggle(t))
-                }
-            })
-
-            return this
-        },
-
+    /**
+     * @param {"add"|"remove"|"toggle"} action @param {...string} tokens 
+     */
+    setClass(action, ...tokens) {
+        this.nodes.forEach(node => {
+            for (const token of tokens) node.classList[action]?.(token)
+        })
+        return this
     }
 
     classList(selector = "", index = 0) {
