@@ -36,9 +36,7 @@ export const $ran = (min, max) => Math.round(Math.random() * (max - min) + min)
 
 /**
  * Returns a random string whose length is specified.
- * @param {number} length The length of each string block.
- * @param {number} count The number of string blocks seperated with '-'.
- * @param {string} end The optional string to be added at the end.
+ * @param {number} length The length of each string block. @param {number} count The number of string blocks seperated with '-'. @param {string} end The optional string to be added at the end.
  */
 export const ranstring = (length, count, end = '') => {
     const chars = 'abcdefd', vchars = chars + '1234567890';
