@@ -21,8 +21,11 @@ class dom_module {
         this.init = !1;
         this.ready = !1;
         this.nodes = this.nodereg.reg;
-        this.query = a => new query$(a);
-        this.root = null
+        this.query = /**@param {string} a*/ a  => new query$(a);
+        this.root = doc
+        this.find = /**@param {string} s*/ s => this.query(s).first()
+        this.findAll = /**@param {string} s*/ s => this.query(s).nodes
+        this.has = /**@param {Node} v*/ v => v instanceof Node && doc.contains(v)
     }
 
     /**
