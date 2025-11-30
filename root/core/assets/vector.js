@@ -5,7 +5,7 @@
  */
 
 import {jsx} from "./nodecreator.js";
-import {strictObject} from "./utilities/any.js";
+import {strictObject} from "../../../nodes/scripts/utilities/any.js";
 
 const v24 = {
     fill: 'none',
