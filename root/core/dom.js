@@ -9,10 +9,11 @@ import {query$} from "./assets/domquery.js";
 import {Registry} from "../../nodes/scripts/utilities/any.js";
 import {UICell as cell, UIBlock as block, UIComponent as comp} from "./assets/ui-root.js";
 
+const doc = window.document;
+
 class dom_module {
 
-    /**@param {Kernel} runtime */
-    constructor(runtime) {
+    constructor(/**@type {kernel}*/ runtime) {
         /** Reference to the kernel for hooks, module communication, etc. */
             this.runtime = runtime;
         /** A registry for created nodes. */
@@ -31,7 +32,7 @@ class dom_module {
      */
     async onInit() {
         if (typeof window === 'undefined') throw new Error("[DOM] Not running in browser environment.");
-        this.doc = window.document;
+        this.doc = doc;
         this.init = !0
     }
 
