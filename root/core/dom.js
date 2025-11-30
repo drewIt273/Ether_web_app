@@ -4,10 +4,10 @@
  * dom.js
  */
 
-import {jsx} from "../../nodes/scripts/nodecreator.js";
+import {jsx} from "./assets/nodecreator.js";
 import {query$} from "./assets/domquery.js";
 import {Registry} from "../../nodes/scripts/utilities/any.js";
-import {UICell as cell, UIBlock as block, UIComponent as comp} from "../../user/interface/root/ui-scripts/ui.root.js";
+import {UICell as cell, UIBlock as block, UIComponent as comp} from "./assets/ui-root.js";
 
 class dom_module {
 
