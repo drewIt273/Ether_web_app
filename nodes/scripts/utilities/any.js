@@ -15,6 +15,8 @@ export function toKebab(s) {
 
 export const isNode = v => v instanceof Node
 
+export const isElement = n => n instanceof Element || n instanceof HTMLElement
+
 /** @param {Node} v */
 export const hasNode = v => isNode(v) && document.contains(v)
 
