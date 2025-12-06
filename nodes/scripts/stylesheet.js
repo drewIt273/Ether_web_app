@@ -4,7 +4,7 @@
  * stylesheet.js
  */
 
-import {isString, strictObject, toKebab, create} from "./utilities/any.js";
+import {isString, strictObject, toKebab, create} from "./any.js";
 
 class StylesheetConstructor {
     constructor() {

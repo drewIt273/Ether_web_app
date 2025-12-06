@@ -6,7 +6,7 @@
 
 import {jsx} from "./assets/nodecreator.js";
 import {query$} from "./assets/domquery.js";
-import {Registry} from "../../nodes/scripts/utilities/any.js";
+import {Registry} from "../../nodes/scripts/any.js";
 import {UICell as cell, UIBlock as block, UIComponent as comp} from "./assets/ui-root.js";
 
 const doc = window.document;

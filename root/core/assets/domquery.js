@@ -4,7 +4,7 @@
  * domquery.js
  */
 
-import {on, off} from "../../../nodes/scripts/utilities/any.js";
+import {on, off} from "../../../nodes/scripts/any.js";
 
 export class query$ {
 

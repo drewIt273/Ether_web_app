@@ -4,7 +4,7 @@
  * ui.root.js
  */
 
-import {isNode, isString, create, find, toKebab, setAttr, hasAttr, removeAttr, on, off, ranstring, strictObject, removeNode, setStyle, Registry, isArray, getStyle, isElement} from "../../../nodes/scripts/utilities/any.js";
+import {isNode, isString, create, find, toKebab, setAttr, hasAttr, removeAttr, on, off, ranstring, strictObject, removeNode, setStyle, Registry, isArray, getStyle, isElement} from "../../../nodes/scripts/any.js";
 import {div} from "./nodecreator.js";
 import {stylesheet} from "../../../nodes/scripts/stylesheet.js";
 
