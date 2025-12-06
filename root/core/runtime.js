@@ -6,12 +6,14 @@
  */
 
 import {dom} from './dom.js'
+import {comp} from './comp.js';
 
 class Kernel {
     constructor() {
         /**Returns the modules constructors */
-        this.modules = {dom};
+        this.modules = {dom, comp};
         this.dom = new dom(this);
+        this.comp = new comp(this);
         this.hooks = {
             init: [],
             ready: []
