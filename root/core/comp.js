@@ -5,7 +5,9 @@
  */
 
 class comp_module {
-    constructor() {
-        
+    constructor(/**@type {Kernel}*/runtime) {
+        this.runtime = runtime
     }
 }
+
+export const comp = comp_module;
