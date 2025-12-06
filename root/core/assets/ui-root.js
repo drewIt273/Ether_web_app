@@ -616,10 +616,10 @@ export class UIComponent extends UIBase {
             this.node.appendChild(e)
         }
         this.childBlocks = []
-        this.node.setAttribute('ui-component-id', this.ID)
-        this.#sheet.base = `[ui-component-id="${this.ID}"]`
+        this.node.setAttribute('ui-comp-id', this.ID)
+        this.#sheet.base = `[ui-comp-id="${this.ID}"]`
         this.#sheet.id = this.ID
-        this.subcomponents = []
+        this.subcomps = []
         this.parentComponent = null
         this.registeredKey = ActiveUIComponents.write({node: this.node, id: this.ID, mounted: false})
         UINodeMap.set(this.node, this)
@@ -687,7 +687,7 @@ export class UIComponent extends UIBase {
         if (isNode(target)) {find(target)?.appendChild(this.node); return this}
         if (target instanceof UIComponent) {
             target.node.appendChild(this.node)
-            target.subcomponents.push(this.node)
+            target.subcomps.push(this.node)
             this.parentComponent = target.node
         }
         else if (cellOrBlock(target)) throw new Error(`A UIComponent cannot mount ${target}`)
