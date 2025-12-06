@@ -702,7 +702,6 @@ export class UIComponent extends UIBase {
         return this
     }
 
-
     /**
      * 
      * @param {string|{}} styleObjOrProp 
@@ -733,9 +732,7 @@ export class UIComponent extends UIBase {
         return this
     }
 
-    /**
-     *Use only for permanently removing the UIComponent.
-     */
+    /**Use only for permanently removing the UIComponent. */
     destroy() {
         UINodeMap.delete(this.node)
         this.unmount().off().node = null
