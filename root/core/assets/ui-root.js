@@ -4,7 +4,7 @@
  * ui.root.js
  */
 
-import {isNode, isString, create, find, toKebab, setAttr, hasAttr, removeAttr, on, off, ranstring, strictObject, removeNode, setStyle, Registry, isArray, getStyle} from "../../../nodes/scripts/utilities/any.js";
+import {isNode, isString, create, find, toKebab, setAttr, hasAttr, removeAttr, on, off, ranstring, strictObject, removeNode, setStyle, Registry, isArray, getStyle, isElement} from "../../../nodes/scripts/utilities/any.js";
 import {div} from "./nodecreator.js";
 import {stylesheet} from "../../../nodes/scripts/stylesheet.js";
 import {runtime} from "../runtime.js";
@@ -23,7 +23,7 @@ export class UIBase {
      * @param {Registry} registry 
      */
     constructor(node, registry) {
-        this.node = isString(node) ? create(node) : isNode(node) ? node : new div
+        this.node = (function(n) {return isElement(n) ? n : isString(n) ? create(n) : new div})(node)
         this.classList = this.node.classList
         this.innerHTML = this.node.innerHTML
         this.childNodes = Array.from(this.node.childNodes)
