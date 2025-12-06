@@ -19,7 +19,7 @@ class Kernel {
         this.ready = !1;
         this.init = !1;
         this.proto = (p, v) => {
-            this.#props().includes(p) ? null : this[p] = v
+            (function() {const a = []; for (const [p] of Object.entries(this)) a.push(p); return a})().includes(p) ? null : this[p] = v
             return p
         }
     }
@@ -33,12 +33,6 @@ class Kernel {
         this.init = !0
         for (const fn of this.hooks.ready) await fn.call(this);
         this.ready = !0
-    }
-
-    #props = () => {
-        const a = []
-        for (const [p] of Object.entries(this)) a.push(p)
-        return a
     }
 
     /**
