@@ -21,11 +21,18 @@ class dom_module {
         this.init = !1;
         this.ready = !1;
         this.nodes = this.nodereg.reg;
-        this.query = /**@param {string} a*/ a  => new query$(a);
+        this.query = /**@param {string} a*/ a => new query$(a);
         this.root = doc
         this.find = /**@param {string} s*/ s => this.query(s).first()
         this.findAll = /**@param {string} s*/ s => this.query(s).nodes
         this.has = /**@param {Node} v*/ v => v instanceof Node && doc.contains(v)
+        this.observer = new MutationObserver(muts => {
+            for (const m of muts) {
+                if (m.addedNodes) for (const added of m.addedNodes) if (!this.nodereg.includesValue(added)) this.nodereg.write(added)
+                if (m.removedNodes) for (const removed of m.removedNodes) this.nodereg.remove(this.nodereg.keyOf(removed))
+            }
+        })
+        this.observer.observe(this.root, {childList: true, subtree: true})
     }
 
     /**
