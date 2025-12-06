@@ -490,6 +490,14 @@ export class UICell extends UIBase {
 
         return emitterProxy
     }
+
+    /**Use only for permanently removing the UICell */
+    destroy() {
+        UINodeMap.delete(this.node)
+        this.unmount().off().node = null
+        ActiveUICells.remove(this.registeredKey)
+        this = null
+    }
 }
 
 export class UIBlock extends UIBase {
@@ -533,7 +541,14 @@ export class UIBlock extends UIBase {
         }
         return this
     }
-    
+
+    /**Use only for permanently removing the UIBlock */
+    destroy() {
+        UINodeMap.delete(this.node)
+        this.unmount().off().node = null
+        ActiveUIBlocks.remove(this.registeredKey)
+        this = null
+    }
 }
 
 export class UIComponent extends UIBase {
@@ -717,14 +732,16 @@ export class UIComponent extends UIBase {
         handlers.forEach(handler => on(ev, target, handler)) 
         return this
     }
-    
+
     /**
-     * Caution. Use only for permanently removing the UIComponent.
+     *Use only for permanently removing the UIComponent.
      */
     destroy() {
+        UINodeMap.delete(this.node)
         this.unmount().off().node = null
         this.#sheet.remove()
-        return this
+        ActiveUIComponents.remove(this.registeredKey)
+        this = null
     }
 }
 
