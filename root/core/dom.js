@@ -28,11 +28,11 @@ class dom_module {
         this.has = /**@param {Node} v*/ v => v instanceof Node && doc.contains(v)
         this.observer = new MutationObserver(muts => {
             for (const m of muts) {
-                if (m.addedNodes) for (const added of m.addedNodes) if (!this.nodereg.includesValue(added)) this.nodereg.write(added)
+                if (m.addedNodes) for (const added of m.addedNodes) if (!this.nodereg.includesValue(added) && !(added instanceof SVGElement)) this.nodereg.write(added)
                 if (m.removedNodes) for (const removed of m.removedNodes) this.nodereg.remove(this.nodereg.keyOf(removed))
             }
         })
-        this.observer.observe(this.root, {childList: true, subtree: true})
+        this.observer.observe(doc.body, {childList: true, subtree: true})
     }
 
     /**
@@ -66,7 +66,6 @@ class dom_module {
      */
     jsx(tag, props, type) {
         const node = jsx(tag, props)
-        this.nodereg.write(node)
         return type === 'ui-block' ? new block(node) : type === 'ui-comp' ? new comp(node) : new cell(node)
     }
 }
