@@ -403,16 +403,6 @@ export class UICell extends UIBase {
         UINodeMap.set(this.node, this)
     }
 
-    #T = null
-
-    /**
-     * Returns true if this UICell is still mounted.
-     * @returns {boolean}
-     */
-    get mounted() {
-        return ActiveUICells.get(this.registeredKey)?.mounted ?? false
-    }
-
     /**
      * 
      * @param  {...Node} nodes 
@@ -441,13 +431,7 @@ export class UICell extends UIBase {
      * @param {Node|UIBlock} target 
      */
     mount(target) {
-        if (target instanceof UIBlock) {
-            target.node.appendChild(this.node)
-            target.childCells.push(this.node)
-            this.parentBlock = target.node
-            this.#T = target
-        }
-        else if (target instanceof Node) find(target)?.appendChild(this.node)
+        find(target)?.appendChild(this.node)
         ActiveUICells.get(this.registeredKey).mounted = !0
         return this
     }
@@ -456,7 +440,6 @@ export class UICell extends UIBase {
         if (this.mounted) {
             removeNode(this.node)
             ActiveUICells.get(this.registeredKey).mounted = !1
-            this.#T.childCells = this.#T.childCells.filter(n => n !== this.node)
         }
         return this
     }
@@ -517,10 +500,6 @@ export class UIBlock extends UIBase {
     constructor(node) {
         super(node, ActiveUIBlocks)
         this.ID = ranstring(3, 1)
-        this.parentComponent = null
-        this.parentBlock = null
-        this.childCells = []
-        this.subBlocks = []
         this.registeredKey = ActiveUIBlocks.write({node: this.node, id: this.ID, mounted: false})
         this.attrs({'ui-block-id': this.ID})
         UINodeMap.set(this.node, this)
@@ -542,16 +521,6 @@ export class UIBlock extends UIBase {
      */
     mount(target) {
         if (target instanceof UICell || find(target)?.hasAttribute('ui-cell-id') || find(target)?.parentElement.hasAttribute('ui-cell-id')) throw new Error('A block cannot mount a cell')
-        if (target instanceof UIComponent) {
-            target.node.appendChild(this.node)
-            target.childBlocks.push(this.node)
-            this.parentComponent = target.node
-        }
-        else if (target instanceof UIBlock) {
-            target.node.appendChild(this.node)
-            target.subBlocks.push(this.node)
-            this.parentBlock = target.node
-        }
         else if (isNode(target)) find(target)?.appendChild(this.node)
         ActiveUIBlocks.get(this.registeredKey).mounted = !0
         return this
@@ -561,7 +530,6 @@ export class UIBlock extends UIBase {
         if (this.mounted) {
             removeNode(this.node)
             ActiveUIBlocks.get(this.registeredKey).mounted = !1
-            this.parentBlock = null, this.parentComponent = null
         }
         return this
     }
@@ -579,12 +547,9 @@ export class UIComponent extends UIBase {
         for (const e of append) {
             this.node.appendChild(e)
         }
-        this.childBlocks = []
         this.node.setAttribute('ui-comp-id', this.ID)
         this.#sheet.base = `[ui-comp-id="${this.ID}"]`
         this.#sheet.id = this.ID
-        this.subcomps = []
-        this.parentComponent = null
         this.registeredKey = ActiveUIComponents.write({node: this.node, id: this.ID, mounted: false})
         UINodeMap.set(this.node, this)
     }
@@ -618,12 +583,8 @@ export class UIComponent extends UIBase {
      * @param {Node|UIComponent} target 
      */
     mount(target) {
-        if (isNode(target)) {find(target)?.appendChild(this.node); return this}
-        if (target instanceof UIComponent) {
-            target.node.appendChild(this.node)
-            target.subcomps.push(this.node)
-            this.parentComponent = target.node
-        }
+        if (isNode(target)) find(target)?.appendChild(this.node)
+        if (target instanceof UIComponent) target.node.append(this.node)
         else if (cellOrBlock(target)) throw new Error(`A UIComponent cannot mount ${target}`)
         ActiveUIComponents.get(this.registeredKey).mounted = !0
         return this
@@ -633,9 +594,10 @@ export class UIComponent extends UIBase {
      * Unmounts this component by removing it from the DOM and from the ActiveUIComponents registry.
      */
     unmount() {
-        removeNode(this.node)
-        ActiveUIComponents.get(this.registeredKey).mounted = !1
-        ActiveUIComponents.remove(this.registeredKey)
+        if (this.mounted) {
+            removeNode(this.node)
+            ActiveUIComponents.get(this.registeredKey).mounted = !1
+        }
         return this
     }
 
