@@ -81,7 +81,7 @@ export class dom_module {
      * @param {{class: string; id: string; style: {} | string; innerHTML: string; textContent: string; append: Node[]; on: (e: Node) => any; attrs: {};}} props 
      * @param {"ui-cell"|"ui-block"|"ui-comp"} type 
      */
-    jsx(tag, props, type) {
+    jsx(tag, props = {}, type = 'ui-cell') {
         const node = jsx(tag, props)
         return type === 'ui-block' ? new block(node) : type === 'ui-comp' ? new comp(node) : new cell(node)
     }
