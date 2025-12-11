@@ -395,9 +395,8 @@ export class UICell extends UIBase {
     constructor(node) {
         super(node, ActiveUICells)
         this.ID = ranstring(4, 1)
-        this.parentBlock = null
-        this.emittedData = new Registry
-        this.receivedData = new Registry
+        this.emittedData = null
+        this.receivedData = null
         this.registeredKey = ActiveUICells.write({node: this.node, id: this.ID, mounted: false})
         this.attrs({'ui-cell-id': this.ID})
         UINodeMap.set(this.node, this)
@@ -475,8 +474,6 @@ export class UICell extends UIBase {
                 const targets = isArray(targetCells) ? targetCells : [targetCells];
                 for (const target of targets) {
                     if (!(target instanceof UICell)) throw new TypeError("targetCell must be an instance of UICell.")
-                    this.emittedData.write({data, targetID: target.ID})
-                    target.receivedData.write({sourceID: this.ID, data})
                     if (typeof callback === 'function') {
                         try {callback.call(this, target, data)}
                         catch(err) {
