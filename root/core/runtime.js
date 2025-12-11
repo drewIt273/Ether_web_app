@@ -5,8 +5,8 @@
  * co-built with GPT-5
  */
 
-import {dom} from './dom.js'
-import {comp} from './comp.js';
+import {dom_module} from './dom.js'
+import {comp_module} from './comp.js';
 
 class Kernel {
     constructor() {
@@ -55,4 +55,4 @@ class Kernel {
     }
 }
 
-export const runtime = new Kernel;
+export const runtime = new Kernel, dom = runtime.dom, comp = runtime.comp;

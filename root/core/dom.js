@@ -86,5 +86,3 @@ class dom_module {
         return type === 'ui-block' ? new block(node) : type === 'ui-comp' ? new comp(node) : new cell(node)
     }
 }
-
-export const dom = dom_module;

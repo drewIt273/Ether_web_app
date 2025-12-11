@@ -9,5 +9,3 @@ class comp_module {
         this.runtime = runtime
     }
 }
-
-export const comp = comp_module;
