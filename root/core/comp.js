@@ -4,7 +4,7 @@
  * comp.js
  */
 
-class comp_module {
+export class comp_module {
     constructor(/**@type {Kernel}*/runtime) {
         this.runtime = runtime
     }

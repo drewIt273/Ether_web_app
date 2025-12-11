@@ -11,7 +11,7 @@ import {UICell as cell, UIBlock as block, UIComponent as comp} from "./assets/ui
 
 const doc = window.document;
 
-class dom_module {
+export class dom_module {
 
     constructor(/**@type {kernel}*/ runtime) {
         /** Reference to the kernel for hooks, module communication, etc. */
