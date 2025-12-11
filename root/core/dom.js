@@ -20,7 +20,7 @@ export class dom_module {
             this.nodereg = new Registry;
         this.init = !1;
         this.ready = !1;
-        this.nodes = this.nodereg.reg;
+        this.nodes = this.nodereg.values;
         this.query = /**@param {string} a*/ a => new query$(a);
         this.root = doc
         this.find = /**@param {string} s*/ s => this.query(s).first()
