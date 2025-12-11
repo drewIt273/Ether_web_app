@@ -462,7 +462,7 @@ export class UICell extends UIBase {
     }
 
     /**
-     * Emits data to another UICell.
+     * Emits data to another UICell or Block.
      * @param {*} data 
      */
     emit(data) {
@@ -499,6 +499,8 @@ export class UIBlock extends UIBase {
     constructor(node) {
         super(node, ActiveUIBlocks)
         this.ID = ranstring(3, 1)
+        this.emittedData = null
+        this.receivedData = null
         this.registeredKey = ActiveUIBlocks.write({node: this.node, id: this.ID, mounted: false})
         this.attrs({'ui-block-id': this.ID})
         UINodeMap.set(this.node, this)
@@ -539,6 +541,27 @@ export class UIBlock extends UIBase {
         this.unmount().off().node = null
         ActiveUIBlocks.remove(this.registeredKey)
         this = null
+    }
+
+    /**
+     * Emits data to another UICell or Block
+     * @param {*} data 
+     */
+    emit(data) {
+        const P = {
+            /**
+             * @param {UICell|UIBlock|(UIBlock|UICell)[]|string} targets 
+             * @param {(target: UICell|UIBlock, data?: *)} callback 
+             */
+            to: (targets, callback) => {
+                const T = isArray(targets) ? targets : [targets];
+                for (const target of T) dom.interface.emit(data).to(target, callback)
+                this.emittedData = data
+                return P
+            }
+        }
+
+        return P
     }
 }
 
