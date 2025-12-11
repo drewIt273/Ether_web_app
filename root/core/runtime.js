@@ -12,8 +12,8 @@ class Kernel {
     constructor() {
         /**Returns the modules constructors */
         this.modules = {dom, comp};
-        this.dom = new dom(this);
-        this.comp = new comp(this);
+        this.dom = new dom_module(this);
+        this.comp = new comp_module(this);
         this.hooks = {
             init: [],
             ready: []
