@@ -43,7 +43,7 @@ export class dom_module {
                     to: (target, callback) => {
                         const f = fu(target), t = f instanceof cell || f instanceof block
                         if (t) {
-                            if (typeof callback === 'function') try {callback.call(f, target, data); f.receivedData = data} catch(err) {console.error(`Error during emit callback for target ${f.ID}:`, err);}
+                            if (typeof callback === 'function') try {callback.call(f, f.node, data); f.receivedData = data} catch(err) {console.error(`Error during emit callback for target ${f.ID}:`, err);}
                         }
                         else throw new TypeError('target must be a UICell or UIBlock')
                     }
