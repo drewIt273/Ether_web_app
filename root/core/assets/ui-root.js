@@ -466,27 +466,20 @@ export class UICell extends UIBase {
      * @param {*} data 
      */
     emit(data) {
-        const emitterProxy = {
+        const P = {
             /**
-             * @param {UICell|UICell[]} targetCells 
-             * @param {(targetCell: UICell, data?: *) => *} callback 
+             * @param {UICell|UIBlock|(UIBlock|UICell)[]|string} targets 
+             * @param {(target: UICell|UIBlock, data?: *)} callback 
              */
-            to: (targetCells, callback) => {
-                const targets = isArray(targetCells) ? targetCells : [targetCells];
-                for (const target of targets) {
-                    if (!(target instanceof UICell)) throw new TypeError("targetCell must be an instance of UICell.")
-                    if (typeof callback === 'function') {
-                        try {callback.call(this, target, data)}
-                        catch(err) {
-                            console.error(`Error during emit callback for target ${target.ID}:`, err);
-                        }
-                    }
-                }
-                return emitterProxy
+            to: (targets, callback) => {
+                const T = isArray(targets) ? targets : [targets];
+                for (const target of T) dom.interface.emit(data).to(target, callback)
+                this.emittedData = data
+                return P
             }
         }
 
-        return emitterProxy
+        return P
     }
 
     /**Use only for permanently removing the UICell */
