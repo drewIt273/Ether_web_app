@@ -489,7 +489,6 @@ export class UICell extends UIBase {
         UINodeMap.delete(this.node)
         this.unmount().off().node = null
         ActiveUICells.remove(this.registeredKey)
-        this = null
     }
 }
 
@@ -544,7 +543,6 @@ export class UIBlock extends UIBase {
         UINodeMap.delete(this.node)
         this.unmount().off().node = null
         ActiveUIBlocks.remove(this.registeredKey)
-        this = null
     }
 
     /**
@@ -756,7 +754,6 @@ export class UIComponent extends UIBase {
         this.unmount().off().node = null
         this.#sheet.remove()
         ActiveUIComponents.remove(this.registeredKey)
-        this = null
     }
 }
 
