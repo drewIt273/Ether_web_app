@@ -544,13 +544,6 @@ export class UIBlock extends UIBase {
         return this
     }
 
-    /**Use only for permanently removing the UIBlock */
-    destroy() {
-        UINodeMap.delete(this.node)
-        this.unmount().off().node = null
-        ActiveUIBlocks.remove(this.registeredKey)
-    }
-
     /**
      * Emits data to another UICell or Block
      * @param {*} data 
@@ -576,6 +569,13 @@ export class UIBlock extends UIBase {
         }
 
         return P
+    }
+
+    /**Use only for permanently removing the UIBlock */
+    destroy() {
+        UINodeMap.delete(this.node)
+        this.unmount().off().node = null
+        ActiveUIBlocks.remove(this.registeredKey)
     }
 }
 
@@ -664,7 +664,7 @@ export class UIComponent extends UIBase {
         if (target === '&') nodes = [this.node]
         else if (isNode(target)) {
             if (!this.node.contains(target)) return undefined
-            nodes = [target]
+            else nodes = [target]
         }
         else if (isString(target)) {
             nodes = this.findAll(target)
