@@ -478,6 +478,12 @@ export class UICell extends UIBase {
                 for (const target of T) dom.interface.emit(data).to(target, callback)
                 this.emittedData = data
                 return P
+            },
+            /**
+             * @param {(target: UICell|UIBlock, data?: *)} callback 
+             */
+            map: (callback) => {
+                this.mappedData.set(data, callback)
             }
         }
 
@@ -560,6 +566,12 @@ export class UIBlock extends UIBase {
                 for (const target of T) dom.interface.emit(data).to(target, callback)
                 this.emittedData = data
                 return P
+            },
+            /**
+             * @param {(target: UICell|UIBlock, data?: *)} callback 
+             */
+            map: (callback) => {
+                this.mappedData.set(data, callback)
             }
         }
 
