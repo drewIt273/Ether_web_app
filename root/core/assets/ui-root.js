@@ -400,6 +400,8 @@ export class UICell extends UIBase {
         this.receivedData = null
         this.registeredKey = ActiveUICells.write({node: this.node, id: this.ID, mounted: false})
         this.attrs({'ui-cell-id': this.ID})
+            /**@type {Map<any, ()>}> */
+            this.mappedData = new Map()
         UINodeMap.set(this.node, this)
     }
 
@@ -503,6 +505,8 @@ export class UIBlock extends UIBase {
         this.receivedData = null
         this.registeredKey = ActiveUIBlocks.write({node: this.node, id: this.ID, mounted: false})
         this.attrs({'ui-block-id': this.ID})
+        /**@type {Map<any, ()>}> */
+            this.mappedData = new Map()
         UINodeMap.set(this.node, this)
     }
 
