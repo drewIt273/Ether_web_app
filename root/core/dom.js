@@ -43,7 +43,7 @@ export class dom_module {
                     to: (target, callback = () => {}) => {
                         const f = isString(target) ? fu(target) : target, t = f.hasAttr('ui-cell-id') || f.hasAttr('ui-block-id')
                         if (t) {
-                            if (typeof callback === 'function') try {callback.call(f, f.node, data); f.receivedData = data} catch(err) {console.error(`Error during emit callback for target ${f.ID}:`, err);}
+                            if (typeof callback === 'function') try {if (f.mappedData.has(data)) {f.mappedData.get(data).call(f, f, data)}; callback.call(f, f, data); f.receivedData = data} catch(err) {console.error(`Error during emit callback for target ${f.ID}:`, err);}
                         }
                         else throw new TypeError('target must be a UICell or UIBlock')
                     }
