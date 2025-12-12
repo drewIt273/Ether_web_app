@@ -11,7 +11,7 @@ import {comp_module} from './comp.js';
 class Kernel {
     constructor() {
         /**Returns the modules constructors */
-        this.modules = {dom, comp};
+        this.modules = {dom_module, comp_module};
         this.dom = new dom_module(this);
         this.comp = new comp_module(this);
         this.hooks = {
