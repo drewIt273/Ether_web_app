@@ -761,14 +761,9 @@ export class UIComponent extends UIBase {
  * Returns the UI instance associated with a node or selector.
  * @param {string|Node} target 
  */
-export function UIConstructorOf(target) {
-    let t; typeof target === 'string' ? t = document.querySelector(target) : target instanceof Node ? t = target : null
-    return UINodeMap.get(t) || null
-}
+export const UIConstructorOf = (target) => UINodeMap.get(find(target))
 
 /**
  * @param {UICell|UIBlock} n 
  */
-export function cellOrBlock(n) {
-    return (n instanceof UICell) ? !0 : (n instanceof UIBlock) ? !0 : !1
-}
+export const cellOrBlock = n => (n instanceof UICell) ? !0 : (n instanceof UIBlock) ? !0 : !1
