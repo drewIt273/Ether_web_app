@@ -40,8 +40,8 @@ export class dom_module {
                      * @param {cell|block|string} target 
                      * @param {(target: cell|block, data?: *)} callback
                      */
-                    to: (target, callback) => {
-                        const f = fu(target), t = f instanceof cell || f instanceof block
+                    to: (target, callback = () => {}) => {
+                        const f = isString(target) ? fu(target) : target, t = f.hasAttr('ui-cell-id') || f.hasAttr('ui-block-id')
                         if (t) {
                             if (typeof callback === 'function') try {callback.call(f, f.node, data); f.receivedData = data} catch(err) {console.error(`Error during emit callback for target ${f.ID}:`, err);}
                         }
