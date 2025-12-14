@@ -447,15 +447,6 @@ export class UICell extends UIBase {
     }
 
     /**
-     * Add event listeners to this node and writes them into the activeListeners registry.
-     * @param {string} ev @param  {...(node: Node)} handlers 
-     */
-    on(ev, ...handlers) {
-        handlers.forEach(handler => on(ev, this.node, handler.bind(this, this.node)))
-        return this
-    }
-
-    /**
      * Removes event listeners from this UICell and registers them into the backlogListeners registry.
      */
     off() {
