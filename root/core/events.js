@@ -19,6 +19,8 @@ export class events_module {
             this.ActiveGlobals = new Set()
         /**Stores references to global delegated listeners so they can be removed later @type {Map<string, ()>} */
             this.GlobalDelegates = new Map()
+        /**@type {Element} */
+            this.root = runtime.dom.find('web-app')
     }
 
     listen(ev, target, ...handlers) {    }
