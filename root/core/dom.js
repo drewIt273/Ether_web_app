@@ -22,7 +22,7 @@ export class dom_module {
         this.ready = !1;
         this.nodes = this.nodereg.values;
         this.query = /**@param {string} a*/ a => new query$(a);
-        this.root = doc
+        this.root = this.query('#lazy-app').nodes[0]
         this.body = doc.body
         this.find = /**@param {string} s*/ s => {const h = this.query(s); return h.count() === 1 ? h.first() : h.nodes}
         this.has = /**@param {Node} v*/ v => v instanceof Node && doc.contains(v)
