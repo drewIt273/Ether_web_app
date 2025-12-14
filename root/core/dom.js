@@ -69,7 +69,7 @@ export class dom_module {
      * Prepare rendering surface.
      */
     async onReady() {
-        const a = this.runtime?.config.root || 'lazy-app', r = this.doc.querySelector(a);
+        const a = this.runtime.config?.root || 'lazy-app', r = this.doc.querySelector(a);
         if (!r) throw new Error(`[DOM] root '${a}' not found`)
         this.root = r
         this.nodereg.write(r, 'root')
