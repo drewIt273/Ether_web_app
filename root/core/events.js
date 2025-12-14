@@ -4,8 +4,7 @@
  * events.js
  */
 
-import {find, findAll, isNode, isString, Registry} from "../../nodes/scripts/any.js"
-
+import {find, isNode, isString, Registry} from "../../nodes/scripts/any.js"
 
 export class events_module {
     constructor(/**@type {kernel}*/runtime) {
@@ -20,8 +19,57 @@ export class events_module {
         /**Stores references to global delegated listeners so they can be removed later @type {Map<string, ()>} */
             this.GlobalDelegates = new Map()
         /**@type {Element} */
-            this.root = runtime.dom.find('web-app')
+            this.root = runtime.dom.find('#mainLayoutContainer')
     }
 
-    listen(ev, target, ...handlers) {    }
+    #unbubble = new Set(['mouseenter', 'mouseleave', 'blur', 'focus', 'pointerenter', 'pointerleave'])
+
+    /**
+     * Adds event listeners to all matching selectors for each given handler and registers their listeners into the activeListeners registry, removing them from backlogListeners if found.
+     * @param {string} ev @param {string|Node} target  @param {...(e: Event)} handlers
+     */
+    listen(ev, target, ...handlers) {
+        const a = this.ActiveListeners, b = this.BacklogListeners
+        const nodes = isString(target) ? runtime.dom.find(target) : [target]
+    
+        nodes.forEach(node => {
+            let existing = a.find(o => o.node === node && o.ev === ev)
+
+            if (existing) {
+                // Only add handlers that aren’t already registered
+                    handlers.forEach(handler => {
+                        if (!existing.fn.includes(handler)) existing.fn.push(handler)
+                    })
+            }
+            else {
+                // New entry
+                    if (!this.#unbubble.has(ev)) a.write({node, ev, fn: [...handlers], in: 'active'})
+            }
+            // Ensure this node isn't still in backlog
+                b.splice(0, b.size, b.filter(o => o.node !== node))
+        })
+
+        if (!this.ActiveGlobals.has(ev)) {
+            this.ActiveGlobals.add(ev)
+            if (this.#unbubble.has(ev)) {
+                nodes.forEach(n => {
+                    const node = find(n)
+                    handlers.forEach(handler => node.addEventListener(ev, e => handler.call(node, e)))
+                })
+            }
+            else {
+                const delegatedListener = e => {
+                    a.filter(o => o.ev === ev).forEach(o => {
+                        if (isString(o.node)) {
+                            const matched = e.target.closest(o.node);
+                            if (matched && this.root.contains(matched)) o.fn.forEach(fn => fn.call(matched, e));
+                        }
+                        else if (isNode(o.node)) if (o.node.contains(e.target)) o.fn.forEach(fn => fn.call(o.node, e));
+                    })
+                }
+                this.root.addEventListener(ev, delegatedListener)
+                this.GlobalDelegates.set(ev, delegatedListener)
+            }
+        }
+    }
 }
