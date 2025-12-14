@@ -4,7 +4,8 @@
  * events.js
  */
 
-import {Registry} from "../../nodes/scripts/any.js"
+import {find, findAll, isNode, isString, Registry} from "../../nodes/scripts/any.js"
+
 
 export class events_module {
     constructor(/**@type {kernel}*/runtime) {
