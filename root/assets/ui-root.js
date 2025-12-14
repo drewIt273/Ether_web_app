@@ -7,7 +7,7 @@
 import {isNode, isString, create, find, toKebab, setAttr, hasAttr, removeAttr, on, off, ranstring, strictObject, removeNode, setStyle, Registry, isArray, getStyle, isElement} from "../../nodes/scripts/any.js";
 import {div} from "./nodecreator.js";
 import {stylesheet} from "../../nodes/scripts/stylesheet.js";
-import {dom} from "../core/runtime.js";
+import {dom, GlobalEvents} from "../core/runtime.js";
 
 export const ActiveUICells = new Registry;
 export const ActiveUIBlocks = new Registry;
