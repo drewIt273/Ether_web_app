@@ -50,6 +50,7 @@ export class dom_module {
                 }
             }
         }
+        this.doc = doc;
     }
 
     /**
@@ -59,7 +60,6 @@ export class dom_module {
      */
     async onInit() {
         if (typeof window === 'undefined') throw new Error("[DOM] Not running in browser environment.");
-        this.doc = doc;
         this.init = !0
     }
 
