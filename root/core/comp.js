@@ -6,6 +6,7 @@
 
 export class comp_module {
     constructor(/**@type {Kernel}*/runtime) {
-        this.runtime = runtime
+        /** Reference to the kernel for hooks, module communication, etc. */
+            this.runtime = runtime
     }
 }
