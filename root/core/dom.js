@@ -23,8 +23,8 @@ export class dom_module {
         this.nodes = this.nodereg.values;
         this.query = /**@param {string} a*/ a => new query$(a);
         this.root = doc
-        this.find = /**@param {string} s*/ s => this.query(s).first()
-        this.findAll = /**@param {string} s*/ s => this.query(s).nodes
+        this.body = doc.body
+        this.find = /**@param {string} s*/ s => {const h = this.query(s); return h.count() === 1 ? h.first() : h.nodes}
         this.has = /**@param {Node} v*/ v => v instanceof Node && doc.contains(v)
         this.observer = new MutationObserver(muts => {
             for (const m of muts) {
