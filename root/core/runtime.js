@@ -7,13 +7,15 @@
 
 import {dom_module} from './dom.js'
 import {comp_module} from './comp.js';
+import {events_module} from './events.js';
 
 class Kernel {
     constructor() {
         /**Returns the modules constructors */
-        this.modules = {dom_module, comp_module};
+        this.modules = {dom_module, comp_module, events_module};
         this.dom = new dom_module(this);
         this.comp = new comp_module(this);
+        this.events = new events_module(this);
         this.hooks = {
             init: [],
             ready: []
@@ -55,4 +57,4 @@ class Kernel {
     }
 }
 
-export const runtime = new Kernel, dom = runtime.dom, comp = runtime.comp;
+export const runtime = new Kernel, dom = runtime.dom, comp = runtime.comp, GlobalEvents = runtime.events;
