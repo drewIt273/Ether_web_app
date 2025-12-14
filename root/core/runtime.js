@@ -26,6 +26,7 @@ class Kernel {
             (function() {const a = []; for (const [p] of Object.entries(this)) a.push(p); return a})().includes(p) ? null : this[p] = v
             return p
         }
+        this.config = {}
     }
 
     async boot() {
