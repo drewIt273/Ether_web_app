@@ -365,12 +365,12 @@ export class UIBase {
     }
     
     /**
-     * Add event listeners to this node and writes them into the activeListeners registry.
-     * @param {string} ev @param  {...(node: Node)} handlers 
+     * Add event listeners to this node.
+     * @param {string} ev @param  {...(n: Node, e: Event)} handlers 
      */
     on(ev, ...handlers) {
         handlers.forEach(handler => {
-            on(ev, this.node, handler.call(this, this.node))
+            GlobalEvents.listen(ev, this.node, (e) => handler.call(this, this.node, e))
         }) 
         return this
     }
