@@ -5,8 +5,8 @@
  * co-built with GPT-5
  */
 
-import {toKebab, isNode} from "../../../nodes/scripts/any.js";
-import {on} from "../../../nodes/scripts/any.js";
+import {toKebab, isNode} from "../../nodes/scripts/any.js";
+import {on} from "../../nodes/scripts/any.js";
 
 const SVG_NAMESPACE = `http://www.w3.org/2000/svg`;
 const SVG_TAGS = new Set(["svg", "g", "rect", "path", "circle", "line", "polyline", "polygon", "ellipse", "text", "defs", "use", "mask", "clipPath", "linearGradient", "radialGradient", "stop"]);
