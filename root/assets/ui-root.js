@@ -4,7 +4,7 @@
  * ui.root.js
  */
 
-import {isNode, isString, create, find, toKebab, setAttr, hasAttr, removeAttr, on, off, ranstring, strictObject, removeNode, setStyle, Registry, isArray, getStyle, isElement} from "../../nodes/scripts/any.js";
+import {isNode, isString, create, find, toKebab, setAttr, hasAttr, removeAttr, off, ranstring, strictObject, removeNode, setStyle, Registry, isArray, getStyle, isElement} from "../../nodes/scripts/any.js";
 import {div} from "./nodecreator.js";
 import {stylesheet} from "../../nodes/scripts/stylesheet.js";
 import {dom, GlobalEvents} from "../core/runtime.js";
@@ -207,7 +207,7 @@ export class UIBase {
             }    
         }
 
-        global ? on('keydown', document, listener) : on('keydown', targetNode, listener)
+        GlobalEvents.listen('keydown', targetNode, listener);
         this.#keybinds.push({keys, handler, listener, node: targetNode, global: global})
         return this
     }
@@ -376,16 +376,13 @@ export class UIBase {
     }
 
     /**
-     * Removes event listeners from this node if no selector is given and writes them into the backlogListeners registry. Does same for all descendants matching selector if selector is given.
-     * @param {string} s selector
+     * Removes event listeners from this node.
+     * @param {string} ev
      */
-    off(s = '') {
-        if (!s) off(this.node)
-        else if (typeof s === 'string') {
-            this.findAll(s).forEach(e => off(e))
-        }
+    off(ev) {
+        GlobalEvents.unlisten(ev, this.node)
         return this
-    }    
+    }
 }
 
 export class UICell extends UIBase {
@@ -443,14 +440,6 @@ export class UICell extends UIBase {
             removeNode(this.node)
             ActiveUICells.get(this.registeredKey).mounted = !1
         }
-        return this
-    }
-
-    /**
-     * Removes event listeners from this UICell and registers them into the backlogListeners registry.
-     */
-    off() {
-        off(this.node)
         return this
     }
 
@@ -744,10 +733,10 @@ export class UIComponent extends UIBase {
     }
 
     /**
-     * @param {string} ev @param {string|Node} target @param {...Function} handlers 
+     * @param {string} ev @param {string|Node} target @param {...()} handlers 
      */
     delegate(ev, target, ...handlers) {
-        handlers.forEach(handler => on(ev, target, handler)) 
+        handlers.forEach(handle => GlobalEvents.listen(ev, target, handle)) 
         return this
     }
 
