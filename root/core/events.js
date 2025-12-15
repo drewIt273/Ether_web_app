@@ -75,9 +75,9 @@ export class events_module {
 
     /**
      * Removes registered event listeners from targets.
-     * @param {string} ev @param {string|Node} target @param {...()} handlers
+     * @param {string} ev @param {string|Node} target
      */
-    unlisten(ev, target, ...handlers) {
+    unlisten(ev, target) {
         const a = this.ActiveListeners
         const nodes = isString(target) ? runtime.dom.find(target) : [target]
 
@@ -85,13 +85,10 @@ export class events_module {
             const existing = a.find(o => o.node === node && o.ev === ev)
             if (!existing) return;
 
-            // Remove only the specified handlers, or all if none specified
-                handlers.length ? existing.fn = existing.fn.filter(fn => !handlers.includes(fn)) : existing.fn.length = 0;
-
             // Remove direct listeners for non-bubbling events
                 if (this.#unbubble.has(ev)) {
                     const e = find(node);
-                    if (e) (function() {return handlers.length ? handlers : existing.fn})().forEach(fn => e.removeEventListener(ev, fn));
+                    if (e) existing.fn.forEach(fn => e.removeEventListener(ev, fn));
                 }
 
             // If no handlers left, remove from ActiveListeners
