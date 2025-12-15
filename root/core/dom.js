@@ -77,6 +77,15 @@ export class dom_module {
     }
 
     /**
+     * Executes a callback after a given timeout ones the DOM has fully loaded.
+     * @param {()} callback 
+     */
+    DOMLoaded(callback, timeout = 0) {
+        let f = () => {setTimeout(callback, timeout)}; (this.doc.readyState === "complete") ? f() : this.runtime.events.listen('DOMContentLoaded', this.doc, f());
+        return this
+    }
+
+    /**
      * @param {string} tag 
      * @param {{class: string; id: string; style: {} | string; innerHTML: string; textContent: string; append: Node[]; on: (e: Node) => any; attrs: {};}} props 
      * @param {"ui-cell"|"ui-block"|"ui-comp"} type 

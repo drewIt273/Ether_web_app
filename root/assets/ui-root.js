@@ -353,16 +353,6 @@ export class UIBase {
         setAttr(this.node, 'pointer-events', a)
         return this
     }
-
-    /**
-     * Executes a callback after a given timeout ones the DOM has fully loaded.
-     * @param {()} callback 
-     * @param {number} timeout 
-     */
-    DOMLoaded(callback, timeout = 0) {
-        (document.readyState === "complete") ? setTimeout(callback, timeout) : on("DOMContentLoaded", document, () => {setTimeout(callback, timeout)})
-        return this
-    }
     
     /**
      * Add event listeners to this node.
