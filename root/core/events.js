@@ -25,7 +25,7 @@ export class events_module {
     #unbubble = new Set(['mouseenter', 'mouseleave', 'blur', 'focus', 'pointerenter', 'pointerleave'])
 
     /**
-     * Adds event listeners to all matching selectors for each given handler and registers their listeners into the activeListeners registry, removing them from backlogListeners if found.
+     * Adds global delegated listener to all matching selectors for each given handler
      * @param {string} ev @param {string|Node} target  @param {...(e: Event)} handlers
      */
     listen(ev, target, ...handlers) {
@@ -71,5 +71,31 @@ export class events_module {
                 this.GlobalDelegates.set(ev, delegatedListener)
             }
         }
+    }
+
+    /**
+     * Removes registered event listeners from targets.
+     * @param {string} ev @param {string|Node} target @param {...()} handlers
+     */
+    unlisten(ev, target, ...handlers) {
+        const a = this.ActiveListeners
+        const nodes = isString(target) ? runtime.dom.find(target) : [target]
+
+        nodes.forEach(node => {
+            const existing = a.find(o => o.node === node && o.ev === ev)
+            if (!existing) return;
+
+            // Remove only the specified handlers, or all if none specified
+                handlers.length ? existing.fn = existing.fn.filter(fn => !handlers.includes(fn)) : existing.fn.length = 0;
+
+            // Remove direct listeners for non-bubbling events
+                if (this.#unbubble.has(ev)) {
+                    const e = find(node);
+                    if (e) (function() {return handlers.length ? handlers : existing.fn})().forEach(fn => e.removeEventListener(ev, fn));
+                }
+
+            // If no handlers left, remove from ActiveListeners
+                if (!existing.fn.length) a.splice(0, a.size, a.filter(o => o !== existing))
+        })
     }
 }
