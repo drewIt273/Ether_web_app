@@ -106,4 +106,20 @@ export class events_module {
         if (typeof handler !== 'function' || struct(node?.node) === undefined) return;
         else this.Keybinds.has(node.node) ? this.Keybinds.get(node.node).push([keys, handler]) : this.Keybinds.set(node.node, [[keys, handler]])
     }
+
+    /**
+     * @param {cell|block|comp} node 
+     */
+    keycall(node) {
+        if (!this.Keybinds.has(node.node)) return;
+        else {
+            const o = this.Keybinds.get(node.node); let b = [];
+            const listener =  (/**@type {KeyboardEvent}*/ e) => o.forEach(a => {
+                const i = a[0]; node.focus()
+                    console.log(e.key); a[1].call(node, e); b.push(i[i.indexOf(e.key)]); 
+                
+            })
+            this.listen('keydown', node.node, listener)
+        }
+    }
 }
