@@ -298,7 +298,9 @@ export class UIBase {
         return this
     }
 
-    focus() {
+    /**@param {-1|0} n The value of the tabindex */
+    focus(n) {
+        this.node.tabIndex = n
         this.node.focus()
         return this
     }
