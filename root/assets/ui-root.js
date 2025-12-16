@@ -32,7 +32,6 @@ export class UIBase {
     }
 
     #reg
-    #keybinds = []
     #states = {}
     #currentstate = null
     #onstatechange
@@ -185,47 +184,16 @@ export class UIBase {
     }
 
     /**
-     * Executes a handler function when the keys are fired (e.g ctrl + P) to a node descendant of this UIComponent if given. Otherwise, this UIComponent.
-     * @param {string} keys The key or keys to be pressed joined with a '+'.
-     * @param {(this: this, e: KeyboardEvent)} handler The Function to be fired.
-     * @param {string|Node} node The node targeted if set.
+     * @param {("ctrl" | "alt" | "meta" | "shift")[]} keys The key or keys to be pressed joined with a '+'.
+     * @param {()} handler The Function to be fired.
      */
-    keybind(keys, handler, node = '', global = false) {
-        if (!isString(keys) || typeof handler !== 'function') return this
-
-        let targetNode  = isString(node) ? this.find(node) : isNode(node) ? node : this.node
-
-        // Normalize key string: "ctrl + shift + p" -> ['ctrl', 'shift', 'p']
-            const keyParts = keys.toLowerCase().split('+').map(k => k.trim());
-
-        /** @param {KeyboardEvent} e */
-        const listener = e => {
-            const ctrl = keyParts.includes('ctrl') ? e.ctrlKey : true, shift = keyParts.includes('shift') ? e.shiftKey : true, alt = keyParts.includes('alt') ? e.altKey : true, meta = keyParts.includes('meta') ? e.metaKey : true, mainKey = keyParts.find(k => !['ctrl','shift','alt','meta'].includes(k));
-            if (ctrl && shift && alt && meta && e.key.toLowerCase() === mainKey) {
-                e.preventDefault();
-                handler.call(this, e);
-            }    
-        }
-
-        GlobalEvents.listen('keydown', targetNode, listener);
-        this.#keybinds.push({keys, handler, listener, node: targetNode, global: global})
+    keybind(keys, handler) {
+        GlobalEvents.keybind(keys, this, handler);
         return this
     }
-
-    /**
-     * 
-     * @param {string|Node} node 
-     */
-    unbindkeys(node = '') {
-        let target = isString(node) ? this.find(node) : isNode(node) ? node : null
-        this.#keybinds = this.#keybinds.filter(k => {
-            if (k.node === target) {
-                off(target)
-                return !1
-            }
-            return !0
-        })
-
+        
+    unbindkeys() {
+        GlobalEvents.Keybinds.delete(this)
         return this
     }
 
