@@ -19,7 +19,7 @@ export class events_module {
             this.ActiveGlobals = new Set()
         /**Stores references to global delegated listeners so they can be removed later @type {Map<string, ()>} */
             this.GlobalDelegates = new Map()
-        /**@type {WeakMap<(cell|block|comp), [string[], ()][]>} */
+        /**@type {WeakMap<Node, [string[], ()][]>} */
             this.Keybinds = new WeakMap()
         /**@type {Element} */
             this.root = runtime.dom.find('#mainLayoutContainer')
@@ -112,14 +112,24 @@ export class events_module {
      */
     keycall(node) {
         if (!this.Keybinds.has(node.node)) return;
-        else {
-            const o = this.Keybinds.get(node.node); let b = [];
-            const listener =  (/**@type {KeyboardEvent}*/ e) => o.forEach(a => {
-                const i = a[0]; node.focus()
-                    console.log(e.key); a[1].call(node, e); b.push(i[i.indexOf(e.key)]); 
-                
-            })
-            this.listen('keydown', node.node, listener)
+        let k = (c, e) => {
+            const map = {ctrl: e.ctrlKey, shift: e.shiftKey, alt: e.altKey, meta: e.metaKey}
+            for (const k of c) {
+                if (map[k] === !1) return !1
+                if (!map[k] && e.key.toLowerCase() !== k) return !1
+            }
+            return !0
         }
+        const o = this.Keybinds.get(node.node)
+        const listener = (/**@type {KeyboardEvent}*/ e) => {
+            o.forEach(([ks, h]) => {
+                if (k(ks, e)) {
+                    e.preventDefault()
+                    h.call(node.node, e)
+                }
+            })
+        }
+        node.focus(0)
+        this.runtime.dom.doc.addEventListener('keydown', listener)
     }
 }
