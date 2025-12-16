@@ -5,7 +5,7 @@
  */
 
 import {find, isNode, isString, Registry} from "../../nodes/scripts/any.js"
-import {UIBlock, UICell, UIComponent, UIConstructorOf} from "../assets/ui-root.js"
+import {UIBlock as block, UICell as cell, UIComponent as comp, UIConstructorOf as struct} from "../assets/ui-root.js"
 
 export class events_module {
     constructor(/**@type {kernel}*/runtime) {
@@ -19,7 +19,7 @@ export class events_module {
             this.ActiveGlobals = new Set()
         /**Stores references to global delegated listeners so they can be removed later @type {Map<string, ()>} */
             this.GlobalDelegates = new Map()
-        /**@type {WeakMap<(UICell|UIBlock|UIComponent), [string[], ()][]>} */
+        /**@type {WeakMap<(cell|block|comp), [string[], ()][]>} */
             this.Keybinds = new WeakMap()
         /**@type {Element} */
             this.root = runtime.dom.find('#mainLayoutContainer')
@@ -100,10 +100,10 @@ export class events_module {
     }
 
     /**
-     * @param {("ctrl"|"alt"|"meta"|"shift")[]} keys @param {UICell|UIBlock|UIComponent} node @param {()} handler 
+     * @param {("ctrl"|"alt"|"meta"|"shift")[]} keys @param {cell|block|comp} node @param {()} handler 
      */
     keybind(keys, node, handler) {
-        if (typeof handler !== 'function' || UIConstructorOf(node?.node) === undefined) return;
+        if (typeof handler !== 'function' || struct(node?.node) === undefined) return;
         else this.Keybinds.has(node.node) ? this.Keybinds.get(node.node).push([keys, handler]) : this.Keybinds.set(node.node, [[keys, handler]])
     }
 }
