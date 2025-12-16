@@ -173,25 +173,21 @@ export class UIBase {
      */
     fadeToggle(callback, duration = 400) {
         const computed = getComputedStyle(this.node);
-        if (computed.display === 'none' || computed.opacity === 0) {
-            this.fadeIn.call({node: this.node}, () => callback.call(this, this.node), duration)
-        }
-        else {
-            this.fadeOut.call({node: this.node}, () => callback.call(this, this.node), duration)
-        }
-
+        if (computed.display === 'none' || computed.opacity === 0) this.fadeIn.call({node: this.node}, () => callback.call(this, this.node), duration)
+        else this.fadeOut.call({node: this.node}, () => callback.call(this, this.node), duration)
         return this
     }
 
     /**
-     * @param {("ctrl" | "alt" | "meta" | "shift")[]} keys The key or keys to be pressed joined with a '+'.
+     * @param {("ctrl" | "alt" | "meta" | "shift")[]} keys The keys to be pressed.
      * @param {()} handler The Function to be fired.
      */
     keybind(keys, handler) {
         GlobalEvents.keybind(keys, this, handler);
+        GlobalEvents.keycall(this)
         return this
     }
-        
+
     unbindkeys() {
         GlobalEvents.Keybinds.delete(this)
         return this
