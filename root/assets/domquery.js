@@ -4,7 +4,8 @@
  * domquery.js
  */
 
-import {on, off} from "../../nodes/scripts/any.js";
+import {off} from "../../nodes/scripts/any.js";
+import {GlobalEvents} from "../core/runtime.js";
 
 export class query$ {
 
@@ -37,12 +38,9 @@ export class query$ {
         })
     }
 
-    on(event, callback, delay = 0) {
-        this.nodes.forEach(node => {
-            on(event, node, (e) => {setTimeout(callback.call(this, e), delay)})
-        })
-
-        return this // For chaining
+    on(ev, callback, delay = 0) {
+        this.nodes.forEach(node => GlobalEvents.listen(ev, node, e => {setTimeout(callback.call(this, e), delay)}))
+        return this
     }
 
     onload(callback, timeout = 0) {
@@ -54,15 +52,9 @@ export class query$ {
     }
 
     delegate(eventType, handler, selector = "") {
-        if (selector === "" || undefined) {
-            this.nodes.forEach(() => {
-                on(eventType, this.selector, handler);
-            })
-        }
-        else {
-            on(eventType, `${this.selector}${selector}`, handler)
-        }
-
+        this.nodes.forEach(n => {
+            GlobalEvents.listen(eventType, n.querySelector(selector), handler)
+        })
         return this
     }
 

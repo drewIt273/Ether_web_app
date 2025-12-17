@@ -288,63 +288,6 @@ export const ActiveGlobals = new Set()
 export const GlobalDelegates = new Map()
 
 /**
- * Adds event listeners to all matching selectors for each given handler and registers their listeners into the activeListeners registry, removing them from backlogListeners if found.
- * @param {string} ev @param {string|Node} target  @param {...(e: Event)} handlers
- */
-export function on(ev, target, ...handlers) {
-    const nodes = isString(target) ? findAll(target) : [target]
-    const unbubble = new Set(['mouseenter', 'mouseleave', 'blur', 'focus', 'pointerenter', 'pointerleave'])
-    console.log(activeListeners, ActiveGlobals, GlobalDelegates); // Testing, don't mind.
-    
-    nodes.forEach(node => {
-        let existing = activeListeners.find(o => o.node === node && o.ev === ev)
-
-        if (existing) {
-            // Only add handlers that aren’t already registered
-                handlers.forEach(handler => {
-                    if (!existing.fn.includes(handler)) existing.fn.push(handler)
-                })
-        }
-        else {
-            // New entry
-                if (!unbubble.has(ev)) activeListeners.write({node, ev, fn: [...handlers], in: 'active'})
-        }
-
-        // Ensure this node isn't still in backlog
-            backlogListeners.splice(0, backlogListeners.size, backlogListeners.filter(o => o.node !== node))
-    })
-
-    if (!ActiveGlobals.has(ev)) {
-        ActiveGlobals.add(ev)
-        if (unbubble.has(ev)) {
-            nodes.forEach(n => {
-                const node = find(n)
-                handlers.forEach(handler => node.addEventListener(ev, e => handler.call(node, e)))
-            })
-        }
-        else {
-            const delegatedListener = e => {
-                activeListeners.filter(o => o.ev === ev).forEach(o => {
-                    if (isString(o.node)) {
-                        const matched = e.target.closest(o.node);
-                        if (matched && document.body.contains(matched)) {
-                            o.fn.forEach(fn => fn.call(matched, e));
-                        }
-                    }
-                    else if (isNode(o.node)) {
-                        if (o.node.contains(e.target)) {
-                            o.fn.forEach(fn => fn.call(o.node, e));
-                        }
-                    }
-                })
-            }
-            document.body.addEventListener(ev, delegatedListener)
-            GlobalDelegates.set(ev, delegatedListener)
-        }
-    }
-}
-
-/**
  * Removes previously registered event listeners from targets and registers their listeners into the backlogListeners registry, removing them from activeListeners.
  * @param {string} ev @param {string|Node} target @param {...()} handlers
  */

@@ -6,7 +6,7 @@
  */
 
 import {toKebab, isNode} from "../../nodes/scripts/any.js";
-import {on} from "../../nodes/scripts/any.js";
+import {GlobalEvents} from "../core/runtime.js";
 
 const SVG_NAMESPACE = `http://www.w3.org/2000/svg`;
 const SVG_TAGS = new Set(["svg", "g", "rect", "path", "circle", "line", "polyline", "polygon", "ellipse", "text", "defs", "use", "mask", "clipPath", "linearGradient", "radialGradient", "stop"]);
@@ -93,7 +93,7 @@ export function jsx(tag = "div", props = {}) {
         // Event listeners onClick -> click
             if (/^on[A-Z]/.test(key) && typeof value === "function") {
                 const ev = key.slice(2).toLowerCase()
-                on(ev, E, () => value.call(this, E))
+                GlobalEvents.listen(ev, E, value)
                 continue;
             }
 
