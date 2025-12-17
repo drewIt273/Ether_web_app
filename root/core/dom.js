@@ -6,7 +6,7 @@
 
 import {jsx} from "../assets/nodecreator.js";
 import {query$} from "../assets/domquery.js";
-import {isString, Registry} from "../../nodes/scripts/any.js";
+import {Registry} from "../../nodes/scripts/any.js";
 import {UICell as cell, UIBlock as block, UIComponent as comp, UIConstructorOf as fu} from "../assets/ui-root.js";
 
 const doc = window.document;
@@ -40,11 +40,11 @@ export class dom_module {
             emit: (data) => {
                 return {
                     /**
-                     * @param {cell|block|string} target 
+                     * @param {cell|block|Node|string} target 
                      * @param {(target: cell|block, data?: *)} callback
                      */
                     to: (target, callback = () => {}) => {
-                        const f = isString(target) ? fu(target) : target, t = f.hasAttr('ui-cell-id') || f.hasAttr('ui-block-id')
+                        const f = (typeof target === 'string' || target instanceof Node) ? fu(target) : target, t = f.hasAttr('ui-cell-id') || f.hasAttr('ui-block-id')
                         if (t) {
                             if (typeof callback === 'function') try {if (f.mappedData.has(data)) {f.mappedData.get(data).call(f, f, data)}; callback.call(f, f, data); f.receivedData = data} catch(err) {console.error(`Error during emit callback for target ${f.ID}:`, err);}
                         }
