@@ -19,7 +19,7 @@ export const UINodeMap = new WeakMap()
 export class UIBase {
 
     /**
-     * @param {string|Node} node 
+     * @param {string|Element} node 
      * @param {Registry} registry 
      */
     constructor(node, registry) {

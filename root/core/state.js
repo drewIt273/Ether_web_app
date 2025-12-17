@@ -1,11 +1,11 @@
 /**
  * Instance by DrewIt
  * 
- * comp.js
+ * state.js
  */
 
-export class comp_module {
-    constructor(/**@type {Kernel}*/runtime) {
+export class state_module {
+    constructor(/**@type {kernel}*/runtime) {
         /**Reference to the kernel for hooks, module communication, etc. */
             this.runtime = runtime
     }
