@@ -4,7 +4,6 @@
  * domquery.js
  */
 
-import {off} from "../../nodes/scripts/any.js";
 import {GlobalEvents} from "../core/runtime.js";
 
 export class query$ {
@@ -55,11 +54,6 @@ export class query$ {
         this.nodes.forEach(n => {
             GlobalEvents.listen(eventType, n.querySelector(selector), handler)
         })
-        return this
-    }
-
-    removeListeners() {
-        off(this.selector)
         return this
     }
 
