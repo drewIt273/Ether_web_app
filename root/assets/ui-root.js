@@ -189,7 +189,7 @@ export class UIBase {
     }
 
     unbindkeys() {
-        GlobalEvents.Keybinds.delete(this)
+        GlobalEvents.Keybinds.delete(this.node)
         return this
     }
 
