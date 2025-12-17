@@ -22,7 +22,7 @@ export class events_module {
         /**@type {WeakMap<Node, [string[], ()][]>} */
             this.Keybinds = new WeakMap()
         /**@type {Element} */
-            this.root = runtime.dom.find('#mainLayoutContainer')
+            this.root = runtime.dom.body
     }
 
     #unbubble = new Set(['mouseenter', 'mouseleave', 'blur', 'focus', 'pointerenter', 'pointerleave'])
@@ -130,6 +130,6 @@ export class events_module {
             })
         }
         node.focus(0)
-        this.runtime.dom.doc.addEventListener('keydown', listener)
+        this.listen('keydown', this.root, listener)
     }
 }
