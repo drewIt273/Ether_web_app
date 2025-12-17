@@ -13,7 +13,7 @@ const doc = window.document;
 
 export class dom_module {
 
-    constructor(/**@type {kernel}*/ runtime) {
+    constructor(/**@type {Kernel}*/ runtime) {
         /** Reference to the kernel for hooks, module communication, etc. */
             this.runtime = runtime;
         /** A registry for created nodes. */

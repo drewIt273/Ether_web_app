@@ -6,16 +6,18 @@
  */
 
 import {dom_module} from './dom.js'
-import {comp_module} from './comp.js';
-import {events_module} from './events.js';
+import {comp_module} from './comp.js'
+import {events_module} from './events.js'
+import {state_module} from './state.js'
 
 class Kernel {
     constructor() {
         /**Returns the modules constructors */
-        this.modules = {dom_module, comp_module, events_module};
+        this.modules = {dom_module, comp_module, events_module, state_module};
         this.dom = new dom_module(this);
         this.comp = new comp_module(this);
         this.events = new events_module(this);
+        this.state = new state_module(this);
         this.hooks = {
             init: [],
             ready: []
