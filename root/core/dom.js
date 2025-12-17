@@ -29,7 +29,10 @@ export class dom_module {
         this.observer = new MutationObserver(muts => {
             for (const m of muts) {
                 if (m.addedNodes) for (const added of m.addedNodes) if (!this.nodereg.includesValue(added) && !(added instanceof SVGElement)) this.nodereg.write(added)
-                if (m.removedNodes) for (const removed of m.removedNodes) this.nodereg.remove(this.nodereg.keyOf(removed))
+                if (m.removedNodes) for (const removed of m.removedNodes) {
+                    this.nodereg.remove(this.nodereg.keyOf(removed))
+                    if (this.runtime.events.Keybinds.has(removed)) this.runtime.events.unlisten('keydown', removed)
+                }
             }
         })
         this.observer.observe(doc.body, {childList: true, subtree: true})
