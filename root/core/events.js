@@ -8,7 +8,7 @@ import {find, isNode, isString, Registry} from "../../nodes/scripts/any.js"
 import {UIBlock as block, UICell as cell, UIComponent as comp, UIConstructorOf as struct} from "../assets/ui-root.js"
 
 export class events_module {
-    constructor(/**@type {kernel}*/runtime) {
+    constructor(/**@type {Kernel}*/runtime) {
         /** Reference to the kernel for hooks, module communication, etc. */
             this.runtime = runtime
         /**A registry for nodes still having active listeners in the DOM */
