@@ -286,22 +286,3 @@ export const ActiveGlobals = new Set()
 
 /**Stores references to global delegated listeners so they can be removed later @type {Map<string, ()>} */
 export const GlobalDelegates = new Map()
-
-/**
- * Restores all event listeners from backlog for matching selectors
- * @param {string} selector 
- */
-export function restoreListeners(selector) {
-    findAll(selector).forEach(node => {
-        const toRestore = backlogListeners.filter(o => o.node === node);
-
-        toRestore.forEach(o => {
-            o.fn.forEach(f => node.addEventListener(o.ev, f));
-            if (!activeListeners.includesValue(o)) activeListeners.write(o);
-            o.in = 'active'
-        })
-
-        // Filter out restored objects from backlogListeners
-            backlogListeners.splice(0, backlogListeners.length, ...backlogListeners.filter(o => o.node !== node))
-    })
-}
