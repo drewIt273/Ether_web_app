@@ -15,7 +15,7 @@ class Kernel {
         /**Returns the modules constructors */
         this.modules = {dom_module, comp_module, events_module, state_module};
         this.dom = new dom_module(this);
-        this.comp = new comp_module(this);
+        this.lifecycle = new comp_module(this);
         this.events = new events_module(this);
         this.state = new state_module(this);
         this.hooks = {
@@ -60,4 +60,4 @@ class Kernel {
     }
 }
 
-export const runtime = new Kernel, dom = runtime.dom, comp = runtime.comp, GlobalEvents = runtime.events;
+export const runtime = new Kernel, dom = runtime.dom, lifecycle = runtime.lifecycle, GlobalEvents = runtime.events;
