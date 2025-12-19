@@ -265,24 +265,3 @@ export const setAttr = (e, a, v) => e.setAttribute(a, v)
  * @param {Element} e @param {string} a 
  */
 export const removeAttr = (e, a) => hasAttr(e, a) ? e.removeAttribute(a) : null
-
-/**
- * Removes event listeners from nodes in the DOM
- * @param {NodeListOf<Node>} nodes should be a query result @param {string} ev @param {Function} handler 
- */
-export const removeListeners = (nodes, ev, handler) => Array.from(nodes).forEach(node => {node.removeEventListener(ev, handler)})
-
-/**A registry for nodes still having active listeners in the DOM */
-export const activeListeners = new Registry
-
-/**A registry for nodes whose event listeners where removed from the DOM */
-export const backlogListeners = new Registry
-
-/**A registry for deleted nodes */
-export const backlogNodes = new Registry
-
-/**Track which global events are already delegated @type {Set<string>} */
-export const ActiveGlobals = new Set()
-
-/**Stores references to global delegated listeners so they can be removed later @type {Map<string, ()>} */
-export const GlobalDelegates = new Map()
