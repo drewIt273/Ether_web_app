@@ -544,9 +544,7 @@ export class UIComponent extends UINode {
      * @param {(Node|UICell|UIBlock|UIComponent)[]} o 
      */
     set append(o) {
-        for (const h of o) {
-            isNode(h) ? this.node.appendChild(h) : (h instanceof UINode ? h.mount(this) : null)
-        }
+        for (const h of o) isNode(h) ? this.node.appendChild(h) : (h instanceof UINode ? h.mount(this) : null)
     }
 
     /**
@@ -554,9 +552,9 @@ export class UIComponent extends UINode {
      * @param {Node|UIComponent} target 
      */
     mount(target) {
+        if (cellOrBlock(target)) throw new Error(`A UIComponent cannot mount ${target}`)
+        else if (target instanceof UIComponent) target.node.append(this.node)
         if (isNode(target)) find(target)?.appendChild(this.node)
-        if (target instanceof UIComponent) target.node.append(this.node)
-        else if (cellOrBlock(target)) throw new Error(`A UIComponent cannot mount ${target}`)
         ActiveUIComponents.get(this.registeredKey).mounted = !0
         return this
     }
@@ -670,9 +668,7 @@ export class UIComponent extends UINode {
             const v = styleObjOrProp[key];
             if (strictObject(v)) {
                 const targets = document.querySelectorAll(`${this.selector} ${key}`);
-                targets.forEach(target => {
-                    Object.assign(target.style, v)
-                })
+                targets.forEach(target => Object.assign(target.style, v))
             }
             else if (typeof v !== 'object') this.node.style[toKebab(key)] = v
         }
@@ -684,7 +680,7 @@ export class UIComponent extends UINode {
      * @param {string} ev @param {string|Node} target @param {...()} handlers 
      */
     delegate(ev, target, ...handlers) {
-        handlers.forEach(handle => GlobalEvents.listen(ev, target, handle)) 
+        if (this.contains(target)) handlers.forEach(handle => GlobalEvents.listen(ev, target, handle)) 
         return this
     }
 
@@ -701,7 +697,7 @@ export class UIComponent extends UINode {
  * Returns the UI instance associated with a node or selector.
  * @param {string|Node} target 
  */
-export const UIConstructorOf = (target) => UINodeMap.get(find(target))
+export const UIConstructorOf = target => UINodeMap.get(find(target))
 
 /**
  * @param {UICell|UIBlock} n 
