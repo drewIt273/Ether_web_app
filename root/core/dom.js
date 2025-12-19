@@ -14,9 +14,9 @@ const doc = window.document;
 export class dom_module {
 
     constructor(/**@type {Kernel}*/ runtime) {
-        /** Reference to the kernel for hooks, module communication, etc. */
+        /**Reference to the kernel for hooks, module communication, etc. */
             this.runtime = runtime;
-        /** A registry for created nodes. */
+        /**A registry for created nodes. */
             this.nodereg = new Registry;
         this.init = !1;
         this.ready = !1;
@@ -28,7 +28,10 @@ export class dom_module {
         this.has = /**@param {Node} v*/ v => v instanceof Node && doc.contains(v)
         this.observer = new MutationObserver(muts => {
             for (const m of muts) {
-                if (m.addedNodes) for (const added of m.addedNodes) if (!this.nodereg.includesValue(added) && !(added instanceof SVGElement)) this.nodereg.write(added)
+                if (m.addedNodes) for (const added of m.addedNodes) {
+                    if (!this.nodereg.includesValue(added) && !(added instanceof SVGElement)) this.nodereg.write(added)
+                    this.runtime.events.BacklogListeners.restore(added)
+                }
                 if (m.removedNodes) for (const removed of m.removedNodes) {
                     this.nodereg.remove(this.nodereg.keyOf(removed))
                     if (this.runtime.events.Keybinds.has(removed)) this.runtime.events.unlisten('keydown', removed)

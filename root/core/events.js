@@ -8,12 +8,13 @@ import {find, isNode, isString, Registry} from "../../nodes/scripts/any.js"
 import {UIBlock as block, UICell as cell, UIComponent as comp, UIConstructorOf as struct} from "../assets/ui-root.js"
 
 export class events_module {
-    constructor(/**@type {Kernel}*/runtime) {
+    
+    constructor(/**@type {Kernel}*/ runtime) {
         /** Reference to the kernel for hooks, module communication, etc. */
             this.runtime = runtime
         /**A registry for nodes still having active listeners in the DOM */
             this.ActiveListeners = new Registry()
-        /**A registry for nodes whose event listeners where removed from the DOM */
+        /**A registry for nodes whose event listeners are pending or where removed from the DOM */
             this.BacklogListeners = new Registry()
         /**Track which global events are already delegated @type {Set<string>} */
             this.ActiveGlobals = new Set()

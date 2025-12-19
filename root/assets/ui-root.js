@@ -317,9 +317,8 @@ export class UINode {
      * @param {string} ev @param  {...(n: Node, e: Event)} handlers 
      */
     on(ev, ...handlers) {
-        handlers.forEach(handler => {
-            GlobalEvents.listen(ev, this.node, (e) => handler.call(this, this.node, e))
-        }) 
+        if (this.mounted) handlers.forEach(handler => GlobalEvents.listen(ev, this.node, (e) => handler.call(this, this.node, e)))
+        else GlobalEvents.BacklogListeners.write({node: this.node, ev: ev, fn: handlers, in: 'backlog'})
         return this
     }
 
@@ -328,7 +327,7 @@ export class UINode {
      * @param {string} ev
      */
     off(ev) {
-        GlobalEvents.unlisten(ev, this.node)
+        if (this.mounted) GlobalEvents.unlisten(ev, this.node)
         return this
     }
 }
