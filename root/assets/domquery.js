@@ -9,11 +9,11 @@ import {GlobalEvents} from "../core/runtime.js";
 export class query$ {
 
     /**
-     * @param {string} selector 
+     * @param {string|Node} selector 
      */
     constructor(selector) {
         /**@type {ChildNode[]} */
-        this.nodes =  selector.startsWith('$') ? [document.querySelector(selector.replace('$',''))] : selector ? Array.from(document.querySelectorAll(selector)) : Array.from(document.childNodes)
+        this.nodes =  selector.startsWith('$') ? [document.querySelector(selector.replace('$',''))] : selector ? Array.from(document.querySelectorAll(selector)) : selector instanceof Node ? selector : Array.from(document.childNodes)
         this.selector = selector;
         return new Proxy(this, {
             get(target, prop) {
