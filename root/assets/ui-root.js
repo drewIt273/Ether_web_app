@@ -16,7 +16,7 @@ export const ActiveUIComponents = new Registry;
 /**@type {WeakMap<Node, UICell|UIBlock|UIComponent>}*/
 export const UINodeMap = new WeakMap()
 
-export class UIBase {
+export class UINode {
 
     /**
      * @param {string|Element} node 
@@ -341,7 +341,7 @@ export class UIBase {
     }
 }
 
-export class UICell extends UIBase {
+export class UICell extends UINode {
 
     /**
      * @param {Element|string} node 
@@ -434,7 +434,7 @@ export class UICell extends UIBase {
     }
 }
 
-export class UIBlock extends UIBase {
+export class UIBlock extends UINode {
 
     /**
      * @param {HTMLElement|string} node 
@@ -515,7 +515,7 @@ export class UIBlock extends UIBase {
     }
 }
 
-export class UIComponent extends UIBase {
+export class UIComponent extends UINode {
 
     /**
      * @param {string|HTMLElement} node @param {HTMLElement[]} append 
@@ -553,7 +553,7 @@ export class UIComponent extends UIBase {
      */
     set append(o) {
         for (const h of o) {
-            isNode(h) ? this.node.appendChild(h) : (h instanceof UIBase ? h.mount(this) : null)
+            isNode(h) ? this.node.appendChild(h) : (h instanceof UINode ? h.mount(this) : null)
         }
     }
 
