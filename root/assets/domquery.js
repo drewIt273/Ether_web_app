@@ -12,175 +12,83 @@ export class query$ {
      * @param {string} selector 
      */
     constructor(selector) {
-
-        this.nodes = selector.startsWith('$') ? [document.querySelector(selector.replace('$',''))] : selector ? Array.from(document.querySelectorAll(selector)) : Array.from(document.childNodes)
+        /**@type {ChildNode[]} */
+        this.nodes =  selector.startsWith('$') ? [document.querySelector(selector.replace('$',''))] : selector ? Array.from(document.querySelectorAll(selector)) : Array.from(document.childNodes)
         this.selector = selector;
-
         return new Proxy(this, {
-
             get(target, prop) {
-
                 // If prop exist on query$, use it
                     if (prop in target) return target[prop]
-
                 // Otherwise, return the first property from the first element
                     return target.nodes[0]?.[prop]
             },
-
             set(target, prop, value) {
-
-                target.nodes.forEach(e => {
-                    e[prop] = value
-                });
+                target.nodes.forEach(e => {e[prop] = value})
                 return true
             }
         })
     }
 
+    #each = c => this.nodes.forEach(c)
+
     on(ev, callback, delay = 0) {
-        this.nodes.forEach(node => GlobalEvents.listen(ev, node, e => {setTimeout(callback.call(this, e), delay)}))
+        this.#each(node => GlobalEvents.listen(ev, node, e => {setTimeout(callback.call(this, e), delay)}))
         return this
     }
 
     onload(callback, timeout = 0) {
-        document.addEventListener("DOMContentLoaded", () => {
-            setTimeout(callback, timeout);
-        });
-
+        document.addEventListener("DOMContentLoaded", () => {setTimeout(callback, timeout)})
         return this
     }
 
     delegate(eventType, handler, selector = "") {
-        this.nodes.forEach(n => {
-            GlobalEvents.listen(eventType, n.querySelector(selector), handler)
-        })
+        this.#each(n => GlobalEvents.listen(eventType, n.querySelector(selector), handler))
         return this
     }
 
     hover(enter, leave, enterDelay = 0, leaveDelay = 0) {
         this.on("mouseenter", () => enter, enterDelay)
         this.on("mouseleave", () => leave, leaveDelay)
-
-        return this
-    }
-
-    hover0(enter, leave, enterDelay = 0, leaveDelay = 0) {
-        let t = this.nodes.at(0);
-        t.addEventListener("mouseenter", () => setTimeout(() => enter, enterDelay))
-        t.addEventListener("mouseleave", () => setTimeout(() => leave, leaveDelay))
-
-        return this
-    }
-
-    css(styleObjOrProp) {
-        if (typeof styleObjOrProp === "string") {
-
-            // Returns value of the first element
-                const e = this.nodes[0];
-                return e ? getComputedStyle(e).getPropertyValue(styleObjOrProp) : undefined
-        }
-
-        for (const key in styleObjOrProp) {
-            const v = styleObjOrProp[key];
-            if (typeof v === "object") {
-
-                // Handle nested style block
-                    if (key.startsWith('#') || key.startsWith('.') || key.startsWith('[')) {
-                        this.nodes.forEach(node => {
-                            const targets = node.querySelectorAll(key);
-                            targets.forEach(t => {Object.assign(t.style, v);})
-                        })
-                    }
-            }
-            else if (key.startsWith('_')) {
-
-                // Handle tag prefix like _div, _section
-                    const tag = key.slice(1).toLowerCase();
-                    this.nodes.forEach(node => {
-                        const targets = node.querySelectorAll(tag);
-                        targets.forEach(t => Object.assign(t.style, v))
-                    })
-            }
-            else {
-
-                // Apply to main elements
-                   this.nodes.forEach(node => node.style[key] = v)
-            }
-        }
-
         return this
     }
 
     attr(a, v = "") {
         if (typeof a === "string") {
-            if (v === undefined || null) {
-
-                // Case 1, get attribute
-                    return this.nodes[0]?.getAttribute(a);
-            }
-            else {
-
-                // Case 2, set single attribute
-                    this.nodes.forEach(node => node.setAttribute(a, v))
-            }
+            if (v === undefined || null) return this.nodes[0]?.getAttribute(a); else this.#each(node => node.setAttribute(a, v))
         }
-        else if (typeof a === "object") {
-
-            // Case 3, set multiple attributes
-                for (let [key, val] of Object.entries(a)) {
-                    this.nodes.forEach(node => node.setAttribute(key, val))
-                }
-        }
-
+        else if (typeof a === "object") for (let [key, val] of Object.entries(a)) this.#each(node => node.setAttribute(key, val))
         return this
     }
 
     removeAttr(...attrs) {
-        this.nodes.forEach(node => {
-            attrs.forEach(attr => {
-                node.removeAttribute(attr)
-            })
+        this.#each(node => {
+            attrs.forEach(attr => node.removeAttribute(attr))
         })
-
         return this
     }
 
     append(...nodes) {
-        this.nodes.forEach(node => {
-            nodes.forEach(n => {
-                node.innerHTML += n
-            })
+        this.#each(node => {
+            nodes.forEach(n => node.appendChild(n))
         })
-
         return this
     }
 
     appendTo(target) {
-        this.nodes.forEach(node => {
-            document.querySelector(target).innerHTML += node.innerHTML
+        this.#each(node => {
+            let t = document.querySelector(target); typeof target === 'string' ? t.innerHTML += node.innerHTML : t.append(target)
         })
-
         return this
     }
 
     remove(n = "") {
-        if (n === "" || undefined) {
-            this.nodes.forEach(node => node.remove());
-
-            return this;
-        }
-        else if (typeof n === "string" && n !== "") {
-            this.nodes.forEach(node => {
-                let a = node.querySelectorAll(n);
-                a.forEach(l => {if (node.contains(l)) l.remove()})
-            })
-
-            return this
-        }
+        if (n === "" || undefined) this.#each(node => node.remove());
+        else if (typeof n === "string" && n !== "") this.#each(node => node.querySelectorAll(n).forEach(l => {if (node.contains(l)) l.remove()}))
+        return this
     }
 
-    at(index = 0) {
-        return this.nodes[index]
+    at(i = 0) {
+        return this.nodes[i]
     }
 
     eq(index = this.count()) {
@@ -188,7 +96,6 @@ export class query$ {
         for (let i = 0; i < index; i++) {
             a.push(this.nodes[i])
         }
-
         return a
     }
 
@@ -198,7 +105,6 @@ export class query$ {
             let n = this.nodes[i], q = n.querySelector(selector);
             if (q) a.push(n)
         }
-
         return a
     }
 
@@ -206,7 +112,6 @@ export class query$ {
         let g = this.nodes.filter(node => node.matches(selector)), b;
         if (g.length > 0) b = true
         else b = false
-
         return {
             isfound: b,
             nodes: g,
@@ -215,12 +120,8 @@ export class query$ {
     }
 
     childrenOf(selector = "", i = 0) {
-        if (selector === "" || undefined) {
-            return this.nodes[i].childNodes
-        }
-        else {
-            return document.querySelector(`${this.selector}${selector}`).childNodes
-        }
+        if (selector === "" || undefined) return this.nodes[i].childNodes
+        else return document.querySelector(`${this.selector}${selector}`).childNodes
     }
 
     targetChild(selector) {
@@ -228,45 +129,24 @@ export class query$ {
     }
 
     prop(n, v = "") {
-        if (v === "" || undefined) {
-
-            // Get property from first element
-                return this.nodes[0]?.[n]
-        }
-        else {
-
-            // Set property for all elements
-                this.nodes.forEach(node => {
-                    node[n] = v
-                })
-        }
-
+        if (v === "" || undefined) return this.nodes[0]?.[n]
+        else this.#each(node => {node[n] = v})
         return this
     }
 
     html(content = "") {
-        if (content === "" || undefined) {
-            return this.nodes[0]?.innerHTML
-        }
-        else {
-            this.nodes.forEach(node => {
-                node.innerHTML = content
-            })
-        }
-
+        if (content === "" || undefined) return this.nodes[0]?.innerHTML
+        else this.#each(node => {node.innerHTML = content})
         return this
     }
 
     empty() {
-        this.nodes.forEach(node => 
-            node.childNodes.forEach(n => n.remove())
-        )
-
+        this.#each(node => node.childNodes.forEach(n => n.remove()))
         return this
     }
 
     fadeIn(callback, duration = 400) {
-        this.nodes.forEach(node => {
+        this.#each(node => {
             
             // Ignore if already visible an opacity is 1
                 const computed = getComputedStyle(node);
@@ -300,7 +180,7 @@ export class query$ {
     }
 
     fadeOut(callback, duration = 400) {
-        this.nodes.forEach(node => {
+        this.#each(node => {
             const computed = getComputedStyle(node);
             if (computed.display === 'none') {
                 if (callback) callback.call(node);
@@ -314,18 +194,15 @@ export class query$ {
                 node.offsetWidth;
 
             node.style.opacity = 0;
-
             const handler = (e) => {
 
                 // Ensure the event is for opacity property
                     if (e.propertyName !== 'opacity') return;
-                
                 node.style.transition = '';
                 node.style.display = 'none';
                 node.removeEventListener('transitionend', handler);
                 if (callback) callback.call(node);
             }
-
             node.addEventListener('transitionend', handler);
         })
 
@@ -333,7 +210,7 @@ export class query$ {
     }
 
     fadeToggle(callback, duration = 400) {
-        this.nodes.forEach(node => {
+        this.#each(node => {
             const computed = getComputedStyle(node);
             if (computed.display === 'none' || computed.opacity === 0) {
 
@@ -368,20 +245,17 @@ export class query$ {
     }
 
     click() {
-        this.nodes.forEach(n => n.click());
-
+        this.#each(n => n.click());
         return this;
     }
 
     blur() {
-        this.nodes.forEach(n => n.blur())
-
+        this.#each(n => n.blur())
         return this;
     }
 
     focus() {
-        this.nodes.forEach(n => n.focus())
-
+        this.#each(n => n.focus())
         return this;
     }
 
@@ -389,16 +263,12 @@ export class query$ {
      * @param {"add"|"remove"|"toggle"} action @param {...string} tokens 
      */
     setClass(action, ...tokens) {
-        this.nodes.forEach(node => {
-            for (const token of tokens) node.classList[action]?.(token)
-        })
+        this.#each(node => {for (const token of tokens) node.classList[action]?.(token)})
         return this
     }
 
     classList(selector = "", index = 0) {
-        if (selector !== "" || undefined) {
-            return document.querySelector(`${this.selector}${selector}`).classList
-        }
+        if (selector !== "" || undefined) return document.querySelector(`${this.selector}${selector}`).classList
         else return this.nodes[index].classList
     }
 }
