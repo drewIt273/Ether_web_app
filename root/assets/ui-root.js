@@ -55,7 +55,7 @@ export class UINode {
      */
     get state() {
         return this.#currentstate
-    }    
+    }
 
     /**
      * Returns this node as a selector string that can be used later in searching this node using find, findAll, etc.
@@ -207,8 +207,8 @@ export class UINode {
         }
         this.#currentstate = state
         this.#states[state].call(this, this.node)
-
-        if (this.#onstatechange) this.#onstatechange.call(this, state, this.node)
+        if (this.#onstatechange) this.#onstatechange.call(this, this.node)
+        this.dataset({state: `${state}`})
 
         return this
     }
