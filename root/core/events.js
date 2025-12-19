@@ -100,6 +100,19 @@ export class events_module {
     }
 
     /**
+     * Restore all listeners from backlog for nodes matching target.
+     * @param {string|Node} target 
+     */
+    restore(target) {
+        const h = this.runtime.dom.query(target).first(), toRestore = this.BacklogListeners.filter(o => o.node === h);
+        toRestore.forEach(o => {
+            o.fn.forEach(fn => this.listen(o.ev, o.node, fn))
+            if (!this.ActiveListeners.includesValue(o)) this.ActiveListeners.write(o); o.in = 'active';
+        })
+        this.BacklogListeners.splice(0, this.BacklogListeners.size, ...this.BacklogListeners.filter(o => o.node !== h))
+    }
+
+    /**
      * @param {("ctrl"|"alt"|"meta"|"shift")[]} keys @param {cell|block|comp} node @param {()} handler 
      */
     keybind(keys, node, handler) {
