@@ -68,7 +68,6 @@ export class UINode {
                 s += `.${c.item(i)}`
             }
         }
-
         return `${this.node.tagName.toLowerCase()}${s}`
     }
 
@@ -124,19 +123,15 @@ export class UINode {
             return;
         }
         if (!this.node._fadeOriginalDisplay) this.node._fadeOriginalDisplay = computed.display === "none" ? "block" : computed.display
-
         setStyle(this.node, 'opacity', 0); setStyle(this.node, 'display', this.node._fadeOriginalDisplay); setStyle(this.node, 'transition', `opacity ${duration}ms ease`);
 
         this.node.offsetWidth;
-
         const handler = () => {
             this.node.style.transition = '';
-            this.node.removeEventListener("transitionend", handler)
+            GlobalEvents.unlisten('transitionend', this.node)
             if (callback) callback.call(this, this.node)
         }
-
-        this.node.addEventListener("transitionend", handler)
-
+        GlobalEvents.listen('transitionend', this.node, handler)
         return this
     }
 
@@ -154,16 +149,13 @@ export class UINode {
         setStyle(this.node, 'transition', `opacity ${duration}ms ease`); setStyle(this.node, 'opacity', 1);
 
         this.node.offsetWidth; this.node.style.opacity = 0;
-
         const handler = (e) => {
             if (e.propertyName !== 'opacity') return;
             this.node.style.transition = ''; this.node.style.display = 'none';
-            this.node.removeEventListener('transitionend', handler);
+            GlobalEvents.unlisten('transitionend', this.node, handler)
             if (callback) callback.call(this, this.node)
         }
-
-        this.node.addEventListener('transitionend', handler)
-
+        GlobalEvents.listen('transitionend', this.node, handler)
         return this
     }
 

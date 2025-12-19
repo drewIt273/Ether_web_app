@@ -83,7 +83,6 @@ export class events_module {
     unlisten(ev, target) {
         const a = this.ActiveListeners
         const nodes = isString(target) ? runtime.dom.find(target) : [target]
-
         nodes.forEach(node => {
             const existing = a.find(o => o.node === node && o.ev === ev)
             if (!existing) return;
