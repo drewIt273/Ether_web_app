@@ -260,24 +260,6 @@ export class UINode {
         return this
     }
 
-    /**
-     * Hides this node after a given timeout by setting a hidden attribute.
-     * @param {number} timeout 
-     */
-    hide(timeout = 0) {
-        setTimeout(() => setAttr(this.node, 'hidden', ''), timeout)
-        return this
-    }
-
-    /**
-     * Displays back this node if initially hidden by a 'hidden' attribute.
-     * @param {number} timeout 
-     */
-    display(timeout = 0) {
-        if (hasAttr(this.node, 'hidden') || getStyle(this.node, 'display') === 'none') setTimeout(() => {removeAttr(this.node, 'hidden')}, timeout)
-        return this
-    }
-
     /**@param {-1|0} n The value of the tabindex */
     focus(n) {
         this.node.tabIndex = n
