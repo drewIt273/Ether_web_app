@@ -91,7 +91,7 @@ export class dom_module {
      * @param {()} callback 
      */
     DOMLoaded(callback, timeout = 0) {
-        let f = () => {setTimeout(callback, timeout)}; (this.doc.readyState === "complete") ? f() : this.runtime.events.listen('DOMContentLoaded', this.doc, f());
+        let f = () => {setTimeout(callback, timeout)}; (this.doc.readyState === "complete") ? f() : this.runtime.events.listen('DOMContentLoaded', this.doc, f);
         return this
     }
 
