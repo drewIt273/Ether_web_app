@@ -9,9 +9,7 @@ import {div} from "./nodecreator.js";
 import {stylesheet} from "../../nodes/scripts/stylesheet.js";
 import {dom, GlobalEvents} from "../core/runtime.js";
 
-export const ActiveUICells = new Registry;
-export const ActiveUIBlocks = new Registry;
-export const ActiveUIComponents = new Registry;
+export const UIreg = new Registry;
 
 /**@type {WeakMap<Node, UICell|UIBlock|UIComponent>}*/
 export const UINodeMap = new WeakMap()
@@ -22,14 +20,14 @@ export class UINode {
      * @param {string|Element} node 
      * @param {Registry} registry 
      */
-    constructor(node, registry) {
+    constructor(node) {
         this.node = (function(n) {return isElement(n) ? n : isString(n) ? create(n) : new div})(node)
         this.classList = this.node.classList
         this.className = this.node.className
         this.innerHTML = this.node.innerHTML
         this.childNodes = Array.from(this.node.childNodes)
         this.parent = this.node.parentNode
-        this.#reg = registry
+        this.#reg = UIreg
     }
 
     #reg
@@ -308,11 +306,11 @@ export class UICell extends UINode {
      * @param {Element|string} node 
      */
     constructor(node) {
-        super(node, ActiveUICells)
+        super(node)
         this.ID = ranstring(4, 1)
         this.emittedData = null
         this.receivedData = null
-        this.registeredKey = ActiveUICells.write({node: this.node, id: this.ID, mounted: false})
+        this.registeredKey = UIreg.write({node: this.node, id: this.ID, type: 'cell', mounted: false})
         this.attrs({'ui-cell-id': this.ID})
         /**@type {Map<any, ()>}> */
             this.mappedData = new Map()
@@ -349,7 +347,7 @@ export class UICell extends UINode {
     mount(target) {
         if (!this.mounted) {
             find(target)?.appendChild(this.node)
-            ActiveUICells.get(this.registeredKey).mounted = !0
+            UIreg.get(this.registeredKey).mounted = !0
         }
         return this
     }
@@ -357,7 +355,7 @@ export class UICell extends UINode {
     unmount() {
         if (this.mounted) {
             removeNode(this.node)
-            ActiveUICells.get(this.registeredKey).mounted = !1
+            UIreg.get(this.registeredKey).mounted = !1
         }
         return this
     }
@@ -392,7 +390,7 @@ export class UICell extends UINode {
     destroy() {
         UINodeMap.delete(this.node)
         this.unmount().off().node = null
-        ActiveUICells.remove(this.registeredKey)
+        UIreg.remove(this.registeredKey)
     }
 }
 
@@ -402,11 +400,11 @@ export class UIBlock extends UINode {
      * @param {HTMLElement|string} node 
      */
     constructor(node) {
-        super(node, ActiveUIBlocks)
+        super(node)
         this.ID = ranstring(3, 1)
         this.emittedData = null
         this.receivedData = null
-        this.registeredKey = ActiveUIBlocks.write({node: this.node, id: this.ID, mounted: false})
+        this.registeredKey = UIreg.write({node: this.node, id: this.ID, type: 'block', mounted: false})
         this.attrs({'ui-block-id': this.ID})
         /**@type {Map<any, ()>}> */
             this.mappedData = new Map()
@@ -430,14 +428,14 @@ export class UIBlock extends UINode {
     mount(target) {
         if (target instanceof UICell || find(target)?.hasAttribute('ui-cell-id') || find(target)?.parentElement.hasAttribute('ui-cell-id')) throw new Error('A block cannot mount a cell')
         else if (isNode(target)) find(target)?.appendChild(this.node)
-        ActiveUIBlocks.get(this.registeredKey).mounted = !0
+        UIreg.get(this.registeredKey).mounted = !0
         return this
     }
 
     unmount() {
         if (this.mounted) {
             removeNode(this.node)
-            ActiveUIBlocks.get(this.registeredKey).mounted = !1
+            UIreg.get(this.registeredKey).mounted = !1
         }
         return this
     }
@@ -473,7 +471,7 @@ export class UIBlock extends UINode {
     destroy() {
         UINodeMap.delete(this.node)
         this.unmount().off().node = null
-        ActiveUIBlocks.remove(this.registeredKey)
+        UIreg.remove(this.registeredKey)
     }
 }
 
@@ -483,7 +481,7 @@ export class UIComponent extends UINode {
      * @param {string|HTMLElement} node @param {HTMLElement[]} append 
      */
     constructor(node, ...append) {
-        super(node, ActiveUIComponents)
+        super(node)
         this.ID = ranstring(4, 1)
         for (const e of append) {
             this.node.appendChild(e)
@@ -491,7 +489,7 @@ export class UIComponent extends UINode {
         this.node.setAttribute('ui-comp-id', this.ID)
         this.#sheet.base = `[ui-comp-id="${this.ID}"]`
         this.#sheet.id = this.ID
-        this.registeredKey = ActiveUIComponents.write({node: this.node, id: this.ID, mounted: false})
+        this.registeredKey = UIreg.write({node: this.node, id: this.ID, type: 'comp', mounted: false})
         UINodeMap.set(this.node, this)
     }
 
@@ -525,7 +523,7 @@ export class UIComponent extends UINode {
         if (cellOrBlock(target)) throw new Error(`A UIComponent cannot mount ${target}`)
         else if (target instanceof UIComponent) target.node.append(this.node)
         if (isNode(target)) find(target)?.appendChild(this.node)
-        ActiveUIComponents.get(this.registeredKey).mounted = !0
+        UIreg.get(this.registeredKey).mounted = !0
         return this
     }
 
@@ -535,7 +533,7 @@ export class UIComponent extends UINode {
     unmount() {
         if (this.mounted) {
             removeNode(this.node)
-            ActiveUIComponents.get(this.registeredKey).mounted = !1
+            UIreg.get(this.registeredKey).mounted = !1
         }
         return this
     }
@@ -659,7 +657,7 @@ export class UIComponent extends UINode {
         UINodeMap.delete(this.node)
         this.unmount().off().node = null
         this.#sheet.remove()
-        ActiveUIComponents.remove(this.registeredKey)
+        UIreg.remove(this.registeredKey)
     }
 }
 
