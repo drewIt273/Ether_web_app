@@ -30,7 +30,7 @@ export class dom_module {
             for (const m of muts) {
                 if (m.addedNodes) for (const added of m.addedNodes) {
                     if (!this.nodereg.includesValue(added) && !(added instanceof SVGElement)) this.nodereg.write(added)
-                    this.runtime.events.BacklogListeners.restore(added)
+                    this.runtime.events.restore(added)
                 }
                 if (m.removedNodes) for (const removed of m.removedNodes) {
                     this.nodereg.remove(this.nodereg.keyOf(removed))
