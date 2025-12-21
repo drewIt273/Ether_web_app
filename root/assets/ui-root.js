@@ -166,8 +166,7 @@ export class UINode {
      * @param {()} handler The Function to be fired.
      */
     keybind(keys, handler) {
-        GlobalEvents.keybind(keys, this, handler);
-        GlobalEvents.keycall(this)
+        GlobalEvents.keybind(keys, this, handler)(this)
         return this
     }
 
