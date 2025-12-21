@@ -278,7 +278,7 @@ export class UINode {
      */
     pointerEvents(v) {
         let a = (v === "all") ? 'all' : 'none'
-        setAttr(this.node, 'pointer-events', a)
+        this.attrs({pointerEvents: a})
         return this
     }
 
