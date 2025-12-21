@@ -147,9 +147,7 @@ export class Registry {
      * @param {(value: any, key: string) => boolean} predicate 
      */
     find(predicate) {
-        for (const [key, value] of Object.entries(this.reg)) {
-            if (predicate(value, key)) return value;
-        }
+        for (const [key, value] of Object.entries(this.reg)) if (predicate(value, key)) return value;
         return null
     }
 
