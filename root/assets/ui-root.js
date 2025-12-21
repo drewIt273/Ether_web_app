@@ -195,8 +195,8 @@ export class UINode {
             return this
         }
         this.#currentstate = state
-        this.#states[state].call(this, this.node)
-        if (this.#onstatechange) this.#onstatechange.call(this, this.node)
+        this.#states[state]().call(this, this)
+        if (this.#onstatechange) this.#onstatechange.call(this, this)
         this.dataset({state: `${state}`})
         return this
     }
@@ -209,7 +209,7 @@ export class UINode {
 
     /**
      * Register a callback for when the component's state changes.
-     * @param {(state: string, this: Node) => void} callback 
+     * @param {(this: this) => void} callback 
      */
     onStateChange(callback) {
         (typeof callback === 'function') ? this.#onstatechange = callback : console.warn('onStateChange expects a function callback.')
@@ -239,7 +239,7 @@ export class UINode {
      * @param {{}} attrs
      */
     dataset(attrs) {
-        for (const [k, v] of Object.entries(attrs)) setAttr(this.node, `data-${k}`, String(v))
+        for (const [k, v] of Object.entries(attrs)) setAttr(this.node, `data-${toKebab(k)}`, String(v))
         return this
     }
 
