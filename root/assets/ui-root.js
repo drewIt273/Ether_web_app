@@ -483,9 +483,7 @@ export class UIComponent extends UINode {
     constructor(node, ...append) {
         super(node)
         this.ID = ranstring(4, 1)
-        for (const e of append) {
-            this.node.appendChild(e)
-        }
+        for (const e of append) this.node.appendChild(e)
         this.node.setAttribute('ui-comp-id', this.ID)
         this.#sheet.base = `[ui-comp-id="${this.ID}"]`
         this.#sheet.id = this.ID
