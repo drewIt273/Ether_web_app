@@ -58,12 +58,8 @@ export class UINode {
      */
     get selector() {
         let s = '', n = this.node, c = n.classList
-        if (n.id.length > 0) s += `#${n.id}`
-        if (c.length > 0) {
-            for (let i = 0; i < c.length; i++) {
-                s += `.${c.item(i)}`
-            }
-        }
+        if (n.id.length) s += `#${n.id}`
+        if (c.length) for (let i = 0; i < c.length; i++) s += `.${c.item(i)}`
         return `${this.node.tagName.toLowerCase()}${s}`
     }
 
@@ -122,7 +118,7 @@ export class UINode {
         setStyle(this.node, 'opacity', 0); setStyle(this.node, 'display', this.node._fadeOriginalDisplay); setStyle(this.node, 'transition', `opacity ${duration}ms ease`);
 
         this.node.offsetWidth;
-        const handler = () => {
+        const handler = e => {
             this.node.style.transition = '';
             GlobalEvents.unlisten('transitionend', this.node)
             if (callback) callback.call(this, this.node)
@@ -141,7 +137,6 @@ export class UINode {
             if (callback) callback.call(this, this.node)
             return;
         }
-
         setStyle(this.node, 'transition', `opacity ${duration}ms ease`); setStyle(this.node, 'opacity', 1);
 
         this.node.offsetWidth; this.node.style.opacity = 0;
@@ -198,14 +193,13 @@ export class UINode {
      */
     setState(state) {
         if (!(state in this.#states)) {
-            console.warn(`State "${state}" not defined for component`, this);
+            console.warn(`State "${state}" not defined for UINode`, this);
             return this
         }
         this.#currentstate = state
         this.#states[state].call(this, this.node)
         if (this.#onstatechange) this.#onstatechange.call(this, this.node)
         this.dataset({state: `${state}`})
-
         return this
     }
 
@@ -223,7 +217,7 @@ export class UINode {
         (typeof callback === 'function') ? this.#onstatechange = callback : console.warn('onStateChange expects a function callback.')
         return this
     }
-    
+
     /**
      * @param {string} attr 
      */
@@ -307,13 +301,13 @@ export class UINode {
         setAttr(this.node, 'pointer-events', a)
         return this
     }
-    
+
     /**
      * Add event listeners to this node.
      * @param {string} ev @param  {...(n: Node, e: Event)} handlers 
      */
     on(ev, ...handlers) {
-        if (this.mounted) handlers.forEach(handler => GlobalEvents.listen(ev, this.node, (e) => handler.call(this, this.node, e)))
+        if (this.mounted) handlers.forEach(handler => GlobalEvents.listen(ev, this.node, e => handler.call(this, this.node, e)));
         else GlobalEvents.BacklogListeners.write({node: this.node, ev: ev, fn: handlers, in: 'backlog'})
         return this
     }
@@ -340,7 +334,7 @@ export class UICell extends UINode {
         this.receivedData = null
         this.registeredKey = ActiveUICells.write({node: this.node, id: this.ID, mounted: false})
         this.attrs({'ui-cell-id': this.ID})
-            /**@type {Map<any, ()>}> */
+        /**@type {Map<any, ()>}> */
             this.mappedData = new Map()
         UINodeMap.set(this.node, this)
     }
@@ -373,8 +367,10 @@ export class UICell extends UINode {
      * @param {Node|UIBlock} target 
      */
     mount(target) {
-        find(target)?.appendChild(this.node)
-        ActiveUICells.get(this.registeredKey).mounted = !0
+        if (!this.mounted) {
+            find(target)?.appendChild(this.node)
+            ActiveUICells.get(this.registeredKey).mounted = !0
+        }
         return this
     }
 
@@ -409,7 +405,6 @@ export class UICell extends UINode {
                 this.mappedData.set(data, callback)
             }
         }
-
         return P
     }
 
