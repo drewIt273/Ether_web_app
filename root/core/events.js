@@ -118,6 +118,7 @@ export class events_module {
     keybind(keys, node, handler) {
         if (typeof handler !== 'function' || struct(node?.node) === undefined) return;
         else this.Keybinds.has(node.node) ? this.Keybinds.get(node.node).push([keys, handler]) : this.Keybinds.set(node.node, [[keys, handler]])
+        return this.keycall
     }
 
     /**
