@@ -35,6 +35,8 @@ export class dom_module {
                     this.runtime.events.restore(added)
                 }
                 if (m.removedNodes) for (const removed of m.removedNodes) {
+                    const r = this.runtime.events.ActiveListeners.find(o => o.node === removed)
+                    if (r) this.runtime.events.unlisten(r.ev, r.node)
                     this.nodereg.remove(this.nodereg.keyOf(removed))
                     if (this.runtime.events.Keybinds.has(removed)) this.runtime.events.unlisten('keydown', removed)
                 }
