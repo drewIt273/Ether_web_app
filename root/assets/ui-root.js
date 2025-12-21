@@ -25,6 +25,7 @@ export class UINode {
     constructor(node, registry) {
         this.node = (function(n) {return isElement(n) ? n : isString(n) ? create(n) : new div})(node)
         this.classList = this.node.classList
+        this.className = this.node.className
         this.innerHTML = this.node.innerHTML
         this.childNodes = Array.from(this.node.childNodes)
         this.parent = this.node.parentNode
@@ -35,11 +36,6 @@ export class UINode {
     #states = {}
     #currentstate = null
     #onstatechange
-
-    /** @param {string} s */
-    set className(s) {
-        this.node.className = s
-    }
 
     /**
      * Returns true if this is still mounted
