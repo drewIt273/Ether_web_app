@@ -178,11 +178,10 @@ export class UINode {
     /**
      * Define a new state and its behavior.
      * @param {'active'|'inactive'|'enable'|'disable'} state 
-     * @param {(this: Node)} handler 
+     * @param {(this: this)} handler 
      */
     defineState(state, handler) {
-        if (!isString(state) || typeof handler !== 'function') return this
-        this.#states[state] = handler
+        this.#states[state] = () => handler
         return this
     }
 
