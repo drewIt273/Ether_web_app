@@ -93,9 +93,8 @@ export class events_module {
                     const e = find(node);
                     if (e) existing.fn.forEach(fn => e.removeEventListener(ev, fn));
                 }
-
-            // If no handlers left, remove from ActiveListeners
-                if (!existing.fn.length) a.splice(0, a.size, a.filter(o => o !== existing))
+            if (!existing.fn.length) a.splice(0, a.size, a.filter(o => o !== existing))
+            this.BacklogListeners.write({node, ev, fn: existing.fn, in: 'backlog'})
         })
     }
 
