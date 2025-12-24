@@ -35,7 +35,7 @@ export class Kernel {
                 return {
                     /**
                      * @param {KModule} target 
-                     * @param {(target: KModule, data: *)}
+                     * @param {(target: KModule, data: *)} callback
                      */
                     to: (target, callback = ()=>{}) => {
                         if (isModule(target)) {
