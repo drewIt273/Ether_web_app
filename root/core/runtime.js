@@ -10,7 +10,7 @@ import {comp_module} from './comp.js'
 import {events_module} from './events.js'
 import {state_module} from './state.js'
 
-class Kernel {
+export class Kernel {
     constructor() {
         /**Returns the modules constructors */
         this.modules = {dom_module, comp_module, events_module, state_module};
