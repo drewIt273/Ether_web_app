@@ -12,11 +12,10 @@ import {KModule} from "./module.js";
 
 const doc = window.document;
 
-export class dom_module {
+export class dom_module extends KModule {
 
-    constructor(/**@type {Kernel}*/ runtime) {
-        /**Reference to the kernel for hooks, module communication, etc. */
-            this.runtime = runtime;
+    constructor(runtime) {
+        super(runtime)
         /**A registry for created nodes. */
             this.nodereg = new Registry;
         /**A registry for created UINodes. */

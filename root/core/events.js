@@ -6,12 +6,12 @@
 
 import {find, isNode, isString, Registry} from "../../nodes/scripts/any.js"
 import {UIBlock as block, UICell as cell, UIComponent as comp, UIConstructorOf as struct} from "../assets/ui-root.js"
+import {KModule} from "./module.js"
 
-export class events_module {
+export class events_module extends KModule {
     
-    constructor(/**@type {Kernel}*/ runtime) {
-        /** Reference to the kernel for hooks, module communication, etc. */
-            this.runtime = runtime
+    constructor(runtime) {
+        super(runtime)
         /**A registry for nodes still having active listeners in the DOM */
             this.ActiveListeners = new Registry()
         /**A registry for nodes whose event listeners are pending or where removed from the DOM */
@@ -23,7 +23,7 @@ export class events_module {
         /**@type {WeakMap<Node, [string[], ()][]>} */
             this.Keybinds = new WeakMap()
         /**@type {Element} */
-            this.root = runtime.dom.body
+            this.root = this.runtime.dom.body
     }
 
     #unbubble = new Set(['mouseenter', 'mouseleave', 'blur', 'focus', 'pointerenter', 'pointerleave'])
