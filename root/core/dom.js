@@ -8,6 +8,7 @@ import {jsx} from "../assets/nodecreator.js";
 import {query$} from "../assets/domquery.js";
 import {Registry} from "../../nodes/scripts/any.js";
 import {UICell as cell, UIBlock as block, UIComponent as comp, UIConstructorOf as fu, UIreg} from "../assets/ui-root.js";
+import {KModule} from "./module.js";
 
 const doc = window.document;
 
