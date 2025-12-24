@@ -108,7 +108,7 @@ export class events_module extends KModule {
             o.fn.forEach(fn => this.listen(o.ev, o.node, fn))
             if (!this.ActiveListeners.includesValue(o)) this.ActiveListeners.write(o); o.in = 'active';
         })
-        this.BacklogListeners.splice(0, this.BacklogListeners.size, ...this.BacklogListeners.filter(o => o.node !== h))
+        this.BacklogListeners.splice(0, this.BacklogListeners.size, this.BacklogListeners.filter(o => o.node !== h))
     }
 
     /**
