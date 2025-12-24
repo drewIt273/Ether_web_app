@@ -18,8 +18,6 @@ export class dom_module extends KModule {
         super(runtime)
         /**A registry for created nodes. */
             this.nodereg = new Registry;
-        /**A registry for created UINodes. */
-            this.uireg = UIreg;
         this.init = !1;
         this.ready = !1;
         this.nodes = this.nodereg.values;
