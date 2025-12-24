@@ -29,7 +29,7 @@ export class dom_module extends KModule {
         this.observer = new MutationObserver(muts => {
             for (const m of muts) {
                 if (m.addedNodes) for (const added of m.addedNodes) {
-                    if (!this.nodereg.includesValue(added) && !(added instanceof SVGElement)) this.nodereg.write(added)
+                    if (!this.nodereg.includesValue(added) && !(added instanceof SVGElement)) this.emit('write-reg').to(this)
                     this.runtime.events.restore(added)
                 }
                 if (m.removedNodes) for (const removed of m.removedNodes) {
@@ -59,6 +59,7 @@ export class dom_module extends KModule {
             }
         }
         this.doc = doc;
+        this.emit('write-reg').map((t, d) => {this.nodereg.write(d); console.log(this.nodereg)})
     }
 
     /**
