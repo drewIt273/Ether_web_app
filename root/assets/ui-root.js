@@ -4,7 +4,7 @@
  * ui.root.js
  */
 
-import {isNode, isString, create, find, toKebab, setAttr, hasAttr, removeAttr, ranstring, strictObject, removeNode, setStyle, Registry, isArray, getStyle, isElement} from "../../nodes/scripts/any.js";
+import {isNode, isString, create, find, toKebab, setAttr, hasAttr, removeAttr, ranstring, strictObject, setStyle, Registry, isArray, isElement} from "../../nodes/scripts/any.js";
 import {div} from "./nodecreator.js";
 import {stylesheet} from "../../nodes/scripts/stylesheet.js";
 import {dom, GlobalEvents} from "../core/runtime.js";
@@ -669,3 +669,6 @@ export const UIConstructorOf = target => UINodeMap.get(find(target))
  * @param {UICell|UIBlock} n 
  */
 export const cellOrBlock = n => (n instanceof UICell) ? !0 : (n instanceof UIBlock) ? !0 : !1
+
+let h = new UICell('span-test');
+h.mount(dom.body);
