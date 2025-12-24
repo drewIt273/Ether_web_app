@@ -9,6 +9,7 @@ import {dom_module} from './dom.js'
 import {comp_module} from './comp.js'
 import {events_module} from './events.js'
 import {state_module} from './state.js'
+import {isModule, KModule} from './module.js';
 
 export class Kernel {
     constructor() {
