@@ -9,3 +9,4 @@ export class KModule {
         this.runtime = runtime
     }
 }
+export const isModule = v => v instanceof KModule
