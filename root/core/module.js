@@ -28,10 +28,12 @@ export class KModule {
                 }
             },
             /**
+             * Maps data to a callback and returns the emitter
              * @param {(target: KModule, data?: *)} c 
              */
             map: (c) => {
                 this.mappedData.set(data, c)
+                return this.emit
             }            
         }
     }
