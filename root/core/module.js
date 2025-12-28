@@ -14,5 +14,26 @@ export class KModule {
         this.receivedData = null
         this.sentData = null
     }
+
+    emit(data) {
+        return {
+            /**
+             * @param {KModule} t 
+             * @param {...args} c 
+             */
+            to: (t, ...args) => {
+                this.sentData = data
+                this.runtime.interface.emit(data).to(t, ...args);
+                return this.emit
+            },
+            /**
+             * @param {(...args)} c 
+             */
+            map: (c) => {
+                this.mappedData.set(data, c)
+                return this.emit
+            }
+        }
+    }
 }
 export const isModule = v => v instanceof KModule
