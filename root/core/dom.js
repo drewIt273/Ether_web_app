@@ -29,14 +29,14 @@ export class dom_module extends KModule {
         this.observer = new MutationObserver(muts => {
             for (const m of muts) {
                 if (m.addedNodes) for (const added of m.addedNodes) {
-                    if (!this.nodereg.includesValue(added) && !(added instanceof SVGElement)) this.emit('write-reg').to(this)
-                    this.runtime.events.restore(added)
+                    if (!this.nodereg.includesValue(added) && !(added instanceof SVGElement)) this.emit('wr').to(this, added)
+                    this.emit('r').to(this.runtime.events, added)
                 }
                 if (m.removedNodes) for (const removed of m.removedNodes) {
                     const r = this.runtime.events.ActiveListeners.find(o => o.node === removed)
-                    if (r) this.runtime.events.unlisten(r.ev, r.node)
-                    this.nodereg.remove(this.nodereg.keyOf(removed))
-                    if (this.runtime.events.Keybinds.has(removed)) this.runtime.events.unlisten('keydown', removed)
+                    if (r) this.emit('un').to(this.runtime.events, r.ev, r.node)
+                    this.emit('nwr').to(this, removed)
+                    if (this.runtime.events.Keybinds.has(removed)) this.emit('un').to(this.runtime.events, 'keydown', removed)
                 }
             }
         })
