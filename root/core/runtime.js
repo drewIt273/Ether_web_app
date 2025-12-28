@@ -30,26 +30,6 @@ export class Kernel {
             return p
         }
         this.config = {}
-        this.interface = {
-            emit: data => {
-                return {
-                    /**
-                     * @param {KModule} target 
-                     * @param {(target: KModule, data: *)} callback
-                     */
-                    to: (target, callback = ()=>{}) => {
-                        if (isModule(target)) {
-                            if (typeof callback === 'function') try {
-                                if (target.mappedData.has(data)) target.mappedData.get(data).call(target, target, data)
-                                callback.call(target, target, data)
-                                target.received = data
-                            } catch(e) {throw new Error('error during emit callback')}
-                        }
-                        else throw new Error(`${target} must be a kernel module.`)
-                    }
-                }
-            }
-        }
     }
 
     async boot() {

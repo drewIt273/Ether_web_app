@@ -59,7 +59,6 @@ export class dom_module extends KModule {
             }
         }
         this.doc = doc;
-        this.emit('write-reg').map((t, d) => {this.nodereg.write(d); console.log(this.nodereg)})
     }
 
     /**
