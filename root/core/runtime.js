@@ -33,17 +33,12 @@ export class Kernel {
                 return {
                     /**
                      * @param {KModule} t 
-                     * @param {()} c 
                      */
                     to: (t, ...args) => {
-                        if (isModule(t)) {
-                            try {
-                                t.receivedData = data
-                                let a = t.mappedData.get(data)
-                                if (t.mappedData.has(data)) a.call(t, ...args)
-                                c.call(t)
-                            } catch(e) {}
-                        }
+                        if (isModule(t)) try {
+                            t.receivedData = data
+                            if (t.mappedData.has(data)) t.mappedData.get(data).call(t, ...args)
+                        } catch(e) {}
                         else throw new TypeError(`${t} is not a module`)
                     }
                 }
@@ -80,4 +75,4 @@ export class Kernel {
     }
 }
 
-export const runtime = new Kernel, dom = runtime.dom, lifecycle = runtime.lifecycle, GlobalEvents = runtime.events;
+export const runtime = new Kernel, dom = runtime.dom, GlobalEvents = runtime.events;
