@@ -23,7 +23,7 @@ export class KModule {
              */
             to: (t, ...args) => {
                 this.sentData = data
-                this.runtime.interface.emit(data).to(t, ...args);
+                this.runtime.interface.emit(data).to(t, ...args)
                 return this.emit
             },
             /**

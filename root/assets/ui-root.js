@@ -4,10 +4,10 @@
  * ui.root.js
  */
 
-import {isNode, isString, create, find, toKebab, setAttr, hasAttr, removeAttr, ranstring, strictObject, setStyle, Registry, isArray, isElement} from "../../nodes/scripts/any.js";
-import {div} from "./nodecreator.js";
-import {stylesheet} from "../../nodes/scripts/stylesheet.js";
-import {dom, GlobalEvents} from "../core/runtime.js";
+import {isNode, isString, create, find, toKebab, setAttr, hasAttr, removeAttr, ranstring, setStyle, Registry, isArray, isElement} from "../../nodes/scripts/any.js"
+import {div} from "./nodecreator.js"
+import {stylesheet} from "../../nodes/scripts/stylesheet.js"
+import {dom, GlobalEvents} from "../core/runtime.js"
 
 export const UIreg = new Registry;
 
@@ -88,7 +88,7 @@ export class UINode {
     style(o) {
         for (const [p, v] of Object.entries(o)) this.node.style[toKebab(p)] = v
         return this
-    }    
+    }
 
     /**
      * Returns the first element that is a descendant of node that matches selectors.
