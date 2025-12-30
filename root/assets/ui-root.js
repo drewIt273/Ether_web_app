@@ -327,14 +327,6 @@ export class UICell extends UINode {
     }
 
     /**
-     * Returns a copy of node. If deep is true, the copy also includes the node's descendants.
-     */
-    clone(subtree = false) {
-        return this.node.cloneNode(subtree)
-    }
-
-
-    /**
      * @param {Node} node @param {Node|null} child 
      */
     insertBefore(node, child) {
@@ -619,26 +611,6 @@ export class UIComponent extends UINode {
      */
     forEach(callback) {
         this.children.forEach(c => callback.call(this, c, this.children.indexOf(c), this.children))
-        return this
-    }
-
-    /**
-     * 
-     * @param {string|{}} styleObjOrProp 
-     */
-    css(styleObjOrProp) {
-        const e = this.node
-        if (typeof styleObjOrProp === "string") return getComputedStyle(e).getPropertyValue(styleObjOrProp)
-
-        for (const key in styleObjOrProp) {
-            const v = styleObjOrProp[key];
-            if (strictObject(v)) {
-                const targets = document.querySelectorAll(`${this.selector} ${key}`);
-                targets.forEach(target => Object.assign(target.style, v))
-            }
-            else if (typeof v !== 'object') this.node.style[toKebab(key)] = v
-        }
-
         return this
     }
 
