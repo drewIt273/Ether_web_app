@@ -36,24 +36,22 @@ export class events_module extends KModule {
      */
     listen(ev, target, ...handlers) {
         const a = this.ActiveListeners, b = this.BacklogListeners
-        const nodes = isString(target) ? runtime.dom.find(target) : [target]
-    
-        nodes.forEach(node => {
-            let existing = a.find(o => o.node === node && o.ev === ev)
+        const nodes = isString(target) ? this.runtime.dom.find(target) : [target]
 
+        nodes instanceof Array ? nodes.forEach(n => fn(n)) : fn(nodes)
+
+        let fn = n => {
+            let existing = a.find(o => o.node === n && o.ev === ev)
             if (existing) {
-                // Only add handlers that aren’t already registered
-                    handlers.forEach(handler => {
-                        if (!existing.fn.includes(handler)) existing.fn.push(handler)
-                    })
+                handlers.forEach(handler => {
+                    if (!existing.fn.includes(handler)) existing.fn.push(handler)
+                })
             }
             else {
-                // New entry
-                    if (!this.#unbubble.has(ev)) a.write({node, ev, fn: [...handlers], in: 'active'})
+                if (!this.#unbubble.has(ev)) a.write({node: n, ev, fn: [...handlers], in: 'active'})
             }
-            // Ensure this node isn't still in backlog
-                b.splice(0, b.size, b.filter(o => o.node !== node))
-        })
+            b.splice(0, b.size, b.filter(o => o.node !== n))
+        }
 
         if (!this.ActiveGlobals.has(ev)) {
             this.ActiveGlobals.add(ev)
@@ -85,19 +83,20 @@ export class events_module extends KModule {
      */
     unlisten(ev, target) {
         const a = this.ActiveListeners
-        const nodes = isString(target) ? runtime.dom.find(target) : [target]
-        nodes.forEach(node => {
-            const existing = a.find(o => o.node === node && o.ev === ev)
+        const nodes = isString(target) ? this.runtime.dom.find(target) : [target]
+        nodes instanceof Array ? nodes.forEach(n => fn(n)) : fn(nodes)
+        let fn = n => {
+            const existing = a.find(o => o.node === n && o.ev === ev)
             if (!existing) return;
 
             // Remove direct listeners for non-bubbling events
                 if (this.#unbubble.has(ev)) {
-                    const e = find(node);
+                    const e = find(n);
                     if (e) existing.fn.forEach(fn => e.removeEventListener(ev, fn));
                 }
             if (!existing.fn.length) a.splice(0, a.size, a.filter(o => o !== existing))
-            this.BacklogListeners.write({node, ev, fn: existing.fn, in: 'backlog'})
-        })
+            this.BacklogListeners.write({node: n, ev, fn: existing.fn, in: 'backlog'})
+        }
     }
 
     /**
