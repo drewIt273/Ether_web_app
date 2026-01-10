@@ -9,20 +9,18 @@ import {Kernel} from "./runtime.js"
 export class KModule {
     constructor(/**@type {Kernel}*/ r) {
         this.runtime = r
-        /**@type {Map<*, ()>} */
-        this.mappedData = new Map()
-        this.receivedData = null
-        this.sentData = null
+        /**Mapped data @type {Map<*, (...args)>} */ this.md = new Map()
+        /**Received data */ this.rd = null
+        /**Sent data */ this.sd = null
     }
 
     emit(data) {
         return {
             /**
              * @param {KModule} t 
-             * @param {...args} c 
              */
             to: (t, ...args) => {
-                this.sentData = data
+                this.sd = data
                 this.runtime.interface.emit(data).to(t, ...args)
                 return this.emit
             },
@@ -30,7 +28,7 @@ export class KModule {
              * @param {(...args)} c 
              */
             map: (c) => {
-                this.mappedData.set(data, c)
+                this.md.set(data, (...args) => c.call(this, ...args))
                 return this.emit
             }
         }
