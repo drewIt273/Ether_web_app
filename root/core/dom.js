@@ -53,7 +53,8 @@ export class dom_module extends KModule {
                         if (t) {
                             if (typeof callback === 'function') try {
                                 f.receivedData = data
-                                if (f.mappedData.has(data)) f.mappedData.get(data).call(f, f, data); callback.call(f, f, data)
+                                if (f.mappedData.has(data)) f.mappedData.get(data).call(f, f, data)
+                                callback.call(f, f, data)
                             } catch(e) {console.error(`Error during emit callback for target ${f.ID}:`, e);}
                         }
                         else throw new TypeError('target must be a UICell or UIBlock')
