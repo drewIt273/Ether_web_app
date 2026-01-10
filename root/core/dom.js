@@ -62,8 +62,7 @@ export class dom_module extends KModule {
             }
         }
         this.doc = doc;
-        this.emit('wr').map((...a) => a.forEach(a => this.nodereg.write(a)))
-        this.emit('nwr').map((...a) => a.forEach(a => this.nodereg.remove(this.nodereg.keyOf(a))))
+        this.emit('wr').map((...a) => a.forEach(a => this.nodereg.write(a))) ('nwr').map((...a) => a.forEach(a => this.nodereg.remove(this.nodereg.keyOf(a))))
     }
 
     /**
