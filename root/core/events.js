@@ -24,8 +24,7 @@ export class events_module extends KModule {
             this.Keybinds = new WeakMap()
         /**@type {Element} */
             this.root = this.runtime.dom.body
-        this.emit('r').map((...r) => r.forEach(r => this.restore(r)))
-        this.emit('un').map((ev, n) => this.unlisten(ev, n))
+        this.emit('r').map((...r) => r.forEach(r => this.restore(r))) ('un').map((ev, n) => this.unlisten(ev, n))
     }
 
     #unbubble = new Set(['mouseenter', 'mouseleave', 'blur', 'focus', 'pointerenter', 'pointerleave'])

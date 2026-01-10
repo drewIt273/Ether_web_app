@@ -28,7 +28,7 @@ export class KModule {
              * @param {(...args)} c 
              */
             map: (c) => {
-                this.md.set(data, (...args) => c.call(this, ...args))
+                this.md.set(data, c)
                 return this.emit
             }
         }
