@@ -36,8 +36,8 @@ export class Kernel {
                      */
                     to: (t, ...args) => {
                         if (isModule(t)) try {
-                            t.receivedData = data
-                            if (t.mappedData.has(data)) t.mappedData.get(data).call(t, ...args)
+                            t.rd = data
+                            if (t.md.has(data)) t.md.get(data).call(t, ...args)
                         } catch(e) {}
                         else throw new TypeError(`${t} is not a module`)
                     }
