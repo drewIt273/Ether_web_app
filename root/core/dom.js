@@ -46,17 +46,13 @@ export class dom_module extends KModule {
                 return {
                     /**
                      * @param {cell|block|Node|string} target 
-                     * @param {(target: cell|block, data?: *)} callback
                      */
-                    to: (target, callback = () => {}) => {
+                    to: (target, ...args) => {
                         const f = (typeof target === 'string' || target instanceof Node) ? fu(target) : target, t = f.hasAttr('ui-cell-id') || f.hasAttr('ui-block-id')
-                        if (t) {
-                            if (typeof callback === 'function') try {
-                                f.receivedData = data
-                                if (f.mappedData.has(data)) f.mappedData.get(data).call(f, f, data)
-                                callback.call(f, f, data)
-                            } catch(e) {console.error(`Error during emit callback for target ${f.ID}:`, e);}
-                        }
+                        if (t) try {
+                            f.receivedData = data
+                            if (f.mappedData.has(data)) f.mappedData.get(data).call(f, ...args)
+                        } catch(e) {console.error(`Error during emit callback for target ${f.ID}:`, e);}
                         else throw new TypeError('target must be a UICell or UIBlock')
                     },
                 }
