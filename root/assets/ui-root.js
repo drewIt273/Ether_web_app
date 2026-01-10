@@ -363,16 +363,16 @@ export class UICell extends UINode {
              * @param {(target: UICell|UIBlock, data?: *)} callback 
              */
             to: (targets, callback) => {
+                this.emittedData = data
                 const T = isArray(targets) ? targets : [targets];
                 for (const target of T) dom.interface.emit(data).to(target, callback)
-                this.emittedData = data
                 return P
             },
             /**
-             * @param {(target: UICell|UIBlock, data?: *)} callback 
+             * @param {(target: UICell|UIBlock, data?: *)} c 
              */
-            map: (callback) => {
-                this.mappedData.set(data, callback)
+            map: (c) => {
+                this.mappedData.set(data, c)
             }
         }
         return P
