@@ -14,7 +14,7 @@ export class KModule {
         /**Sent data */ this.sd = null
     }
 
-    emit(data) {
+    emit = data => {
         return {
             /**
              * @param {KModule} t 
