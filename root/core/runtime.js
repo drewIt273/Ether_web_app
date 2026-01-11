@@ -75,4 +75,4 @@ export class Kernel {
     }
 }
 
-export const runtime = new Kernel, dom = runtime.dom, GlobalEvents = runtime.events;
+export const runtime = new Kernel, dom = runtime.dom, GlobalEvents = runtime.events, GlobalStates = runtime.state;
