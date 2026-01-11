@@ -7,16 +7,16 @@
 
 import {dom_module} from './dom.js'
 import {events_module} from './events.js'
-import {state_module} from './state.js'
+import {states_module} from './state.js'
 import {isModule, KModule} from './module.js'
 
 export class Kernel {
     constructor() {
         /**Returns the modules constructors */
-        this.modules = {dom_module, events_module, state_module};
+        this.modules = {dom_module, events_module, states_module};
         this.dom = new dom_module(this);
         this.events = new events_module(this);
-        this.state = new state_module(this);
+        this.state = new states_module(this);
         this.hooks = {
             init: [],
             ready: []
