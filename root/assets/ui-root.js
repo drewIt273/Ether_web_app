@@ -52,6 +52,13 @@ export class UINode {
     }
 
     /**
+     * Returns the ui-data-key of this UINode.
+     */
+    get key() {
+        return this.node.getAttribute('ui-data-key')
+    }
+
+    /**
      * Returns this node as a selector string that can be used later in searching this node using find, findAll, etc.
      */
     get selector() {
@@ -229,6 +236,15 @@ export class UINode {
      */
     removeAttr(a) {
         removeAttr(this.node, a)
+        return this
+    }
+
+    /**
+     * Set the ui-data-key of this UINode.
+     * @param {string} k 
+     */
+    UIKey(k) {
+        this.attrs({'ui-data-key': `${k}`})
         return this
     }
 
