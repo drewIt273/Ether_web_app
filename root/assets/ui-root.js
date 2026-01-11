@@ -655,5 +655,6 @@ export const UIConstructorOf = target => UINodeMap.get(find(target))
  */
 export const cellOrBlock = n => (n instanceof UICell) ? !0 : (n instanceof UIBlock) ? !0 : !1
 
-let h = new UICell('span-test');
-h.mount(dom.body);
+let h = new UICell('span-test'), e = new UICell('sp-test'), v = new UICell('nd-test'), a;
+h.mount(dom.body), e.mount(dom.body), v.mount(dom.body);
+h.emit(['b', 'j']).map((t, d) => {console.log('d.a', 'd.b')}); e.emit(['b', 'j']).to(h); console.log(h.mappedData, e.emittedData, h.receivedData);
