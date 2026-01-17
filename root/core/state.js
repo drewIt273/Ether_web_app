@@ -4,9 +4,9 @@
  * state.js
  */
 
-import {KModule} from "./module.js"
+import {DModule} from "./module.js"
 
-export class states_module extends KModule {
+export class StateManager extends DModule {
 
     constructor(runtime) {
         super(runtime)

@@ -6,9 +6,9 @@
 
 import {find, isNode, isString, Registry} from "../../nodes/scripts/any.js"
 import {UIBlock as block, UICell as cell, UIComponent as comp, UIConstructorOf as struct} from "../assets/ui-root.js"
-import {KModule} from "./module.js"
+import {DModule} from "./module.js"
 
-export class events_module extends KModule {
+export class EventsModule extends DModule {
     
     constructor(runtime) {
         super(runtime)

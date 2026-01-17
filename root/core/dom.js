@@ -8,11 +8,11 @@ import {jsx} from "../assets/nodecreator.js";
 import {query$} from "../assets/domquery.js";
 import {Registry} from "../../nodes/scripts/any.js";
 import {UICell as cell, UIBlock as block, UIComponent as comp, UIConstructorOf as fu, UIreg} from "../assets/ui-root.js";
-import {KModule} from "./module.js";
+import {DModule} from "./module.js";
 
 const doc = window.document;
 
-export class dom_module extends KModule {
+export class DOMInterface extends DModule {
 
     constructor(runtime) {
         super(runtime)

@@ -6,7 +6,7 @@
 
 import {Kernel} from "./runtime.js"
 
-export class KModule {
+export class DModule {
     constructor(/**@type {Kernel}*/ r) {
         this.runtime = r
         /**Mapped data @type {Map<*, (...args)>} */ this.md = new Map()
@@ -17,7 +17,7 @@ export class KModule {
     emit = data => {
         return {
             /**
-             * @param {KModule} t 
+             * @param {DModule} t 
              */
             to: (t, ...args) => {
                 this.sd = data
@@ -34,4 +34,4 @@ export class KModule {
         }
     }
 }
-export const isModule = v => v instanceof KModule
+export const isModule = v => v instanceof DModule

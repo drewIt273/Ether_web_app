@@ -5,18 +5,18 @@
  * co-built with GPT-5
  */
 
-import {dom_module} from './dom.js'
-import {events_module} from './events.js'
-import {states_module} from './state.js'
-import {isModule, KModule} from './module.js'
+import {DOMInterface} from './dom.js'
+import {EventsModule} from './events.js'
+import {StateManager} from './state.js'
+import {isModule, DModule} from './module.js'
 
 export class Kernel {
     constructor() {
         /**Returns the modules constructors */
-        this.modules = {dom_module, events_module, states_module};
-        this.dom = new dom_module(this);
-        this.events = new events_module(this);
-        this.state = new states_module(this);
+        this.modules = {DOMInterface, EventsModule, StateManager};
+        this.dom = new DOMInterface(this);
+        this.events = new EventsModule(this);
+        this.state = new StateManager(this);
         this.hooks = {
             init: [],
             ready: []
@@ -32,7 +32,7 @@ export class Kernel {
             emit: data => {
                 return {
                     /**
-                     * @param {KModule} t 
+                     * @param {DModule} t 
                      */
                     to: (t, ...args) => {
                         if (isModule(t)) try {
