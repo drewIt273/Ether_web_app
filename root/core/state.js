@@ -7,6 +7,34 @@
 import {UINode} from "../assets/ui-root.js"
 import {DModule} from "./module.js"
 
+let CURRENT_EFFECT = null
+
+function cs(initial) {
+    let value = initial
+    const subscribers = new Set()
+
+    return {
+        get() {
+            if (CURRENT_EFFECT) subscribers.add(CURRENT_EFFECT)
+            return value
+        },
+        set(next) {
+            if (Object.is(value, next)) return
+            value = next
+            subscribers.forEach(fn => fn())
+        }
+    }
+}
+
+function effect(fn) {
+    const run = () => {
+        CURRENT_EFFECT = run
+        try {fn()} finally {CURRENT_EFFECT = null}
+    }
+    run()
+    return run
+}
+
 export class StateManager extends DModule {
 
     constructor(runtime) {
