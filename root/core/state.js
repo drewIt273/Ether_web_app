@@ -41,7 +41,7 @@ export class StateManager extends DModule {
         super(runtime)
         this.init = !1
         this.ready = !1
-        /**@type {WeakMap<Node, {}>} */
+        /**@type {WeakMap<Node, Map<string, *>>} */
         this.reg = new WeakMap()
     }
 
@@ -56,21 +56,23 @@ export class StateManager extends DModule {
     /**
      * @param {UINode} node @param {string} state
      */
-    define(node, state, fn = () => {}) {
-        !this.reg.has(node.node) ? this.reg.set(node.node, {[state]: fn}) : this.reg.get(node.node)[state] = fn
-        node.dataset({state: state})
+    define(node, name, initial, fn = () => {}) {
+        if (!this.reg.has(node.node)) this.reg.set(node.node, new Map())
+        const state = cs(initial)
+        this.reg.get(node.node).set(name, {state, fn})
+        effect(() => {
+            const v = state.get()
+            node.dataset({state: v})
+            fn.call(node, v)
+        })
     }
 
     /**
-     * @param {UINode} node @param {string} state 
+     * @param {UINode} node @param {string} name
      */
-    set(node, state) {
-        if (this.reg.has(node))
-            if (Object.hasOwn(this.reg.get(node.node), state)) {
-                node.dataset({state: state})
-                this.reg.get(node.node)[state].call(node)
-            }
-            else throw new Error(`State '${state}' not defined for UINode '${node}'`)
-        else throw new Error(`[StateManager] UINode '${node}' not registered`)
+    set(node, name, value) {
+        const entry = this.reg.get(node.node)?.get(name)
+        if (!entry) throw new Error(`State '${name}' not defined`)
+        entry.state.set(value)
     }
 }
