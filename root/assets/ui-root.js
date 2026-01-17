@@ -27,10 +27,9 @@ export class UINode {
         this.innerHTML = this.node.innerHTML
         this.childNodes = Array.from(this.node.childNodes)
         this.parent = this.node.parentNode
+        this.currentstate = null
     }
 
-    #states = {}
-    #currentstate = null
     #onstatechange
 
     /**
@@ -39,14 +38,6 @@ export class UINode {
      */
     get mounted() {
         return UIreg.get(this.registeredKey)?.mounted ?? false
-    }
-
-    /**
-     * Get the currently active state name.
-     * @returns {string|null}
-     */
-    get state() {
-        return this.#currentstate
     }
 
     /**
@@ -184,7 +175,7 @@ export class UINode {
      * @param {(this: this)} handler 
      */
     defineState(state, handler) {
-        this.#states[state] = () => handler
+        GlobalStates.define(this, state, handler)
         return this
     }
 
@@ -193,26 +184,21 @@ export class UINode {
      * @param {'active'|'inactive'|'enable'|'disable'} state 
      */
     setState(state) {
-        if (!(state in this.#states)) {
-            console.warn(`State "${state}" not defined for UINode`, this);
-            return this
-        }
-        this.#currentstate = state
-        this.#states[state]().call(this, this)
+        GlobalStates.set(this, state)
+        this.currentstate = state
         if (this.#onstatechange) this.#onstatechange.call(this, this)
-        this.dataset({state: `${state}`})
         return this
     }
 
     /**
-     * Returns true if s was defined as a state of this UIComponent.
+     * Returns true if s was defined as a state of this UINode.
      * @param {string} s 
      */
-    hasState = s => s in this.#states
+    hasState = s => s in GlobalStates.reg.get(this.node)
 
     /**
      * Register a callback for when the component's state changes.
-     * @param {(this: this) => void} callback 
+     * @param {(this: this)} callback 
      */
     onStateChange(callback) {
         (typeof callback === 'function') ? this.#onstatechange = callback : console.warn('onStateChange expects a function callback.')
