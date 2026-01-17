@@ -30,8 +30,6 @@ export class UINode {
         this.currentstate = null
     }
 
-    #onstatechange
-
     /**
      * Returns true if this is still mounted
      * @returns {boolean}
@@ -172,10 +170,10 @@ export class UINode {
     /**
      * Define a new state and its behavior.
      * @param {'active'|'inactive'|'enable'|'disable'} state 
-     * @param {(this: this)} handler 
+     * @param {(this: this)} handler Runs whenever state changes.
      */
-    defineState(state, handler) {
-        GlobalStates.define(this, state, handler)
+    defineState(state, initial, handler) {
+        GlobalStates.define(this, state, initial, handler)
         return this
     }
 
@@ -183,10 +181,9 @@ export class UINode {
      * Set (or trigger) a defined state.
      * @param {'active'|'inactive'|'enable'|'disable'} state 
      */
-    setState(state) {
-        GlobalStates.set(this, state)
-        this.currentstate = state
-        if (this.#onstatechange) this.#onstatechange.call(this, this)
+    setState(state, value) {
+        GlobalStates.set(this, state, value)
+        this.currentstate = value
         return this
     }
 
@@ -194,16 +191,7 @@ export class UINode {
      * Returns true if s was defined as a state of this UINode.
      * @param {string} s 
      */
-    hasState = s => s in GlobalStates.reg.get(this.node)
-
-    /**
-     * Register a callback for when the component's state changes.
-     * @param {(this: this)} callback 
-     */
-    onStateChange(callback) {
-        (typeof callback === 'function') ? this.#onstatechange = callback : console.warn('onStateChange expects a function callback.')
-        return this
-    }
+    hasState = s => GlobalStates.reg.get(this.node).has(s)
 
     /**
      * @param {string} attr 
