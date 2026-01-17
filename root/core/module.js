@@ -12,6 +12,8 @@ export class DModule {
         /**Mapped data @type {Map<*, (...args)>} */ this.md = new Map()
         /**Received data */ this.rd = null
         /**Sent data */ this.sd = null
+        this.init = !1
+        this.ready = !1
     }
 
     emit = data => {
