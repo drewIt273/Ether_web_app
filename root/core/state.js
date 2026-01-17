@@ -2,6 +2,7 @@
  * Instance by DrewIt
  * 
  * state.js
+ * Co-built with GPT-5
  */
 
 import {UINode} from "../assets/ui-root.js"
