@@ -27,10 +27,8 @@ export class UINode {
         this.innerHTML = this.node.innerHTML
         this.childNodes = Array.from(this.node.childNodes)
         this.parent = this.node.parentNode
-        this.#reg = UIreg
     }
 
-    #reg
     #states = {}
     #currentstate = null
     #onstatechange
@@ -40,7 +38,7 @@ export class UINode {
      * @returns {boolean}
      */
     get mounted() {
-        return this.#reg.get(this.registeredKey)?.mounted ?? false
+        return UIreg.get(this.registeredKey)?.mounted ?? false
     }
 
     /**
