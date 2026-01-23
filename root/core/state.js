@@ -10,8 +10,7 @@ import {DModule} from "./module.js"
 
 let CURRENT_EFFECT = null
 
-function cs(initial) {
-    let value = initial
+function cs(value) {
     const subscribers = new Set()
 
     return {
