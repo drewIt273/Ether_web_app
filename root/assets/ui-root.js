@@ -31,6 +31,7 @@ export class UINode {
     }
 
     #s = null
+    #ofn = null
 
     /**
      * Returns true if this is still mounted
@@ -194,6 +195,7 @@ export class UINode {
     setState(state, value) {
         this.#s = this.getAttr('data-state')
         GlobalStates.set(this, state, value)
+        this.#ofn?.call(this)
         this.currentstate = value
         return this
     }
@@ -203,6 +205,14 @@ export class UINode {
      * @param {string} s 
      */
     hasDefinedState = s => GlobalStates.reg.get(this.node).has(s)
+
+    /**
+     * Calls a function each time this UINode's state changes.
+     * @param {()} fn 
+     */
+    onStateChange(fn) {
+        this.#ofn = fn
+    }
 
     /**
      * @param {string} attr 
