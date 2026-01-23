@@ -56,23 +56,22 @@ export class StateManager extends DModule {
     /**
      * @param {UINode} node @param {string} state
      */
-    define(node, name, initial, fn = () => {}) {
+    define(node, state, fn = () => {}) {
         if (!this.reg.has(node.node)) this.reg.set(node.node, new Map())
-        const state = cs(initial)
-        this.reg.get(node.node).set(name, {state, fn})
-        effect(() => {
-            const v = state.get()
-            node.dataset({state: v})
-            fn.call(node, v)
-        })
+        const o = cs('inactive')
+        this.reg.get(node.node).set(state, {o, fn})
     }
 
     /**
-     * @param {UINode} node @param {string} name
+     * @param {UINode} node @param {string} value
      */
-    set(node, name, value) {
-        const entry = this.reg.get(node.node)?.get(name)
-        if (!entry) throw new Error(`State '${name}' not defined`)
-        entry.state.set(value)
+    set(node, value) {
+        const entry = this.reg.get(node.node)?.get(value)
+        if (!entry) throw new Error(`State '${value}' not defined`)
+        effect(() => {
+            entry.o.set(value)
+            entry.fn.call(node, node)
+            node.dataset({state: entry.o.get()})
+        })
     }
 }
