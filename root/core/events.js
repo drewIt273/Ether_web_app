@@ -36,9 +36,6 @@ export class EventsModule extends DModule {
     listen(ev, target, ...handlers) {
         const a = this.ActiveListeners, b = this.BacklogListeners
         const nodes = isString(target) ? this.runtime.dom.find(target) : [target]
-
-        nodes instanceof Array ? nodes.forEach(n => fn(n)) : fn(nodes)
-
         let fn = n => {
             let existing = a.find(o => o.node === n && o.ev === ev)
             if (existing) {
@@ -51,6 +48,8 @@ export class EventsModule extends DModule {
             }
             b.splice(0, b.size, b.filter(o => o.node !== n))
         }
+
+        nodes instanceof Array ? nodes.forEach(n => fn(n)) : fn(nodes)
 
         if (!this.ActiveGlobals.has(ev)) {
             this.ActiveGlobals.add(ev)
