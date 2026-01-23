@@ -30,6 +30,8 @@ export class UINode {
         this.currentstate = null
     }
 
+    #s = null
+
     /**
      * Returns true if this is still mounted
      * @returns {boolean}
@@ -43,6 +45,14 @@ export class UINode {
      */
     get key() {
         return this.node.getAttribute('ui-data-key')
+    }
+
+    /**
+     * Returns the previous data state of this UINode.
+     * @returns {string|null}
+     */
+    get prevState() {
+        return this.#s
     }
 
     /**
