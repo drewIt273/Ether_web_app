@@ -180,10 +180,10 @@ export class UINode {
     /**
      * Define a new state and its behavior.
      * @param {'active'|'inactive'|'enable'|'disable'} state 
-     * @param {(this: this)} handler Runs whenever state changes.
+     * @param {(t: this)} handler Runs whenever state changes.
      */
-    defineState(state, initial, handler) {
-        GlobalStates.define(this, state, initial, handler)
+    defineState(state, handler) {
+        GlobalStates.define(this, state, handler)
         return this
     }
 
