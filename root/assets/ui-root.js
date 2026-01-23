@@ -192,6 +192,7 @@ export class UINode {
      * @param {'active'|'inactive'|'enable'|'disable'} state 
      */
     setState(state, value) {
+        this.#s = this.getAttr('data-state')
         GlobalStates.set(this, state, value)
         this.currentstate = value
         return this
@@ -201,7 +202,7 @@ export class UINode {
      * Returns true if s was defined as a state of this UINode.
      * @param {string} s 
      */
-    hasState = s => GlobalStates.reg.get(this.node).has(s)
+    hasDefinedState = s => GlobalStates.reg.get(this.node).has(s)
 
     /**
      * @param {string} attr 
@@ -637,6 +638,10 @@ export const UIConstructorOf = target => UINodeMap.get(find(target))
  */
 export const cellOrBlock = n => (n instanceof UICell) ? !0 : (n instanceof UIBlock) ? !0 : !1
 
-let h = new UICell('span-test'), e = new UICell('sp-test'), v = new UICell('nd-test'), a;
-h.mount(dom.body), e.mount(dom.body), v.mount(dom.body);
-h.emit(['b', 'j']).map((t, d) => {console.log('d.a', 'd.b')}); e.emit(['b', 'j']).to(h); console.log(h.mappedData, e.emittedData, h.receivedData);
+// testing
+let h = new UICell('span-e');
+h.style({backgroundColor: '#f9f9f9', width: '90px', height: '80px', position: 'absolute', top: '10px', left: '50%'});
+h.mount(dom.body);
+h.defineState('active', (a) => {a.style({backgroundColor: '#3b5998'}); console.log('hey')});
+h.defineState('disable', (a) => {a.style({backgroundColor: 'pink'})})
+h.on('click', () => {h.setState('active'); setTimeout(() => h.setState('disable'), 1200); console.log('blue')});
