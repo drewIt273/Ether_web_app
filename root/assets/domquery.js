@@ -4,8 +4,6 @@
  * domquery.js
  */
 
-import {GlobalEvents} from "../core/runtime.js";
-
 export class query$ {
 
     /**
@@ -32,7 +30,7 @@ export class query$ {
     #each = c => this.nodes.forEach(c)
 
     on(ev, callback, delay = 0) {
-        this.#each(node => GlobalEvents.listen(ev, node, e => {setTimeout(callback.call(this, e), delay)}))
+        this.#each(node => node.addEventListener(ev, e => {setTimeout(callback.call(this, e), delay)}))
         return this
     }
 
@@ -42,7 +40,7 @@ export class query$ {
     }
 
     delegate(eventType, handler, selector = "") {
-        this.#each(n => GlobalEvents.listen(eventType, n.querySelector(selector), handler))
+        this.#each(n => n.querySelector(selector).addEventListener(eventType, handler))
         return this
     }
 
