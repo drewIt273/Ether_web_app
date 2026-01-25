@@ -6,7 +6,7 @@
 
 import {DModule} from "./module.js"
 
-export class StoreModule extends DModule {
+export class StorageManager extends DModule {
 
     constructor(runtime) {
         super(runtime)
