@@ -13,6 +13,10 @@ function safeParse(v, f = null) {
     catch {return f}
 }
 
+function key(k, prefix = 'app') {
+    return `${prefix}.${k}`
+}
+
 export const GlobalStorage = {
     /**
      * @param {string} k 
