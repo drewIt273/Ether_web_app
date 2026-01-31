@@ -22,6 +22,15 @@ export const GlobalStorage = {
      * @param {string} k 
      */
     get: (k) => {
-        return Storage.getItem(k)
+        return safeParse(Storage.getItem(key(k)))
     },
+    /**
+     * @param {string} k @param {*} v 
+     */
+    set: (k, v) => {
+        Storage.setItem(key(k), JSON.stringify(v))
+    },
+    get size() {
+        return Storage.length
+    }
 }
