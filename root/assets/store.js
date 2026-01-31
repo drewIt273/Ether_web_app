@@ -34,7 +34,37 @@ export const GlobalStorage = {
     set: (k, v) => {
         Storage.setItem(key(k), JSON.stringify(v))
     },
+    /**
+     * @param {string} k 
+     */
+    has(k) {
+        return Storage.getItem(key(k)) !== null
+    },
+    /**
+     * @param {string} k 
+     */
+    remove(k) {
+        Storage.removeItem(key(k))
+    },
+    /**
+     * @param {string} k 
+     */
+    getRaw(k) {
+        return Storage.getItem(key(k))
+    },    
+    /**
+     * @param {string} k @param {*} v 
+     */
+    setRaw(k, v) {
+        Storage.setItem(key(k), String(v))
+    },
     get size() {
         return Storage.length
-    }
+    },
+    clear(prefix = 'app') {
+        for (let i = Storage.length - 1; i >= 0; i--) {
+            const k = Storage.key(i)
+            if (k?.startsWith(prefix + '.')) Storage.removeItem(k)
+        }
+    },
 }
