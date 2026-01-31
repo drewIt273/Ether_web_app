@@ -8,10 +8,18 @@ import {DModule} from "./module.js"
 
 const local = localStorage, session = sessionStorage
 
+function safeParse(v, f) {
+    try {
+        return JSON.parse(v)
+    }
+    catch {return f}
+}
+
 export class StorageManager extends DModule {
 
     constructor(runtime) {
         super(runtime)
+        this.prefix = runtime.config?.storeKey || 'ether'
     }
 
     local = {
