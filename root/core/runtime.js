@@ -8,7 +8,6 @@
 import {DOMInterface} from './dom.js'
 import {EventsModule} from './events.js'
 import {StateManager} from './state.js'
-import {StorageManager} from './store.js'
 import {isModule, DModule} from './module.js'
 
 export class Kernel {
@@ -18,7 +17,6 @@ export class Kernel {
         this.dom = new DOMInterface(this);
         this.events = new EventsModule(this);
         this.state = new StateManager(this);
-        this.store = new StorageManager(this);
         this.hooks = {
             init: [],
             ready: []
@@ -77,4 +75,4 @@ export class Kernel {
     }
 }
 
-export const runtime = new Kernel(), dom = runtime.dom, GlobalEvents = runtime.events, GlobalStates = runtime.state, GlobalStorage = runtime.store;
+export const runtime = new Kernel(), dom = runtime.dom, GlobalEvents = runtime.events, GlobalStates = runtime.state;
