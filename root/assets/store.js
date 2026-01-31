@@ -4,7 +4,11 @@
  * store.js
  */
 
-const Storage = localStorage
+let Storage = localStorage
+
+export function useStorage(s) {
+    return Storage = s
+}
 
 function safeParse(v, f = null) {
     try {
