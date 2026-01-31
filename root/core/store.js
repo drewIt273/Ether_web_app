@@ -12,3 +12,9 @@ function safeParse(v, f) {
     }
     catch {return f}
 }
+
+export const GlobalStorage = {
+    get: (k) => {
+        return Storage.getItem(k)
+    },
+}
