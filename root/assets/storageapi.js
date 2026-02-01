@@ -3,10 +3,11 @@
  * storageapi.js
  */
 
-let Storage = localStorage
+let Store = localStorage
 
-export function useStorage(s) {
-    return Storage = s
+export function useStorage(b) {
+    if (!b || typeof b.getItem !== 'function') throw new Error(`Invalid Storage backend: ${b}`)
+    return Store = b
 }
 
 function safeParse(v, f = null) {
@@ -16,13 +17,14 @@ function safeParse(v, f = null) {
     catch {return f}
 }
 
-function key(k, prefix = 'app') {
-    return `${prefix}.${k}`
+function key(k) {
+    if (k.match(/^([a-z].)/i) !== null) return k
+    else return `app.${k}`
 }
 
 export const StorageAPI = {
     /**
-     * @param {string} k 
+     * @param {string} k
      */
     get: (k) => {
         return safeParse(Storage.getItem(key(k)))
