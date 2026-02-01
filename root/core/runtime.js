@@ -13,7 +13,7 @@ import {isModule, DModule} from './module.js'
 export class Kernel {
     constructor() {
         /**Returns the modules constructors */
-        this.modules = {DOMInterface, EventsModule, StateManager, StorageManager};
+        this.modules = {DOMInterface, EventsModule, StateManager};
         this.dom = new DOMInterface(this);
         this.events = new EventsModule(this);
         this.state = new StateManager(this);
