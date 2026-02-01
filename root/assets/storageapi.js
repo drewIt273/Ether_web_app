@@ -1,7 +1,6 @@
 /**
  * Instance by DrewIt
- * 
- * store.js
+ * storageapi.js
  */
 
 let Storage = localStorage
@@ -21,7 +20,7 @@ function key(k, prefix = 'app') {
     return `${prefix}.${k}`
 }
 
-export const GlobalStorage = {
+export const StorageAPI = {
     /**
      * @param {string} k 
      */
