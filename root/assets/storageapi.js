@@ -27,45 +27,46 @@ export const StorageAPI = {
      * @param {string} k
      */
     get: (k) => {
-        return safeParse(Storage.getItem(key(k)))
+        return safeParse(Store.getItem(key(k)))
     },
     /**
      * @param {string} k @param {*} v 
      */
     set: (k, v) => {
-        Storage.setItem(key(k), JSON.stringify(v))
+        Store.setItem(key(k), JSON.stringify(v))
     },
     /**
      * @param {string} k 
      */
     has(k) {
-        return Storage.getItem(key(k)) !== null
+        return Store.getItem(key(k)) !== null
     },
     /**
      * @param {string} k 
      */
     remove(k) {
-        Storage.removeItem(key(k))
+        Store.removeItem(key(k))
     },
     /**
      * @param {string} k 
      */
     getRaw(k) {
-        return Storage.getItem(key(k))
+        return Store.getItem(key(k))
     },    
     /**
      * @param {string} k @param {*} v 
      */
     setRaw(k, v) {
-        Storage.setItem(key(k), String(v))
+        Store.setItem(key(k), String(v))
     },
     get size() {
-        return Storage.length
+        return Store.length
     },
     clear(prefix = 'app') {
-        for (let i = Storage.length - 1; i >= 0; i--) {
-            const k = Storage.key(i)
-            if (k?.startsWith(prefix + '.')) Storage.removeItem(k)
+        if (prefix !== null) for (let i = Store.length - 1; i >= 0; i--) {
+            const k = Store.key(i)
+            if (k?.startsWith(prefix + '.')) Store.removeItem(k)
         }
+        else Store.clear()
     },
 }
