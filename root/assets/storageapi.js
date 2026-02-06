@@ -3,11 +3,14 @@
  * storageapi.js
  */
 
-function safeParse(v, f = null) {
+const stores = [localStorage, caches];
+let backend = localStorage;
+
+function safeParse(v) {
     try {
         return JSON.parse(v)
     }
-    catch {return f}
+    catch(e) {throw new Error(e)}
 }
 
 function key(k) {
