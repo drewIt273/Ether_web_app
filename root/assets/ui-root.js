@@ -118,11 +118,16 @@ export class UINode {
             return;
         }
         if (!this.node._fadeOriginalDisplay) this.node._fadeOriginalDisplay = computed.display === "none" ? "block" : computed.display
-        setStyle(this.node, 'opacity', 0); setStyle(this.node, 'display', this.node._fadeOriginalDisplay); setStyle(this.node, 'transition', `opacity ${duration}ms ease`);
+
+        this.style({
+            opacity: 0,
+            display: this.node._fadeOriginalDisplay,
+            transition: `opacity ${duration}ms ease`
+        })
 
         this.node.offsetWidth;
         const handler = e => {
-            this.node.style.transition = '';
+            this.style({transition: ''});
             GlobalEvents.unlisten('transitionend', this.node)
             if (callback) callback.call(this, this.node)
         }
@@ -140,7 +145,11 @@ export class UINode {
             if (callback) callback.call(this, this.node)
             return;
         }
-        setStyle(this.node, 'transition', `opacity ${duration}ms ease`); setStyle(this.node, 'opacity', 1);
+
+        this.style({
+            transition: `opacity ${duration}ms ease`,
+            opacity: 1
+        })
 
         this.node.offsetWidth; this.node.style.opacity = 0;
         const handler = (e) => {
