@@ -4,7 +4,7 @@
  */
 
 const stores = [localStorage, caches];
-let backend = localStorage;
+let backend = localStorage, tf = a => typeof a === 'function';
 
 function safeParse(v) {
     try {
@@ -18,10 +18,17 @@ function key(k) {
 }
 
 function isValidBackend(b) {
-    return b &&
-        typeof b.getItem === 'function' &&
-        typeof b.setItem === 'function' &&
-        typeof b.removeItem === 'function'
+    return stores.includes(b)
+}
+
+const api = {
+    use: (b) => {
+        if (!api.known(b)) throw new Error(`Invalid Storage backend: ${b}`)
+        backend = b
+    },
+    known: (b) => {
+        return ((tf(b.setItem) && tf(b.getItem) && tf(b.removeItem)) || isValidBackend(b)) ? !0 : !1
+    }
 }
 
 export const StorageAPI = (backend = localStorage) => {
