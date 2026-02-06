@@ -31,55 +31,55 @@ const api = {
     }
 }
 
-export const StorageAPI = (backend = localStorage) => {
-    if (!isValidBackend(backend)) throw new Error(`Invalid Storage backend: ${backend}`)
+export function useStorage(b = localStorage) {
+    api.use(b);
 
     return {
         /**
          * @param {string} k
          */
         get: (k) => {
-            return safeParse(backend.getItem(key(k)))
+            return safeParse(backend?.getItem(key(k)))
         },
         /**
          * @param {string} k @param {*} v 
          */
         set: (k, v) => {
-            backend.setItem(key(k), JSON.stringify(v))
+            backend?.setItem(key(k), JSON.stringify(v))
         },
         /**
          * @param {string} k 
          */
         has(k) {
-            return backend.getItem(key(k)) !== null
+            return backend?.getItem(key(k)) !== null
         },
         /**
          * @param {string} k 
          */
         remove(k) {
-            backend.removeItem(key(k))
+            backend?.removeItem(key(k))
         },
         /**
          * @param {string} k 
          */
         getRaw(k) {
-            return backend.getItem(key(k))
+            return backend?.getItem(key(k))
         },    
         /**
          * @param {string} k @param {*} v 
          */
         setRaw(k, v) {
-            backend.setItem(key(k), String(v))
+            backend?.setItem(key(k), String(v))
         },
         get size() {
-            return backend.length
+            return backend?.length
         },
         clear(prefix = 'app') {
-            if (prefix !== null) for (let i = backend.length - 1; i >= 0; i--) {
-                const k = backend.key(i)
-                if (k?.startsWith(prefix + '.')) backend.removeItem(k)
+            if (prefix !== null) for (let i = backend?.length - 1; i >= 0; i--) {
+                const k = backend?.key(i)
+                if (k?.startsWith(prefix + '.')) backend?.removeItem(k)
             }
-            else backend.clear()
+            else backend?.clear()
         },
     }
 }
