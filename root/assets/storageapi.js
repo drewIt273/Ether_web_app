@@ -3,8 +3,8 @@
  * storageapi.js
  */
 
-const stores = [localStorage, caches];
-let backend = localStorage, tf = a => typeof a === 'function';
+const stores = [localStorage]
+let backend = localStorage, i = a => typeof a === 'function';
 
 function safeParse(v) {
     try {
@@ -27,7 +27,7 @@ const api = {
         backend = b
     },
     known: (b) => {
-        return ((tf(b.setItem) && tf(b.getItem) && tf(b.removeItem)) || isValidBackend(b)) ? !0 : !1
+        return ((i(b.setItem) && i(b.getItem) && i(b.removeItem)) || isValidBackend(b)) ? !0 : !1
     }
 }
 
