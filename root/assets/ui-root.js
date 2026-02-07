@@ -21,7 +21,7 @@ export class UINode {
      * @param {Registry} registry 
      */
     constructor(node) {
-        this.node = (function(n) {return isElement(n) ? n : isString(n) ? create(n) : new div})(node)
+        this.node = (n => isElement(n) ? n : isString(n) ? create(n) : new div)(node)
         this.classList = this.node.classList
         this.className = this.node.className
         this.innerHTML = this.node.innerHTML
