@@ -44,8 +44,13 @@ export function useStorage(b = localStorage) {
         /**
          * @param {string} k @param {*} v 
          */
-        set: (k, v) => {
-            backend?.setItem(key(k), JSON.stringify(v))
+        set: (k, v = null) => {
+            if (v) backend?.setItem(key(k), JSON.stringify(v))
+            else return function(p, n) {
+                const o = useStorage(b).get(k)
+                o[p] = n
+                useStorage(b).set(key(k), o)
+            }
         },
         /**
          * @param {string} k 
