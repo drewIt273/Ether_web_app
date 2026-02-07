@@ -51,6 +51,7 @@ export class StateManager extends DModule {
     }
 
     async onReady() {
+        if (!useStorage(localStorage).has('uistates')) useStorage(localStorage).set('uistates', {})
         this.ready = !0
     }
 
