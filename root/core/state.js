@@ -5,6 +5,7 @@
  * Co-built with GPT-5
  */
 
+import {useStorage} from "../assets/storageapi.js"
 import {UINode} from "../assets/ui-root.js"
 import {DModule} from "./module.js"
 
