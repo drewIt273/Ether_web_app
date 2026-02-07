@@ -75,5 +75,6 @@ export class StateManager extends DModule {
             entry.fn.call(node, node)
             node.dataset({state: entry.o.get()})
         })
+        useStorage(localStorage).set('uistates')(node.key, value)
     }
 }
