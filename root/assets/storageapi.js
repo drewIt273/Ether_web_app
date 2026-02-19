@@ -4,7 +4,7 @@
  */
 
 const stores = [localStorage]
-let backend = localStorage, i = a => typeof a === 'function';
+let i = a => typeof a === 'function';
 
 function safeParse(v) {
     try {
@@ -24,7 +24,7 @@ function isValidBackend(b) {
 const api = {
     use: (b) => {
         if (!api.known(b)) throw new Error(`Invalid Storage backend: ${b}`)
-        backend = b
+        else return b
     },
     known: (b) => {
         return ((i(b.setItem) && i(b.getItem) && i(b.removeItem)) || isValidBackend(b)) ? !0 : !1
@@ -32,7 +32,7 @@ const api = {
 }
 
 export function useStorage(b = localStorage) {
-    api.use(b);
+    const backend = api.use(b), store = useStorage(b)
 
     return {
         /**
