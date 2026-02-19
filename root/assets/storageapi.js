@@ -10,7 +10,9 @@ function safeParse(v) {
     try {
         return JSON.parse(v)
     }
-    catch(e) {throw new Error(e)}
+    catch {
+        return v
+    }
 }
 
 function key(k) {
