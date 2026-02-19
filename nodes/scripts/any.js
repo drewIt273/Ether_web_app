@@ -263,3 +263,13 @@ export const setAttr = (e, a, v) => e.setAttribute(a, v)
  * @param {Element} e @param {string} a 
  */
 export const removeAttr = (e, a) => hasAttr(e, a) ? e.removeAttribute(a) : null
+
+Function.prototype.inferCodomain = function (...args) {
+    try {
+        const result = this(args);
+        if (result === null) return 'null'
+        if (isArray(result)) return 'array'
+        return typeof result
+    }
+    catch {return 'error'}
+};
