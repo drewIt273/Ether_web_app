@@ -36,7 +36,7 @@ const api = {
 export function useStorage(b = localStorage) {
     const backend = api.use(b), store = useStorage(b)
 
-    return {
+    if (backend) return {
         /**
          * @param {string} k
          */
