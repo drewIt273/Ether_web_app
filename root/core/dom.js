@@ -52,7 +52,7 @@ export class DOMInterface extends DModule {
                         if (t) try {
                             f.receivedData = data
                             if (f.mappedData.has(data)) f.mappedData.get(data).call(f, ...args)
-                        } catch(e) {console.error(`Error during emit callback for target ${f.ID}:`, e);}
+                        } catch(e) { throw new Error(`Error during emit callback for target ${f.ID}:`, e)}
                         else throw new TypeError('target must be a UICell or UIBlock')
                     },
                 }
