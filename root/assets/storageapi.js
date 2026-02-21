@@ -90,3 +90,10 @@ export function useStorage(b = localStorage) {
         },
     }
 }
+
+/**
+ * @param {string} v 
+ */
+export function storagehas(v) {
+    return localStorage.getItem(key(v)) !== null
+}
