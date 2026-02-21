@@ -60,7 +60,7 @@ export class StateManager extends DModule {
      */
     define(node, state, fn = () => {}) {
         if (!this.reg.has(node.node)) this.reg.set(node.node, new Map())
-        const o = cs('inactive')
+        const o = cs('null')
         this.reg.get(node.node).set(state, {o, fn})
     }
 
