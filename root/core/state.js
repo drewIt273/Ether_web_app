@@ -69,7 +69,7 @@ export class StateManager extends DModule {
      */
     set(node, value) {
         const entry = this.reg.get(node.node)?.get(value)
-        if (!entry) throw new Error(`State '${value}' not defined`)
+        if (!entry) throw new Error(`State '${value}' not defined for ${node.node}`)
         effect(() => {
             entry.o.set(value)
             entry.fn.call(node, node)
