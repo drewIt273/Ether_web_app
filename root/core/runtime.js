@@ -8,15 +8,17 @@
 import {DOMInterface} from './dom.js'
 import {EventsModule} from './events.js'
 import {StateManager} from './state.js'
+import {Reconciler} from './reconciler.js'
 import {isModule, DModule} from './module.js'
 
 export class Kernel {
     constructor() {
         /**Returns the modules constructors */
-        this.modules = {DOMInterface, EventsModule, StateManager};
+        this.modules = {DOMInterface, EventsModule, StateManager, Reconciler};
         this.dom = new DOMInterface(this);
         this.events = new EventsModule(this);
         this.state = new StateManager(this);
+        this.reconciler = new Reconciler(this);
         this.hooks = {
             init: [],
             ready: []
