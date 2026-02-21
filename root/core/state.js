@@ -5,7 +5,7 @@
  * Co-built with GPT-5
  */
 
-import {useStorage} from "../assets/storageapi.js"
+import {useStorage, storagehas} from "../assets/storageapi.js"
 import {UINode} from "../assets/ui-root.js"
 import {DModule} from "./module.js"
 
@@ -51,7 +51,7 @@ export class StateManager extends DModule {
     }
 
     async onReady() {
-        if (!useStorage(localStorage).has('uistates')) useStorage(localStorage).set('uistates', {})
+        if (!storagehas('uistates')) useStorage(localStorage).set('uistates', {})
         this.ready = !0
     }
 
