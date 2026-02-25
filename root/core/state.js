@@ -41,6 +41,23 @@ class Dep {
     }
 }
 
+function signal(value) {
+    const dep = new Dep()
+
+    return {
+        get() {
+            dep.depend()
+            return value
+        },
+        set(v) {
+            if (v !== value) {
+                value = v
+                dep.notify()
+            }
+        }
+    }
+}
+
 function effect(fn) {
     const run = () => {
         CURRENT_EFFECT = run
