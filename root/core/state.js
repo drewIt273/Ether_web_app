@@ -89,8 +89,6 @@ export class StateManager extends DModule {
 
     constructor(runtime) {
         super(runtime)
-        this.init = !1
-        this.ready = !1
         /**@type {WeakMap<Node, Map<string, *>>} */
         this.reg = new WeakMap()
     }
