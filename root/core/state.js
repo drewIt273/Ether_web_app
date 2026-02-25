@@ -89,7 +89,7 @@ export class StateManager extends DModule {
 
     constructor(runtime) {
         super(runtime)
-        /**@type {WeakMap<Node, Map<string, *>>} */
+        /**Node -> state map @type {WeakMap<Node, {}>} */
         this.reg = new WeakMap()
     }
 
@@ -106,22 +106,31 @@ export class StateManager extends DModule {
      * @param {UINode} node @param {string} state
      */
     define(node, state, fn = () => {}) {
-        if (!this.reg.has(node.node)) this.reg.set(node.node, new Map())
-        const o = cs('null')
-        this.reg.get(node.node).set(state, {o, fn})
+        const map = this.reg.get(node.node) ?? {}
+        map[state] = {t: 'static', fn}
+        this.reg.set(node.node, map)
     }
 
     /**
-     * @param {UINode} node @param {string} value
+     * @param {UINode} node @param {string} state 
      */
-    set(node, value) {
-        const entry = this.reg.get(node.node)?.get(value)
-        if (!entry) throw new Error(`State '${value}' not defined for ${node.node}`)
-        effect(() => {
-            entry.o.set(value)
-            entry.fn.call(node, node)
-            node.dataset({state: entry.o.get()})
-        })
-        useStorage(localStorage).set('uistates')(node.key, value)
+    defineComputed(node, state, fn = () => {}) {
+        const map = this.reg.get(node.node) ?? {}, c = computed(() => fn.call(node))
+        map[state] = {t: 'computed', g: () => c.get()}
+        effect(() => node.dataset({state: c.get()}))
+        this.reg.set(node.node, map)
+    }
+
+    /**
+     * @param {UINode} node @param {string} state
+     */
+    set(node, state) {
+        const map = this.reg.get(node.node), entry = map[state]
+        if (!map || !map[state]) throw new Error(`State ${state} not defined for node ${node.key}`)
+        if (entry.t === 'static') {
+            node.dataset({state: state})
+            entry.fn.call(node)
+        }
+        // Computed states are not manually set
     }
 }
