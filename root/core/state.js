@@ -67,6 +67,24 @@ function effect(fn) {
     return run
 }
 
+function computed(fn) {
+    const out = signal(undefined)
+    let dirty = true
+
+    const runner = effect(() => {
+        const value = fn()
+        out.set(value)
+        dirty = false
+    })
+
+    return {
+        get() {
+            if (dirty) runner()
+            return out.get()
+        }
+    }
+}
+
 export class StateManager extends DModule {
 
     constructor(runtime) {
