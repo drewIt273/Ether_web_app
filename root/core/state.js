@@ -27,6 +27,20 @@ function cs(value) {
     }
 }
 
+class Dep {
+    constructor() {
+        this.subs = new Set()
+    }
+
+    depend() {
+        if (CURRENT_EFFECT) this.subs.add(CURRENT_EFFECT)
+    }
+
+    notify() {
+        this.subs.forEach(e => e())
+    }
+}
+
 function effect(fn) {
     const run = () => {
         CURRENT_EFFECT = run
