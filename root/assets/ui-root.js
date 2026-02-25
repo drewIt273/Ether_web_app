@@ -190,7 +190,7 @@ export class UINode {
     /**
      * Define a new state and its behavior.
      * @param {'active'|'inactive'|'enable'|'disable'} state 
-     * @param {(t: this)} handler Runs whenever state changes.
+     * @param {(t: this)} handler
      */
     defineState(state, handler) {
         GlobalStates.define(this, state, handler)
@@ -198,14 +198,24 @@ export class UINode {
     }
 
     /**
+     * Defines a computed state and its behavior
+     * @param {string} state 
+     * @param {()} fn 
+     */
+    defineComputedState(state, fn) {
+        GlobalStates.defineComputed(this, state, fn)
+        return this
+    }
+
+    /**
      * Set (or trigger) a defined state.
      * @param {'active'|'inactive'|'enable'|'disable'} state 
      */
-    setState(state, value) {
+    setState(state) {
         this.#s = this.getAttr('data-state')
-        GlobalStates.set(this, state, value)
+        GlobalStates.set(this, state)
+        this.currentstate = state
         this.#ofn?.call(this)
-        this.currentstate = value
         return this
     }
 
@@ -213,7 +223,7 @@ export class UINode {
      * Returns true if s was defined as a state of this UINode.
      * @param {string} s 
      */
-    hasDefinedState = s => GlobalStates.reg.get(this.node).has(s)
+    hasDefinedState = s => Object.hasOwn(GlobalStates.reg.get(this.node), s)
 
     /**
      * Calls a function each time this UINode's state changes.
