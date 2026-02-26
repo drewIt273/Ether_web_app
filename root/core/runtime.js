@@ -50,7 +50,19 @@ export class Kernel {
     }
 
     async boot() {
+        await this.#preboot()
         await this.#runstartupHooks()
+    }
+
+    async #preboot() {
+        try {
+            for (let i = 0; i < this.order.length; i++) {
+                const a = this.order[i]
+                this.hooks.init.push(a.onInit)
+                this.hooks.ready.push(a.onReady)
+            }
+            return !0
+        } catch(e) {throw new Error(`preboot returned an error: ${e}`)}
     }
 
     async #runstartupHooks() {
