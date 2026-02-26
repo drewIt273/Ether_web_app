@@ -27,6 +27,14 @@ export class EventsModule extends DModule {
         this.emit('r').map((...r) => r.forEach(r => this.restore(r))) ('un').map((ev, n) => this.unlisten(ev, n))
     }
 
+    async onInit() {
+        this.init = !0
+    }
+
+    async onReady() {
+        this.ready = !0
+    }
+
     #unbubble = new Set(['mouseenter', 'mouseleave', 'blur', 'focus', 'pointerenter', 'pointerleave'])
 
     /**
