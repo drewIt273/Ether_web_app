@@ -85,6 +85,10 @@ function computed(fn) {
     }
 }
 
+const persist = function(n, v) {
+    useStorage(localStorage).set('uistates')(n, v)
+}
+
 export class StateManager extends DModule {
 
     constructor(runtime) {
@@ -117,7 +121,10 @@ export class StateManager extends DModule {
     defineComputed(node, state, fn = () => {}) {
         const map = this.reg.get(node.node) ?? {}, c = computed(() => fn.call(node))
         map[state] = {t: 'computed', g: () => c.get()}
-        effect(() => node.dataset({state: c.get()}))
+        effect(() => {
+            node.dataset({state: c.get()})
+            persist(node.key, state)
+        })
         this.reg.set(node.node, map)
     }
 
@@ -131,6 +138,7 @@ export class StateManager extends DModule {
             node.dataset({state: state})
             entry.fn.call(node)
         }
+        persist(node.key, state)
         // Computed states are not manually set
     }
 }
