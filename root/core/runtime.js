@@ -46,6 +46,7 @@ export class Kernel {
                 }
             }
         }
+        this.order = [this.dom, this.state, this.reconciler, this.events]
     }
 
     async boot() {
