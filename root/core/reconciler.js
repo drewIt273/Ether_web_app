@@ -20,4 +20,12 @@ export class Reconciler extends DModule {
     async onReady() {
         this.ready = !0
     }
+
+    async conjugate() {
+        const v = await this.backend.get('uistates')
+        for (const [p, n] of Object.entries(v)) {
+            const node = this.runtime.dom.find(p), inst = node ? UINodeMap.get(node) : undefined
+            if (inst) inst.setState(n)
+        }
+    }
 }
