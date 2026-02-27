@@ -3,11 +3,14 @@
  */
 
 import {DModule} from "./module.js"
+import {useStorage} from "../assets/storageapi.js"
+import {UINodeMap} from "../assets/ui-root.js"
 
 export class Reconciler extends DModule {
 
     constructor(runtime) {
         super(runtime)
+        this.backend = useStorage(localStorage)
     }
 
     async onInit() {
