@@ -61,7 +61,6 @@ export class Kernel {
                 this.hooks.init.push(a.onInit)
                 this.hooks.ready.push(a.onReady)
             }
-            return !0
         } catch(e) {throw new Error(`preboot returned an error: ${e}`)}
     }
 
