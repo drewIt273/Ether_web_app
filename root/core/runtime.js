@@ -40,8 +40,8 @@ export class Kernel {
                         if (isModule(t)) try {
                             t.rd = data
                             if (t.md.has(data)) t.md.get(data).call(t, ...args)
-                        } catch(e) {}
-                        else throw new TypeError(`${t} is not a module`)
+                        } catch(e) {throw new Error(`${e}`)}
+                        else throw new TypeError(`${t} is not a runtime module`)
                     }
                 }
             }
