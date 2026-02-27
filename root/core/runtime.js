@@ -65,10 +65,24 @@ export class Kernel {
     }
 
     async #runstartupHooks() {
-        for (const fn of this.hooks.init) await fn.call(this);
-        this.init = !0
-        for (const fn of this.hooks.ready) await fn.call(this);
-        this.ready = !0
+        for (const fn of this.hooks.init) {
+            const v = await fn.call(this)
+            if (typeof v === 'string') {
+                try {
+                    throw new Error(`${v}`)
+                } finally {break}
+            }
+            else this.init = !0
+        }
+        if (this.init) for (const fn of this.hooks.ready) {
+            const v = await fn.call(this)
+            if (typeof v === 'string') {
+                try {
+                    throw new Error(`${v}`)
+                } finally {break}
+            }
+            else this.ready = !0
+        }
     }
 
     /**
