@@ -127,42 +127,12 @@ export function jsx(tag = "div", props = {}) {
 /** @param {string} e */
 let e = e => document.createElement(e);
 
-class HTMLBase extends HTMLElement {
-    delegate(ev, handler, selector) {
-        document.querySelectorAll(`${this.tagName.toLowerCase()}${selector}`).forEach(e => {
-            e.addEventListener(ev, handler)
-        })
-    }
-}
-class SpanElementConstructor extends HTMLBase {
+class SpanElementConstructor extends HTMLSpanElement {
     constructor() {return e("span")}
 }
-class DivElementConstructor extends HTMLBase {
+
+class DivElementConstructor extends HTMLDivElement {
     constructor() {return e("div")}
 }
-class LiElementConstructor extends HTMLBase {
-    constructor() {return e("li")}
-}
-class HeadingElementConstructor extends HTMLBase {
-    constructor(s) {return e(`h${s}`)}
-}
-class QuoteElementConstructor extends HTMLBase {
-    constructor() {return e("blockquote")}
-}
-class InputElementContructor extends HTMLBase {
-    constructor() {return e('input')}
-}
-class LinkElementConstructor extends HTMLBase {
-    constructor() {return e('link')}
-}
-class AnchorElementConstructor extends HTMLBase {
-    constructor() {return e('a')}
-}
-class BrElementConstructor extends HTMLBase {
-    constructor() {return e('br')}
-}
-class ParagraphElementConstructor extends HTMLBase {
-    constructor() {return e('p')}
-}
 
-export var span = SpanElementConstructor, div = DivElementConstructor, li = LiElementConstructor, heading = HeadingElementConstructor, quote = QuoteElementConstructor, input = InputElementContructor, link = LinkElementConstructor, anchor = AnchorElementConstructor, br = BrElementConstructor, Paragraph = ParagraphElementConstructor;
+export var span = SpanElementConstructor, div = DivElementConstructor;
