@@ -25,10 +25,6 @@ export class Kernel {
         }
         this.ready = !1;
         this.init = !1;
-        this.proto = (p, v) => {
-            (function() {const a = []; for (const [p] of Object.entries(this)) a.push(p); return a})().includes(p) ? null : this[p] = v
-            return p
-        }
         this.config = {}
         this.interface = {
             emit: data => {
