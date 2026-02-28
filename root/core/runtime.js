@@ -66,7 +66,10 @@ export class Kernel {
             if (typeof v === 'string') {
                 try {
                     throw new Error(`${v}`)
-                } finally {break}
+                } finally {
+                    this.init = !1
+                    break
+                }
             }
             else this.init = !0
         }
@@ -75,7 +78,10 @@ export class Kernel {
             if (typeof v === 'string') {
                 try {
                     throw new Error(`${v}`)
-                } finally {break}
+                } finally {
+                    this.ready = !1
+                    break
+                }
             }
             else this.ready = !0
         }
