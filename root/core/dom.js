@@ -68,8 +68,8 @@ export class DOMInterface extends DModule {
      * Maybe pre-create internal helpers.
      */
     async onInit() {
-        if (typeof window === 'undefined') throw new Error("[DOM] Not running in browser environment.");
-        this.init = !0
+        if (typeof window === 'undefined') return '[DOM] not running in browser environment'  
+        else this.init = !0
     }
 
     /**
@@ -79,7 +79,7 @@ export class DOMInterface extends DModule {
      */
     async onReady() {
         const a = this.runtime.config?.root || 'lazy-app', r = this.doc.querySelector(a);
-        if (!r) throw new Error(`[DOM] root '${a}' not found`)
+        if (!r) return `[DOM] root '${a}' not found`
         this.root = r
         this.nodereg.write(r, 'root')
         this.ready = !0
