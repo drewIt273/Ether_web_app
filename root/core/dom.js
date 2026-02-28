@@ -36,7 +36,6 @@ export class DOMInterface extends DModule {
                     const r = this.runtime.events.ActiveListeners.find(o => o.node === removed)
                     if (r) this.emit('un').to(this.runtime.events, r.ev, r.node)
                     this.emit('nwr').to(this, removed)
-                    if (this.runtime.events.Keybinds.has(removed)) this.emit('un').to(this.runtime.events, 'keydown', removed)
                 }
             }
         })
