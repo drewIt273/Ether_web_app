@@ -29,8 +29,7 @@ function createFromSpec(spec) {
 export function jsx(tag = "div", props = {}) {
 
     // Create elements with SVG namespace when appropriate
-        const useNS = SVG_TAGS.has(tag)
-        const E = useNS ? document.createElementNS(SVG_NAMESPACE, tag) : document.createElement(tag)
+        const E = SVG_TAGS.has(tag) ? document.createElementNS(SVG_NAMESPACE, tag) : document.createElement(tag)
 
     // Helper to set attributes safely
         function setAttr(name, value) {
