@@ -11,6 +11,9 @@ export class Reconciler extends DModule {
     constructor(runtime) {
         super(runtime)
         this.backend = useStorage(localStorage)
+        this.hooks = [] // Post-hydration hooks
+        this.batchMode = true // Optional batching
+        this.unFindNodes = []
     }
 
     async onInit() {
