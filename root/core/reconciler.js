@@ -24,6 +24,14 @@ export class Reconciler extends DModule {
         this.ready = !0
     }
 
+    /**
+     * Register a hook to run after a component's state is applied
+     * @param {(o: Object)} fn 
+     */
+    registerHook(fn) {
+        if (typeof fn === 'function') this.hooks.push(fn)
+    }
+
     async conjugate() {
         const v = await this.backend.get('uistates')
         for (const [p, n] of Object.entries(v)) {
