@@ -213,9 +213,11 @@ export class UINode {
      */
     setState(state) {
         this.#s = this.getAttr('data-state')
-        GlobalStates.set(this, state)
-        this.currentstate = state
-        this.#ofn?.call(this)
+        if (this.#s !== state) {
+            GlobalStates.set(this, state)
+            this.currentstate = state
+            this.#ofn?.call(this)
+        }
         return this
     }
 
@@ -226,7 +228,7 @@ export class UINode {
     hasDefinedState = s => Object.hasOwn(GlobalStates.reg.get(this.node), s)
 
     /**
-     * Calls a function each time this UINode's state changes.
+     * Sets a function which runs each time this UINode's state changes.
      * @param {()} fn 
      */
     onStateChange(fn) {
