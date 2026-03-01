@@ -33,10 +33,32 @@ export class Reconciler extends DModule {
     }
 
     async conjugate() {
-        const v = await this.backend.get('uistates')
-        for (const [p, n] of Object.entries(v)) {
-            const node = this.runtime.dom.find(p), inst = node ? UINodeMap.get(node) : undefined
-            if (inst) inst.setState(n)
+        let persisted;
+        try {
+            persisted = await this.backend.get('uistates') || {}
+        } catch(e) {
+            console.warn('could not read persisted uistates', e)
+            return;
         }
+        const updates = []
+        for (const [id, state] of Object.entries(persisted)) {
+            const node = this.runtime.dom.find(`[ui-data-key="${id}"]`), inst = node ? UINodeMap.get(node) : undefined
+            if (!inst) {
+                this.unFindNodes.push(id)
+                continue
+            }
+            if (this.batchMode) updates.push({inst, state})
+            else {
+                inst.setState(state)
+                this.hooks.forEach(fn => fn.call(inst, inst))
+            }
+        }
+
+        // Apply batch update if batching is enabled
+        if (this.batchMode) for (const {inst, state} of updates) {
+            inst.setState(state)
+            this.hooks.forEach(fn => fn.call(inst, inst))
+        }
+        if (this.unFindNodes.length > 0) console.log('unfind nodes: ', this.unFindNodes);
     }
 }
