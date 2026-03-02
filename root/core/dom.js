@@ -7,8 +7,9 @@
 import {jsx} from "../assets/nodecreator.js";
 import {query$} from "../assets/domquery.js";
 import {Registry} from "../../nodes/scripts/any.js";
-import {UICell as cell, UIBlock as block, UIComponent as comp, UIConstructorOf as fu} from "../assets/ui-root.js";
+import {UICell, UIBlock, UIComponent, UIConstructorOf as fu} from "../assets/ui-root.js";
 import {DModule} from "./module.js";
+import {persistedStore, storagehas} from "../assets/storageapi.js";
 
 const doc = window.document;
 
@@ -44,7 +45,7 @@ export class DOMInterface extends DModule {
             emit: (data) => {
                 return {
                     /**
-                     * @param {cell|block|Node|string} target 
+                     * @param {UICell|UIBlock|Node|string} target 
                      */
                     to: (target, ...args) => {
                         const f = (typeof target === 'string' || target instanceof Node) ? fu(target) : target, t = f.hasAttr('ui-cell-id') || f.hasAttr('ui-block-id')
@@ -100,6 +101,6 @@ export class DOMInterface extends DModule {
      */
     jsx(tag, props = {}, type = 'ui-cell') {
         const node = jsx(tag, props)
-        return type === 'ui-block' ? new block(node) : type === 'ui-comp' ? new comp(node) : new cell(node)
+        return type === 'ui-block' ? new UIBlock(node) : type === 'ui-comp' ? new UIComponent(node) : new UICell(node)
     }
 }
