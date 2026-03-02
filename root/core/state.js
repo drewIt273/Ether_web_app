@@ -5,7 +5,7 @@
  * Co-built with GPT-5
  */
 
-import {useStorage, storagehas} from "../assets/storageapi.js"
+import {storagehas, persistedStore} from "../assets/storageapi.js"
 import {UINode} from "../assets/ui-root.js"
 import {DModule} from "./module.js"
 
@@ -86,7 +86,7 @@ function computed(fn) {
 }
 
 const persist = function(n, v) {
-    useStorage(localStorage).set('uistates')(n, v)
+    persistedStore.set('uistates')(n, v)
 }
 
 export class StateManager extends DModule {
@@ -102,7 +102,7 @@ export class StateManager extends DModule {
     }
 
     async onReady() {
-        if (!storagehas('uistates')) useStorage(localStorage).set('uistates', {})
+        if (!storagehas('uistates')) persistedStore.set('uistates', {})
         this.ready = !0
     }
 
