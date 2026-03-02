@@ -78,8 +78,9 @@ export class DOMInterface extends DModule {
      * Prepare rendering surface.
      */
     async onReady() {
-        const a = this.runtime.config?.root || 'lazy-app', r = this.doc.querySelector(a);
-        if (!r) return `[DOM] root '${a}' not found`
+        const a = this.runtime.config.approot, r = this.doc.querySelector(a);
+        if (!r) return this.ready = !1, `[DOM] root '${a}' not found`
+        if (!storagehas('prenodes')) persistedStore.set('prenodes', {})
         this.root = r
         this.nodereg.write(r, 'root')
         this.ready = !0
