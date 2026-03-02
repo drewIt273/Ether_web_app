@@ -25,7 +25,10 @@ export class Kernel {
         }
         this.ready = !1;
         this.init = !1;
-        this.config = {}
+        this.config = {
+            approot: 'lazy-app',
+            appui: 'appLayoutContainer',
+        }
         this.interface = {
             emit: data => {
                 return {
