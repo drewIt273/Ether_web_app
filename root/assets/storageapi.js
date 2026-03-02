@@ -97,3 +97,5 @@ export function useStorage(b = localStorage) {
 export function storagehas(v) {
     return localStorage.getItem(key(v)) !== null
 }
+
+export const persistedStore = useStorage(localStorage);
