@@ -78,9 +78,9 @@ export class DOMInterface extends DModule {
      * Prepare rendering surface.
      */
     async onReady() {
+        if (!storagehas('prenodes')) persistedStore.set('prenodes', {})
         const a = this.runtime.config.approot, r = this.doc.querySelector(a);
         if (!r) return this.ready = !1, `[DOM] root '${a}' not found`
-        if (!storagehas('prenodes')) persistedStore.set('prenodes', {})
         this.root = r
         this.nodereg.write(r, 'root')
         this.ready = !0
