@@ -129,12 +129,12 @@ export class StateManager extends DModule {
     }
 
     /**
-     * @param {UINode} node @param {string} state
+     * @param {UINode} node @param {string} state @param {{schedule: false}} opts 
      */
-    set(node, state) {
+    set(node, state, opts) {
         const map = this.reg.get(node.node), entry = map[state]
         if (!map || !map[state]) throw new Error(`State ${state} not defined for node ${node.key}`)
-        if (entry.t === 'static') {
+        if (opts.schedule === !1) if (entry.t === 'static') {
             node.dataset({state: state})
             entry.fn.call(node)
         }
