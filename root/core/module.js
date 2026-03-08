@@ -29,12 +29,13 @@ export class DModule {
     emit = data => {
         return {
             /**
-             * @param {DModule} t 
+             * @param {"dom"|"events"|"state"|"reconciler"} t 
              */
             to: (t, ...args) => {
-                if (isModule(t)) {
+                const o = Object.keys(this.runtime)[t]
+                if (isModule(o)) {
                     this.sd = data
-                    IMC.emit(data)(t, ...args)
+                    IMC.emit(data)(o, ...args)
                 }
                 return this.emit
             },
