@@ -211,10 +211,10 @@ export class UINode {
      * Set (or trigger) a defined state.
      * @param {'active'|'inactive'|'enable'|'disable'} state 
      */
-    setState(state) {
+    setState(state, o = {schedule: !1}) {
         this.#s = this.getAttr('data-state')
         if (this.#s !== state) {
-            GlobalStates.set(this, state)
+            GlobalStates.set(this, state, o)
             this.currentstate = state
             this.#ofn?.call(this)
         }
