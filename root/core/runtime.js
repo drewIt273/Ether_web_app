@@ -9,7 +9,6 @@ import {DOMInterface} from './dom.js'
 import {EventsModule} from './events.js'
 import {StateManager} from './state.js'
 import {Reconciler} from './reconciler.js'
-import {isModule, DModule} from './module.js'
 
 export class Kernel {
     constructor() {
@@ -29,22 +28,7 @@ export class Kernel {
             approot: 'lazy-app',
             appui: 'appLayoutContainer',
         }
-        this.interface = {
-            emit: data => {
-                return {
-                    /**
-                     * @param {DModule} t 
-                     */
-                    to: (t, ...args) => {
-                        if (isModule(t)) try {
-                            t.rd = data
-                            if (t.md.has(data)) t.md.get(data).call(t, ...args)
-                        } catch(e) {throw new Error(`${e}`)}
-                        else throw new TypeError(`${t} is not a runtime module`)
-                    }
-                }
-            }
-        }
+        this.interface = {}
         this.order = [this.dom, this.state, this.reconciler, this.events]
     }
 
