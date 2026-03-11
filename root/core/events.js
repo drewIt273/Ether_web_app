@@ -24,7 +24,7 @@ export class EventsModule extends DModule {
             this.Keybinds = new WeakMap()
         /**@type {Element} */
             this.root = this.runtime.dom.body
-        this.emit('r').map((...r) => r.forEach(r => this.restore(r))) ('un').map((ev, n) => this.unlisten(ev, n))
+        this.emit('r').map((...r) => r.forEach(r => this.restore(r))) ('un').map((ev, n) => this.unlisten(ev, n)) ('ln').map((ev, n, ...f) => this.listen(ev, n, ...f))
     }
 
     async onInit() {
