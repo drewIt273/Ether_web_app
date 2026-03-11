@@ -33,8 +33,8 @@ export class Kernel {
     }
 
     async boot() {
-        await this.#preboot()
-        await this.#runstartupHooks()
+        const a = await this.#preboot()
+        return a === undefined ? await this.#runstartupHooks() : a
     }
 
     async #preboot() {
@@ -44,7 +44,7 @@ export class Kernel {
                 this.hooks.init.push(a.onInit)
                 this.hooks.ready.push(a.onReady)
             }
-        } catch(e) {throw new Error(`preboot returned an error: ${e}`)}
+        } catch(e) {return new Error(`preboot returned an error: ${e}`)}
     }
 
     async #runstartupHooks() {
@@ -52,7 +52,7 @@ export class Kernel {
             const v = await fn.call(this)
             if (typeof v === 'string') {
                 try {
-                    throw new Error(`${v}`)
+                    return new Error(`${v}`)
                 } finally {
                     this.init = !1
                     break
@@ -64,7 +64,7 @@ export class Kernel {
             const v = await fn.call(this)
             if (typeof v === 'string') {
                 try {
-                    throw new Error(`${v}`)
+                    return new Error(`${v}`)
                 } finally {
                     this.ready = !1
                     break
