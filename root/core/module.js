@@ -7,10 +7,10 @@
 import {Kernel} from "./runtime.js"
 
 const IMC = {
-    emit: (data) => (t, ...args) => {
+    emit: (data) => async (t, ...args) => {
         if (isModule(t)) try {
-            t.rd = data
-            if (t.md.has(data)) t.md.get(data).call(t, ...args)
+            let fn = t.md.get(data); t.rd = data
+            if (t.md.has(data)) return await fn.call(t, ...args)
         } catch {}
         else throw new TypeError(`${t} is not a runtime module`)
     },
@@ -29,15 +29,15 @@ export class DModule {
     emit = data => {
         return {
             /**
+             * Emits data to the target module and returns the returned value of the mapped function
              * @param {"dom"|"events"|"state"|"reconciler"} t 
              */
             to: (t, ...args) => {
                 const o = Object.keys(this.runtime)[t]
                 if (isModule(o)) {
                     this.sd = data
-                    IMC.emit(data)(o, ...args)
+                    return IMC.emit(data)(o, ...args)
                 }
-                return this.emit
             },
             /**
              * @param {(...args)} c 
