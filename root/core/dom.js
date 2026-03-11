@@ -59,7 +59,7 @@ export class DOMInterface extends DModule {
             }
         }
         this.doc = doc;
-        this.emit('wr').map((...a) => a.forEach(a => this.nodereg.write(a))) ('nwr').map((...a) => a.forEach(a => this.nodereg.remove(this.nodereg.keyOf(a))))
+        this.emit('wr').map((...a) => a.forEach(a => this.nodereg.write(a))) ('nwr').map((...a) => a.forEach(a => this.nodereg.remove(this.nodereg.keyOf(a)))) ('fd').map(n => this.find(n))
     }
 
     /**
