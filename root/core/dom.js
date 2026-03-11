@@ -30,13 +30,13 @@ export class DOMInterface extends DModule {
         this.observer = new MutationObserver(muts => {
             for (const m of muts) {
                 if (m.addedNodes) for (const added of m.addedNodes) {
-                    if (!this.nodereg.includesValue(added) && !(added instanceof SVGElement)) this.emit('wr').to(this, added)
-                    this.emit('r').to(this.runtime.events, added)
+                    if (!this.nodereg.includesValue(added) && !(added instanceof SVGElement)) this.emit('wr').to('dom', added)
+                    this.emit('r').to('events', added)
                 }
                 if (m.removedNodes) for (const removed of m.removedNodes) {
                     const r = this.runtime.events.ActiveListeners.find(o => o.node === removed)
-                    if (r) this.emit('un').to(this.runtime.events, r.ev, r.node)
-                    this.emit('nwr').to(this, removed)
+                    if (r) this.emit('un').to('events', r.ev, r.node)
+                    this.emit('nwr').to('dom', removed)
                 }
             }
         })
@@ -91,7 +91,7 @@ export class DOMInterface extends DModule {
      * @param {()} callback 
      */
     DOMLoaded(callback, timeout = 0) {
-        let f = () => {setTimeout(callback, timeout)}; (this.doc.readyState === "complete") ? f() : this.runtime.events.listen('DOMContentLoaded', this.doc, f);
+        let f = () => {setTimeout(callback, timeout)}; (this.doc.readyState === "complete") ? f() : this.emit('ln').to('events', 'DOMContentLoaded', this.doc, f);
         return this
     }
 
