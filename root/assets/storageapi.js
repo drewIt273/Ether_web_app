@@ -33,7 +33,7 @@ const api = {
         else return b
     },
     known: (b) => {
-        return ((i(b.setItem) && i(b.getItem) && i(b.removeItem)) || isValidBackend(b)) ? !0 : !1
+        return (isValidBackend(b)) ? !0 : !1
     }
 }
 
@@ -42,4 +42,10 @@ function setCache() {
         const k = localStorage.key(i)
         cache[k] = safeParse(localStorage.getItem(k));
     }
+}
+
+const memory = {
+    get(k) {
+        return cache[k]
+    },
 }
