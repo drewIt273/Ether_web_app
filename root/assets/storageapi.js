@@ -37,3 +37,9 @@ const api = {
     }
 }
 
+function setCache() {
+    for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i)
+        cache[k] = safeParse(localStorage.getItem(k));
+    }
+}
