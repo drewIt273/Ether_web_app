@@ -45,7 +45,22 @@ function setCache() {
 }
 
 const memory = {
+    /**
+     * @param {string} k 
+     */
     get(k) {
         return cache[k]
     },
+    /**
+     * @param {string} k @param {*} v 
+     */
+    set(k, v) {
+        cache[k] = v
+    },
+    /**
+     * @param {string} k 
+     */
+    has(k) {
+        return Object.hasOwn(cache, k)
+    }
 }
