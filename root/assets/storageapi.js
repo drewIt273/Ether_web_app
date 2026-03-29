@@ -65,15 +65,22 @@ const memory = {
     }
 }
 
-function compareCache() {
-    const a = Object.entries(cache)
-    for (let i = 0; i < a.length; i++) {
-        const k = localStorage.key(i), b = a[i][0], v = a[i][1]
+function syncCache() {
 
-        if (((b === k) && localStorage.getItem(k) !== v)) {
-            localStorage.setItem(b, JSON.stringify(v))
-            continue;
+    // CREATE + UPDATE
+    for (const [k, v] of Object.entries(cache)) {
+        const serialized = JSON.stringify(v)
+        if (localStorage.getItem(k) !== serialized) {
+            localStorage.setItem(k, serialized)
         }
-        if (localStorage.getItem(b) === null) localStorage.removeItem(b);
+    }
+
+    // DELETE
+    for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i)
+        if (!(k in cache)) {
+            localStorage.removeItem(k)
+            i-- // adjust index after removal
+        }
     }
 }
