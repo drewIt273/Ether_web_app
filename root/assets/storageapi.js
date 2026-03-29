@@ -64,3 +64,16 @@ const memory = {
         return Object.hasOwn(cache, k)
     }
 }
+
+function compareCache() {
+    const a = Object.entries(cache)
+    for (let i = 0; i < a.length; i++) {
+        const k = localStorage.key(i), b = a[i][0], v = a[i][1]
+
+        if (((b === k) && localStorage.getItem(k) !== v)) {
+            localStorage.setItem(b, JSON.stringify(v))
+            continue;
+        }
+        if (localStorage.getItem(b) === null) localStorage.removeItem(b);
+    }
+}
