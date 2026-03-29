@@ -3,7 +3,11 @@
  * storageapi.js
  */
 
-const stores = [localStorage]
+/**@deprecated */
+const native = undefined
+const cache = {}
+const stores = [cache]
+
 let i = a => typeof a === 'function';
 
 function safeParse(v) {
