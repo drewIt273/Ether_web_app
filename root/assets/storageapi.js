@@ -105,3 +105,5 @@ function syncCache() {
         }
     }
 }
+
+export const StorageInterface = {syncCache, setCache, isValidBackend, o: memory}
