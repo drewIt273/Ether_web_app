@@ -105,10 +105,3 @@ function syncCache() {
         }
     }
 }
-
-function flush() {
-    localStorage.clear()
-    for (const [k, v] of Object.entries(cache)) {
-        localStorage.setItem(k, JSON.stringify(v))
-    }
-}
