@@ -18,7 +18,6 @@ export class UINode {
 
     /**
      * @param {string|Element} node 
-     * @param {Registry} registry 
      */
     constructor(node) {
         this.node = (n => isElement(n) ? n : isString(n) ? create(n) : new div)(node)
