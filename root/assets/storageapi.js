@@ -56,6 +56,7 @@ const memory = {
      */
     set(k, v) {
         cache[k] = v
+        setItem(k, v)
     },
     /**
      * @param {string} k 
@@ -99,7 +100,7 @@ function syncCache() {
     for (let i = 0; i < localStorage.length; i++) {
         const k = localStorage.key(i)
         if (!(k in cache)) {
-            localStorage.removeItem(k)
+            removeItem(k)
             i-- // adjust index after removal
         }
     }
