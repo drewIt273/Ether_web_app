@@ -55,6 +55,10 @@ export class UINode {
         return this.#s
     }
 
+    get currentstate() {
+        return this.#cs
+    }
+
     /**
      * Returns this node as a selector string that can be used later in searching this node using find, findAll, etc.
      */
