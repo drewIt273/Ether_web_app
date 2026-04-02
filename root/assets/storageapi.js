@@ -38,10 +38,13 @@ const api = {
 }
 
 function setCache() {
-    for (let i = 0; i < localStorage.length; i++) {
-        const k = localStorage.key(i)
-        cache[k] = safeParse(localStorage.getItem(k));
+    try {
+        for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i)
+            cache[k] = safeParse(localStorage.getItem(k));
+        }
     }
+    catch(e) {return `Cache ${e}`}
 }
 
 const memory = {
@@ -87,23 +90,26 @@ function removeItem(k) {
 }
 
 function syncCache() {
+    try {
 
-    // CREATE + UPDATE
-    for (const [k, v] of Object.entries(cache)) {
-        const serialized = JSON.stringify(v)
-        if (localStorage.getItem(k) !== serialized) {
-            localStorage.setItem(k, serialized)
+        // CREATE + UPDATE
+        for (const [k, v] of Object.entries(cache)) {
+            const serialized = JSON.stringify(v)
+            if (localStorage.getItem(k) !== serialized) {
+                localStorage.setItem(k, serialized)
+            }
+        }
+
+        // DELETE
+        for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i)
+            if (!(k in cache)) {
+                removeItem(k)
+                i-- // adjust index after removal
+            }
         }
     }
-
-    // DELETE
-    for (let i = 0; i < localStorage.length; i++) {
-        const k = localStorage.key(i)
-        if (!(k in cache)) {
-            removeItem(k)
-            i-- // adjust index after removal
-        }
-    }
+    catch(e) {return `Cache: ${e}`}
 }
 
-export const StorageInterface = {syncCache, setCache, isValidBackend, o: memory}
+export const storageapi = {syncCache, setCache, isValidBackend, o: memory}
