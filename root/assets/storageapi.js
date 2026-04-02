@@ -62,7 +62,27 @@ const memory = {
      */
     has(k) {
         return Object.hasOwn(cache, k)
+    },
+    /**
+     * @param {string} k 
+     */
+    remove(k) {
+        delete cache[k]
     }
+}
+
+/**
+ * @param {string} k @param {*} v 
+ */
+function setItem(k, v) {
+    localStorage.setItem(k, JSON.stringify(v))
+}
+
+/**
+ * @param {string} k 
+ */
+function removeItem(k) {
+    localStorage.removeItem(k)
 }
 
 function syncCache() {
