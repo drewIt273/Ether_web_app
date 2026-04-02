@@ -57,9 +57,15 @@ const memory = {
     /**
      * @param {string} k @param {*} v 
      */
-    set(k, v) {
-        cache[k] = v
-        setItem(k, v)
+    set(k, v = undefined) {
+        if (v !== undefined) {
+            cache[k] = v
+            setItem(k, v)
+        }
+        else return (p, n) => {
+            const o = cache[k]; o[p] = n; cache[k] = o
+            setItem(k, o)
+        }
     },
     /**
      * @param {string} k 
