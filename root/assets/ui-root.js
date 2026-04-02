@@ -559,8 +559,7 @@ export class UIComponent extends UINode {
      * @param {string|Node} n 
      */
     remove(n) {
-        if (isString(n)) removeNode(`${this.selector} ${n}`)
-        else if (isNode(n)) removeNode(n)
+        if (this.contains(n)) if (isString(n)) this.findAll(n).forEach(n => this.node.removeChild(n)); else if (isNode(n)) this.node.removeChild(n)
         return this
     }
 
