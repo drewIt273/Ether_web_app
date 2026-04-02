@@ -26,10 +26,10 @@ export class UINode {
         this.innerHTML = this.node.innerHTML
         this.childNodes = Array.from(this.node.childNodes)
         this.parent = this.node.parentNode
-        this.currentstate = null
     }
 
     #s = null
+    #cs = null
     #ofn = null
 
     /**
@@ -214,7 +214,7 @@ export class UINode {
         this.#s = this.getAttr('data-state')
         if (this.#s !== state) {
             GlobalStates.set(this, state, o)
-            this.currentstate = state
+            this.#cs = state
             this.#ofn?.call(this)
         }
         return this
