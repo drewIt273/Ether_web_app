@@ -9,6 +9,7 @@ import {DOMInterface} from './dom.js'
 import {EventsModule} from './events.js'
 import {StateManager} from './state.js'
 import {Reconciler} from './reconciler.js'
+import {storageapi} from '../assets/storageapi.js'
 
 export class Kernel {
     constructor() {
@@ -19,7 +20,7 @@ export class Kernel {
         this.state = new StateManager(this);
         this.reconciler = new Reconciler(this);
         this.hooks = {
-            init: [],
+            init: [storageapi.setCache],
             ready: []
         }
         this.ready = !1;
@@ -44,7 +45,7 @@ export class Kernel {
                 this.hooks.init.push(a.onInit)
                 this.hooks.ready.push(a.onReady)
             }
-        } catch(e) {return new Error(`preboot returned an error: ${e}`)}
+        } catch(e) {return new Error(`preboot: ${e}`)}
     }
 
     async #runstartupHooks() {
