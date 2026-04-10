@@ -78,6 +78,7 @@ const memory = {
      */
     remove(k) {
         delete cache[k]
+        syncCache()
     }
 }
 
@@ -101,9 +102,7 @@ function syncCache() {
         // CREATE + UPDATE
         for (const [k, v] of Object.entries(cache)) {
             const serialized = JSON.stringify(v)
-            if (localStorage.getItem(k) !== serialized) {
-                localStorage.setItem(k, serialized)
-            }
+            if (localStorage.getItem(k) !== serialized) localStorage.setItem(k, serialized)
         }
 
         // DELETE
