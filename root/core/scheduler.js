@@ -32,4 +32,11 @@ export class Scheduler extends DModule {
             queueMicrotask(() => this.flushMicro())
         }
     }
+
+    flushMicro() {
+        for (const node of this.microQueue) this.frameQueue.add(node)
+        this.microQueue.clear()
+        this.microPending = !1
+        this.scheduleFrame()
+    }
 }
