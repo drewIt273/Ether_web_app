@@ -43,7 +43,7 @@ export class EventsModule extends DModule {
      */
     listen(ev, target, ...handlers) {
         const a = this.ActiveListeners, b = this.BacklogListeners
-        const nodes = isString(target) ? this.runtime.dom.find(target) : [target]
+        const nodes = isString(target) ? this.emit('fd').to('dom', target) : [target]
         let fn = n => {
             let existing = a.find(o => o.node === n && o.ev === ev)
             if (existing) {

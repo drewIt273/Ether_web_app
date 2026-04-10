@@ -18,7 +18,6 @@ export class UINode {
 
     /**
      * @param {string|Element} node 
-     * @param {Registry} registry 
      */
     constructor(node) {
         this.node = (n => isElement(n) ? n : isString(n) ? create(n) : new div)(node)
@@ -27,10 +26,10 @@ export class UINode {
         this.innerHTML = this.node.innerHTML
         this.childNodes = Array.from(this.node.childNodes)
         this.parent = this.node.parentNode
-        this.currentstate = null
     }
 
     #s = null
+    #cs = null
     #ofn = null
 
     /**
@@ -54,6 +53,10 @@ export class UINode {
      */
     get prevState() {
         return this.#s
+    }
+
+    get currentstate() {
+        return this.#cs
     }
 
     /**
@@ -215,7 +218,7 @@ export class UINode {
         this.#s = this.getAttr('data-state')
         if (this.#s !== state) {
             GlobalStates.set(this, state, o)
-            this.currentstate = state
+            this.#cs = state
             this.#ofn?.call(this)
         }
         return this
@@ -560,8 +563,7 @@ export class UIComponent extends UINode {
      * @param {string|Node} n 
      */
     remove(n) {
-        if (isString(n)) removeNode(`${this.selector} ${n}`)
-        else if (isNode(n)) removeNode(n)
+        if (this.contains(n)) if (isString(n)) this.findAll(n).forEach(n => this.node.removeChild(n)); else if (isNode(n)) this.node.removeChild(n)
         return this
     }
 

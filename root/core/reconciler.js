@@ -3,14 +3,14 @@
  */
 
 import {DModule} from "./module.js"
-import {useStorage} from "../assets/storageapi.js"
+import {storageapi} from "../assets/storageapi.js"
 import {UINodeMap} from "../assets/ui-root.js"
 
 export class Reconciler extends DModule {
 
     constructor(runtime) {
         super(runtime)
-        this.backend = useStorage(localStorage)
+        this.backend = storageapi.o
         this.hooks = [] // Post-hydration hooks
         this.batchMode = true // Optional batching
         this.unFindNodes = []
@@ -42,7 +42,7 @@ export class Reconciler extends DModule {
         }
         const updates = []
         for (const [id, state] of Object.entries(persisted)) {
-            const node = this.runtime.dom.find(`[ui-data-key="${id}"]`), inst = node ? UINodeMap.get(node) : undefined
+            const node = this.emit('fd').to('dom', `[ui-data-key="${id}"]`), inst = node ? UINodeMap.get(node) : undefined
             if (!inst) {
                 this.unFindNodes.push(id)
                 continue

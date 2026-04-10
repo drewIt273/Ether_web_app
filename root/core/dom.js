@@ -9,7 +9,7 @@ import {query$} from "../assets/domquery.js";
 import {Registry} from "../../nodes/scripts/any.js";
 import {UICell, UIBlock, UIComponent, UIConstructorOf as fu} from "../assets/ui-root.js";
 import {DModule} from "./module.js";
-import {persistedStore, storagehas} from "../assets/storageapi.js";
+import {storageapi} from "../assets/storageapi.js";
 
 const doc = window.document;
 
@@ -78,7 +78,7 @@ export class DOMInterface extends DModule {
      * Prepare rendering surface.
      */
     async onReady() {
-        if (!storagehas('prenodes')) persistedStore.set('prenodes', {})
+        if (!storageapi.o.has('prenodes')) storageapi.o.set('prenodes', {})
         const a = this.runtime.config.approot, r = this.doc.querySelector(a);
         if (!r) return this.ready = !1, `[DOM] root '${a}' not found`
         this.root = r

@@ -5,7 +5,7 @@
  * Co-built with GPT-5
  */
 
-import {storagehas, persistedStore} from "../assets/storageapi.js"
+import {storageapi} from "../assets/storageapi.js"
 import {UINode} from "../assets/ui-root.js"
 import {DModule} from "./module.js"
 
@@ -86,7 +86,7 @@ function computed(fn) {
 }
 
 const persist = function(n, v) {
-    persistedStore.set('uistates')(n, v)
+    storageapi.o.set('uistates')(n, v)
 }
 
 export class StateManager extends DModule {
@@ -102,12 +102,12 @@ export class StateManager extends DModule {
     }
 
     async onReady() {
-        if (!storagehas('uistates')) persistedStore.set('uistates', {})
+        if (!storageapi.o.has('uistates')) storageapi.o.set('uistates', {})
         this.ready = !0
     }
 
     /**
-     * @param {UINode} node @param {string} state
+     * @param {UINode} node @param {string} state @param {(node: UINode)} fn
      */
     define(node, state, fn = () => {}) {
         const map = this.reg.get(node.node) ?? {}
@@ -116,7 +116,7 @@ export class StateManager extends DModule {
     }
 
     /**
-     * @param {UINode} node @param {string} state 
+     * @param {UINode} node @param {string} state @param {(node: UINode)} fn
      */
     defineComputed(node, state, fn = () => {}) {
         const map = this.reg.get(node.node) ?? {}, c = computed(() => fn.call(node))
@@ -136,7 +136,7 @@ export class StateManager extends DModule {
         if (!map || !map[state]) throw new Error(`State ${state} not defined for node ${node.key}`)
         if (opts.schedule === !1) if (entry.t === 'static') {
             node.dataset({state: state})
-            entry.fn.call(node)
+            entry.fn.call(node, node)
         }
         persist(node.key, state)
         // Computed states are not manually set
