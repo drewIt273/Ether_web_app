@@ -118,4 +118,4 @@ function syncCache() {
     catch(e) {return `Cache: ${e}`}
 }
 
-export const storageapi = {syncCache, setCache, isValidBackend, o: memory}
+export const storageapi = {syncCache, setCache, isValidBackend, log: () => console.log(cache), o: memory}
