@@ -8,8 +8,10 @@ export class Scheduler extends DModule {
 
     constructor(runtime) {
         this.runtime = runtime
-        this.queue = new Set
-        this.pending = !1
+        this.microQueue = new Set
+        this.frameQueue = new Set
+        this.microPending = !1
+        this.framePending = !1
     }
 
     async onInit() {
@@ -18,5 +20,16 @@ export class Scheduler extends DModule {
 
     async onReady() {
         this.ready = !0
+    }
+
+    /**
+     * @param {()} job
+     */
+    schedule(job) {
+        this.microQueue.add(job)
+        if (!this.microPending) {
+            this.microPending = !0
+            queueMicrotask(() => this.flushMicro())
+        }
     }
 }
