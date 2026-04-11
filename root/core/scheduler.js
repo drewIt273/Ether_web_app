@@ -21,34 +21,4 @@ export class Scheduler extends DModule {
     async onReady() {
         this.ready = !0
     }
-
-    /**
-     * @param {()} job
-     */
-    schedule(job) {
-        this.microQueue.add(job)
-        if (!this.microPending) {
-            this.microPending = !0
-            queueMicrotask(() => this.flushMicro())
-        }
-    }
-
-    flushMicro() {
-        for (const node of this.microQueue) this.frameQueue.add(node)
-        this.microQueue.clear()
-        this.microPending = !1
-        this.scheduleFrame()
-    }
-
-    scheduleFrame() {
-        if (this.framePending) return;
-        this.framePending = !0
-        requestAnimationFrame(() => this.flushFrame())
-    }
-
-    flushFrame() {
-        for (const node of this.frameQueue) node.applyChange()
-        this.frameQueue.clear()
-        this.framePending = false
-    }
 }
