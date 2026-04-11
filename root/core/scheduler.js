@@ -39,4 +39,16 @@ export class Scheduler extends DModule {
         this.microPending = !1
         this.scheduleFrame()
     }
+
+    scheduleFrame() {
+        if (this.framePending) return;
+        this.framePending = !0
+        requestAnimationFrame(() => this.flushFrame())
+    }
+
+    flushFrame() {
+        for (const node of this.frameQueue) node.applyChange()
+        this.frameQueue.clear()
+        this.framePending = false
+    }
 }
