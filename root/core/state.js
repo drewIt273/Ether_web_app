@@ -120,7 +120,7 @@ export class StateManager extends DModule {
      */
     defineComputed(node, state, fn = () => {}) {
         const map = this.reg.get(node.node) ?? {}, c = computed(() => fn.call(node))
-        map[state] = {t: 'computed', g: () => c.get()}
+        map[state] = {t: 'computed', fn: () => c.get()}
         effect(() => {
             node.dataset({state: c.get()})
             persist(node.key, state)
