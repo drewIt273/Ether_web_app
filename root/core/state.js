@@ -111,7 +111,7 @@ export class StateManager extends DModule {
      */
     define(node, state, fn = () => {}) {
         const map = this.reg.get(node.node) ?? {}
-        map[state] = {t: 'static', fn}
+        map[state] = {t: 'static', fn: () => {node.dataset({state: state}); fn.call(node, node)}}
         this.reg.set(node.node, map)
     }
 
@@ -119,7 +119,7 @@ export class StateManager extends DModule {
      * @param {UINode} node @param {string} state @param {(node: UINode)} fn
      */
     defineComputed(node, state, fn = () => {}) {
-        const map = this.reg.get(node.node) ?? {}, c = computed(() => fn.call(node))
+        const map = this.reg.get(node.node) ?? {}, c = computed(() => fn.call(node, node))
         map[state] = {t: 'computed', fn: () => c.get()}
         effect(() => {
             node.dataset({state: c.get()})
@@ -134,9 +134,8 @@ export class StateManager extends DModule {
     set(node, state, opts) {
         const map = this.reg.get(node.node), entry = map[state]
         if (!map || !map[state]) throw new Error(`State ${state} not defined for node ${node.key}`)
-        if (opts.schedule === !1) if (entry.t === 'static') {
-            node.dataset({state: state})
-            entry.fn.call(node, node)
+        if (opts.schedule === !1) {
+            if (entry.t === 'static') entry.fn.call(node)
         }
         persist(node.key, state)
         // Computed states are not manually set
