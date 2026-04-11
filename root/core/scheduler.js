@@ -7,9 +7,9 @@ import {DModule} from "./module";
 export class Scheduler extends DModule {
 
     constructor(runtime) {
-        this.runtime = runtime
-        this.microQueue = new Set
-        this.frameQueue = new Set
+        super(runtime)
+        this.microQueue = new Map
+        this.frameQueue = new Map
         this.microPending = !1
         this.framePending = !1
     }
@@ -23,10 +23,11 @@ export class Scheduler extends DModule {
     }
 
     /**
+     * @param {UINode} node
      * @param {()} job
      */
-    schedule(job) {
-        this.microQueue.add(job)
+    schedule(node, job) {
+        this.microQueue.set(node, job)
         if (!this.microPending) {
             this.microPending = !0
             queueMicrotask(() => this.flushMicro())
@@ -34,7 +35,7 @@ export class Scheduler extends DModule {
     }
 
     flushMicro() {
-        for (const job of this.microQueue) this.frameQueue.add(job)
+        for (const [node, job] of this.microQueue) this.frameQueue.set(node, job)
         this.microQueue.clear()
         this.microPending = !1
         this.scheduleFrame()
@@ -47,7 +48,7 @@ export class Scheduler extends DModule {
     }
 
     flushFrame() {
-        for (const job of this.frameQueue) job()
+        for (const job of this.frameQueue.values()) job()
         this.frameQueue.clear()
         this.framePending = !1
     }

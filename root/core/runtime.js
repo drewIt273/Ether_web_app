@@ -9,16 +9,18 @@ import {DOMInterface} from './dom.js'
 import {EventsModule} from './events.js'
 import {StateManager} from './state.js'
 import {Reconciler} from './reconciler.js'
+import {Scheduler} from './scheduler.js'
 import {storageapi} from '../assets/storageapi.js'
 
 export class Kernel {
     constructor() {
         /**Returns the modules constructors */
-        this.modules = {DOMInterface, EventsModule, StateManager, Reconciler};
+        this.modules = {DOMInterface, EventsModule, StateManager, Reconciler, Scheduler};
         this.dom = new DOMInterface(this);
         this.events = new EventsModule(this);
         this.state = new StateManager(this);
         this.reconciler = new Reconciler(this);
+        this.scheduler = new Scheduler(this);
         this.hooks = {
             init: [storageapi.setCache],
             ready: []
@@ -30,7 +32,7 @@ export class Kernel {
             appui: 'appLayoutContainer',
         }
         this.interface = {}
-        this.order = [this.dom, this.state, this.reconciler, this.events]
+        this.order = [this.dom, this.state, this.reconciler, this.scheduler, this.events]
     }
 
     async boot() {
@@ -76,7 +78,6 @@ export class Kernel {
     }
 
     /**
-     * 
      * @param {"ready"|"init"} st 
      * @param {()} fn 
      */

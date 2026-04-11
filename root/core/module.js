@@ -15,7 +15,7 @@ const IMC = {
         else throw new TypeError(`${t} is not a runtime module`)
     },
 }
-
+let v;
 export class DModule {
     constructor(/**@type {Kernel}*/ r) {
         this.runtime = r

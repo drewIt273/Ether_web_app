@@ -137,6 +137,7 @@ export class StateManager extends DModule {
         if (opts.schedule === !1) {
             if (entry.t === 'static') entry.fn.call(node)
         }
+        else this.runtime.scheduler.schedule(node, entry.fn)
         persist(node.key, state)
         // Computed states are not manually set
     }
