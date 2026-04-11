@@ -12,7 +12,6 @@ export class Scheduler extends DModule {
         this.frameQueue = new Set
         this.microPending = !1
         this.framePending = !1
-        this.emit('sch').map(f => this.schedule(f))
     }
 
     async onInit() {
