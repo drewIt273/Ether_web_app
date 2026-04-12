@@ -10,6 +10,7 @@ export class Scheduler {
         this.frameQueue = new Map
         this.microPending = !1
         this.framePending = !1
+        this.isFlushing = !1
     }
 
     /**
@@ -17,6 +18,10 @@ export class Scheduler {
      * @param {()} job
      */
     schedule(node, job) {
+        if (this.isFlushing) {
+            this.microQueue.set(node, job)
+            return
+        }
         this.microQueue.set(node, job)
         if (!this.microPending) {
             this.microPending = !0
@@ -38,8 +43,10 @@ export class Scheduler {
     }
 
     flushFrame() {
+        this.isFlushing = !0
         for (const job of this.frameQueue.values()) job()
         this.frameQueue.clear()
+        this.isFlushing = !1
         this.framePending = !1
     }
 }
