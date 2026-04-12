@@ -15,7 +15,7 @@ import {storageapi} from '../assets/storageapi.js'
 export class Kernel {
     constructor() {
         /**Returns the modules constructors */
-        this.modules = {DOMInterface, EventsModule, StateManager, Reconciler, Scheduler};
+        this.modules = {DOMInterface, EventsModule, StateManager, Reconciler};
         this.dom = new DOMInterface(this);
         this.events = new EventsModule(this);
         this.state = new StateManager(this);
@@ -32,7 +32,7 @@ export class Kernel {
             appui: 'appLayoutContainer',
         }
         this.interface = {}
-        this.order = [this.dom, this.state, this.reconciler, this.scheduler, this.events]
+        this.order = [this.dom, this.state, this.reconciler, this.events]
     }
 
     async boot() {

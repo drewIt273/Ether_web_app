@@ -2,9 +2,7 @@
  * Instance by DrewIt
  */
 
-import {DModule} from "./module";
-
-export class Scheduler extends DModule {
+export class Scheduler {
 
     constructor(runtime) {
         super(runtime)
@@ -12,14 +10,6 @@ export class Scheduler extends DModule {
         this.frameQueue = new Map
         this.microPending = !1
         this.framePending = !1
-    }
-
-    async onInit() {
-        this.init = !0
-    }
-
-    async onReady() {
-        this.ready = !0
     }
 
     /**
