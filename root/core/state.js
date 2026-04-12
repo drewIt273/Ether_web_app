@@ -111,7 +111,7 @@ export class StateManager extends DModule {
      */
     define(node, state, fn = () => {}) {
         const map = this.reg.get(node.node) ?? {}
-        map[state] = {t: 'static', fn: () => {node.dataset({state: state}); fn.call(node, node)}}
+        map[state] = {t: 'static', fn: () => {if (node.mounted) node.dataset({state: state}), fn.call(node, node)}}
         this.reg.set(node.node, map)
     }
 
