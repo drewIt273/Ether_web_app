@@ -9,6 +9,7 @@ import {DOMInterface} from './dom.js'
 import {EventsModule} from './events.js'
 import {StateManager} from './state.js'
 import {Reconciler} from './reconciler.js'
+import {Scheduler} from './scheduler.js'
 import {storageapi} from '../assets/storageapi.js'
 
 export class Kernel {
@@ -19,6 +20,7 @@ export class Kernel {
         this.events = new EventsModule(this);
         this.state = new StateManager(this);
         this.reconciler = new Reconciler(this);
+        this.scheduler = new Scheduler(this);
         this.hooks = {
             init: [storageapi.setCache],
             ready: []
@@ -76,7 +78,6 @@ export class Kernel {
     }
 
     /**
-     * 
      * @param {"ready"|"init"} st 
      * @param {()} fn 
      */
