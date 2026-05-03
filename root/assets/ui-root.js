@@ -30,7 +30,6 @@ export class UINode {
     #s = null
     #cs = null
     #ofn = null
-    #fnc = null
 
     /**
      * Returns true if this is still mounted
@@ -197,7 +196,6 @@ export class UINode {
      */
     defineState(state, handler) {
         GlobalStates.define(this, state, handler)
-        this.#fnc = handler
         return this
     }
 
@@ -237,10 +235,6 @@ export class UINode {
      */
     onStateChange(fn) {
         this.#ofn = fn
-    }
-
-    applyChange() {
-        this.#fnc.call(this)
     }
 
     /**

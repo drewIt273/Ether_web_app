@@ -2,31 +2,27 @@
  * Instance by DrewIt
  */
 
-import {DModule} from "./module";
-
-export class Scheduler extends DModule {
+export class Scheduler {
 
     constructor(runtime) {
-        this.runtime = runtime
-        this.microQueue = new Set
-        this.frameQueue = new Set
+        super(runtime)
+        this.microQueue = new Map
+        this.frameQueue = new Map
         this.microPending = !1
         this.framePending = !1
-    }
-
-    async onInit() {
-        this.init = !0
-    }
-
-    async onReady() {
-        this.ready = !0
+        this.isFlushing = !1
     }
 
     /**
+     * @param {UINode} node
      * @param {()} job
      */
-    schedule(job) {
-        this.microQueue.add(job)
+    schedule(node, job) {
+        if (this.isFlushing) {
+            this.microQueue.set(node, job)
+            return
+        }
+        this.microQueue.set(node, job)
         if (!this.microPending) {
             this.microPending = !0
             queueMicrotask(() => this.flushMicro())
@@ -34,7 +30,7 @@ export class Scheduler extends DModule {
     }
 
     flushMicro() {
-        for (const node of this.microQueue) this.frameQueue.add(node)
+        for (const [node, job] of this.microQueue) this.frameQueue.set(node, job)
         this.microQueue.clear()
         this.microPending = !1
         this.scheduleFrame()
@@ -47,8 +43,10 @@ export class Scheduler extends DModule {
     }
 
     flushFrame() {
-        for (const node of this.frameQueue) node.applyChange()
+        this.isFlushing = !0
+        for (const job of this.frameQueue.values()) job()
         this.frameQueue.clear()
-        this.framePending = false
+        this.isFlushing = !1
+        this.framePending = !1
     }
 }
