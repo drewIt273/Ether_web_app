@@ -25,7 +25,7 @@ export class DOMInterface extends DModule {
         this.query = /**@param {string} a*/ a => new query$(a);
         this.root = this.query('#lazy-app').nodes[0]
         this.body = doc.body
-        this.find = /**@param {string} s*/ s => {const h = this.query(s); return h.count() === 1 ? h.first() : h.nodes}
+        this.find = /**@param {string} s*/ s => this.query(s).nodes
         this.has = /**@param {Node} v*/ v => v instanceof Node && doc.contains(v)
         this.observer = new MutationObserver(muts => {
             for (const m of muts) {
@@ -91,7 +91,7 @@ export class DOMInterface extends DModule {
      * @param {()} callback 
      */
     DOMLoaded(callback, timeout = 0) {
-        let f = () => {setTimeout(callback, timeout)}; (this.doc.readyState === "complete") ? f() : this.emit('ln').to('events', 'DOMContentLoaded', this.doc, f);
+        let f = () => setTimeout(callback, timeout); (this.doc.readyState === "complete") ? f() : this.emit('ln').to('events', 'DOMContentLoaded', this.doc, f);
         return this
     }
 
