@@ -4,10 +4,9 @@
  * dom.js
  */
 
-import {jsx} from "../assets/nodecreator.js";
 import {query$} from "../assets/domquery.js";
 import {Registry} from "../../nodes/scripts/any.js";
-import {UICell, UIBlock, UIComponent, UIConstructorOf as fu} from "../assets/ui-root.js";
+import {UICell, UIBlock, UIConstructorOf as fu} from "../assets/ui-root.js";
 import {DModule} from "./module.js";
 import {storageapi} from "../assets/storageapi.js";
 
@@ -97,11 +96,8 @@ export class DOMInterface extends DModule {
 
     /**
      * @param {string} tag 
-     * @param {{class: string; id: string; style: {} | string; innerHTML: string; textContent: string; append: Node[]; on: (e: Node) => any; attrs: {};}} props 
-     * @param {"ui-cell"|"ui-block"|"ui-comp"} type 
      */
-    jsx(tag, props = {}, type = 'ui-cell') {
-        const node = jsx(tag, props)
-        return type === 'ui-block' ? new UIBlock(node) : type === 'ui-comp' ? new UIComponent(node) : new UICell(node)
+    newnode(tag) {
+        return tag instanceof Node ? tag : doc.createElement(tag)
     }
 }
