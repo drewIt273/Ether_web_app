@@ -4,8 +4,7 @@
  * ui.root.js
  */
 
-import {isNode, isString, create, find, toKebab, setAttr, hasAttr, removeAttr, ranstring, Registry, isArray, isElement} from "../../nodes/scripts/any.js"
-import {div} from "./nodecreator.js"
+import {isNode, isString, find, toKebab, setAttr, hasAttr, removeAttr, ranstring, Registry, isArray} from "../../nodes/scripts/any.js"
 import {stylesheet} from "../../nodes/scripts/stylesheet.js"
 import {dom, GlobalEvents, GlobalStates} from "../core/runtime.js"
 
@@ -20,7 +19,7 @@ export class UINode {
      * @param {string|Element} node 
      */
     constructor(node) {
-        this.node = (n => isElement(n) ? n : isString(n) ? create(n) : new div)(node)
+        this.node = dom.newnode(node)
         this.classList = this.node.classList
         this.className = this.node.className
         this.innerHTML = this.node.innerHTML
