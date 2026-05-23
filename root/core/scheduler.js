@@ -4,8 +4,7 @@
 
 export class Scheduler {
 
-    constructor(runtime) {
-        super(runtime)
+    constructor() {
         this.microQueue = new Map
         this.frameQueue = new Map
         this.microPending = !1
