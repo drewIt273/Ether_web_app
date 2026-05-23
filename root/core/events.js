@@ -42,17 +42,18 @@ export class EventsModule extends DModule {
      * @param {string} ev @param {string|Node} target  @param {...(e: Event)} handlers
      */
     listen(ev, target, ...handlers) {
-        const a = this.ActiveListeners, b = this.BacklogListeners
-        const nodes = isString(target) ? this.emit('fd').to('dom', target) : [target]
+        const a = this.ActiveListeners, b = this.BacklogListeners, nodes = isString(target) ? this.emit('fd').to('dom', target) : [target]
         let fn = n => {
-            let existing = a.find(o => o.node === n && o.ev === ev)
+            /**@type {{}[]} */
+            let existing = a.find(e => e === ev)
             if (existing) {
+                const o = existing.find(o => o.node === target)
                 handlers.forEach(handler => {
-                    if (!existing.fn.includes(handler)) existing.fn.push(handler)
+                    if (!o.fn.includes(handler)) o.fn.push(handler)
                 })
             }
             else {
-                if (!this.#unbubble.has(ev)) a.write({node: n, ev, fn: [...handlers], in: 'active'})
+                if (!this.#unbubble.has(ev)) a.write([{node: n, fn: [...handlers], in: 'active'}], ev)
             }
             b.splice(0, b.size, b.filter(o => o.node !== n))
         }
@@ -68,13 +69,12 @@ export class EventsModule extends DModule {
                 })
             }
             else {
-                const delegatedListener = e => {
-                    a.filter(o => o.ev === ev).forEach(o => {
-                        if (isString(o.node)) {
-                            const matched = e.target.closest(o.node);
-                            if (matched && this.root.contains(matched)) o.fn.forEach(fn => fn.call(matched, e));
-                        }
-                        else if (isNode(o.node)) if (o.node.contains(e.target)) o.fn.forEach(fn => fn.call(o.node, e));
+                const delegatedListener = () => {
+                    a.filter((o, k) => k === ev).forEach(p => {
+                        p.filter(o => o.node === target).forEach(o => {
+                            console.log(a.reg)
+                            if (isNode(o.node)) o.fn.forEach(fn => fn.call(o.node));
+                        })
                     })
                 }
                 this.root.addEventListener(ev, delegatedListener)
