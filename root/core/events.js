@@ -36,46 +36,39 @@ export class EventsModule extends DModule {
     }
 
     #unbubble = new Set(['mouseenter', 'mouseleave', 'blur', 'focus', 'pointerenter', 'pointerleave'])
+    #a = this.ActiveListeners
+    #b = this.BacklogListeners
 
     /**
      * Adds global delegated listener to all matching selectors for each given handler
-     * @param {string} ev @param {string|Node} target  @param {...(e: Event)} handlers
+     * @param {string} ev @param {Node} node  @param {...(e: Event)} handlers
      */
-    listen(ev, target, ...handlers) {
-        const a = this.ActiveListeners, b = this.BacklogListeners
-        const nodes = isString(target) ? this.emit('fd').to('dom', target) : [target]
-        let fn = n => {
-            let existing = a.find(o => o.node === n && o.ev === ev)
-            if (existing) {
-                handlers.forEach(handler => {
-                    if (!existing.fn.includes(handler)) existing.fn.push(handler)
-                })
+    listen(ev, node, ...handlers) {
+        /**@type {{}[]} */
+        const existing = this.#a.get(ev), backlog = this.#b.get(ev), o = existing.find(o => o.node === node)
+        if (existing) {
+            let n = o;
+            if (!o) {
+                n = {node: node, fn: [...handlers]}
+                existing.push(n)
             }
-            else {
-                if (!this.#unbubble.has(ev)) a.write({node: n, ev, fn: [...handlers], in: 'active'})
-            }
-            b.splice(0, b.size, b.filter(o => o.node !== n))
+            handlers.forEach(handler => {
+                if (!n.fn.includes(handler)) n.fn.push(handler)
+            })
         }
-
-        nodes instanceof Array ? nodes.forEach(n => fn(n)) : fn(nodes)
+        else {
+            if (!this.#unbubble.has(ev)) this.#a.write([{node: node, fn: [...handlers]}], ev)
+        }
+        if (backlog) backlog.splice(0, backlog.length, backlog.filter(o => o.node !== node))
 
         if (!this.ActiveGlobals.has(ev)) {
             this.ActiveGlobals.add(ev)
             if (this.#unbubble.has(ev)) {
-                nodes.forEach(n => {
-                    const node = find(n)
-                    handlers.forEach(handler => node.addEventListener(ev, e => handler.call(node, e)))
-                })
+                handlers.forEach(handler => node.addEventListener(ev, e => handler.call(node, e)))
             }
             else {
                 const delegatedListener = e => {
-                    a.filter(o => o.ev === ev).forEach(o => {
-                        if (isString(o.node)) {
-                            const matched = e.target.closest(o.node);
-                            if (matched && this.root.contains(matched)) o.fn.forEach(fn => fn.call(matched, e));
-                        }
-                        else if (isNode(o.node)) if (o.node.contains(e.target)) o.fn.forEach(fn => fn.call(o.node, e));
-                    })
+                    if (o.node.contains(e.target)) o.fn.forEach(fn => fn.call(o.node, e))
                 }
                 this.root.addEventListener(ev, delegatedListener)
                 this.GlobalDelegates.set(ev, delegatedListener)
@@ -87,22 +80,21 @@ export class EventsModule extends DModule {
      * Removes registered event listeners from targets.
      * @param {string} ev @param {string|Node} target
      */
-    unlisten(ev, target) {
-        const a = this.ActiveListeners
+    unlisten(target, ev = '') {
         const nodes = isString(target) ? this.runtime.dom.find(target) : [target]
-        nodes instanceof Array ? nodes.forEach(n => fn(n)) : fn(nodes)
         let fn = n => {
-            const existing = a.find(o => o.node === n && o.ev === ev)
+            const existing = this.#a.get(ev), o = existing.find(o => o.node === n)
             if (!existing) return;
 
             // Remove direct listeners for non-bubbling events
                 if (this.#unbubble.has(ev)) {
                     const e = find(n);
-                    if (e) existing.fn.forEach(fn => e.removeEventListener(ev, fn));
+                    if (e) o.fn.forEach(fn => e.removeEventListener(ev, fn));
                 }
-            if (!existing.fn.length) a.splice(0, a.size, a.filter(o => o !== existing))
-            this.BacklogListeners.write({node: n, ev, fn: existing.fn, in: 'backlog'})
+            if (!o.fn.length) existing.splice(0, existing.length, existing.filter(o => o !== existing))
+            this.#b.write({node: n, fn: existing.fn})
         }
+        nodes.forEach(n => fn(n))
     }
 
     /**
