@@ -56,9 +56,8 @@ export class EventsModule extends DModule {
                 if (!n.fn.includes(handler)) n.fn.push(handler)
             })
         }
-        else {
-            if (!this.#unbubble.has(ev)) this.#a.write([{node: node, fn: [...handlers]}], ev)
-        }
+        else this.#a.write([{node: node, fn: [...handlers]}], ev)
+
         if (backlog) backlog.splice(0, backlog.length, backlog.filter(o => o.node !== node))
 
         if (!this.ActiveGlobals.has(ev)) {
