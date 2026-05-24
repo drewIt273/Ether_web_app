@@ -43,7 +43,7 @@ export class EventsModule extends DModule {
      */
     listen(ev, node, ...handlers) {
         /**@type {{}[]} */
-        const existing = this.ActiveListeners.get(ev), backlog = this.BacklogListeners.get(ev)
+        const existing = this.ActiveListeners.get(ev)
 
         if (!existing) this.ActiveListeners.write([{node: node, fn: [...handlers]}], ev)
         else {
@@ -53,7 +53,7 @@ export class EventsModule extends DModule {
             })
         }
 
-        if (backlog) backlog.splice(0, backlog.length, backlog.filter(o => o.node !== node))
+        this.BacklogListeners.splice(0, this.BacklogListeners.size, this.BacklogListeners.filter(o => o.node !== node))
 
         if (!this.ActiveGlobals.has(ev)) {
             this.ActiveGlobals.add(ev)
@@ -88,7 +88,9 @@ export class EventsModule extends DModule {
                     if (e) o.fn.forEach(fn => e.removeEventListener(ev, fn));
                 }
             if (!o.fn.length) existing.splice(0, existing.length, existing.filter(o => o !== existing))
-            this.BacklogListeners.write({node: n, fn: existing.fn})
+            this.BacklogListeners.write({node: n, fn: existing.fn, ev: ev})
+
+            this.ActiveListeners.splice(0, this.ActiveListeners.size, this.ActiveListeners.filter(o => o.node !== n))
         }
         nodes.forEach(n => fn(n))
     }
@@ -101,7 +103,7 @@ export class EventsModule extends DModule {
         const h = this.runtime.dom.query(target).first(), toRestore = this.BacklogListeners.filter(o => o.node === h);
         toRestore.forEach(o => {
             o.fn.forEach(fn => this.listen(o.ev, o.node, fn))
-            if (!this.ActiveListeners.includesValue(o)) this.ActiveListeners.write(o); o.in = 'active';
+            if (!this.ActiveListeners.includesValue(o)) this.ActiveListeners.write(o)
         })
         this.BacklogListeners.splice(0, this.BacklogListeners.size, this.BacklogListeners.filter(o => o.node !== h))
     }
