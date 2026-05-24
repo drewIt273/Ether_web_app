@@ -36,8 +36,6 @@ export class EventsModule extends DModule {
     }
 
     #unbubble = new Set(['mouseenter', 'mouseleave', 'blur', 'focus', 'pointerenter', 'pointerleave'])
-    #a = this.ActiveListeners
-    #b = this.BacklogListeners
 
     /**
      * Adds global delegated listener to all matching selectors for each given handler
@@ -45,18 +43,15 @@ export class EventsModule extends DModule {
      */
     listen(ev, node, ...handlers) {
         /**@type {{}[]} */
-        const existing = this.#a.get(ev), backlog = this.#b.get(ev), o = existing.find(o => o.node === node)
-        if (existing) {
-            let n = o;
-            if (!o) {
-                n = {node: node, fn: [...handlers]}
-                existing.push(n)
-            }
+        const existing = this.ActiveListeners.get(ev), backlog = this.BacklogListeners.get(ev)
+
+        if (!existing) this.ActiveListeners.write([{node: node, fn: [...handlers]}], ev)
+        else {
+            let n = existing.find(o => o.node === node)
             handlers.forEach(handler => {
                 if (!n.fn.includes(handler)) n.fn.push(handler)
             })
         }
-        else this.#a.write([{node: node, fn: [...handlers]}], ev)
 
         if (backlog) backlog.splice(0, backlog.length, backlog.filter(o => o.node !== node))
 
@@ -67,7 +62,9 @@ export class EventsModule extends DModule {
             }
             else {
                 const delegatedListener = e => {
+                    const o = this.ActiveListeners.get(ev).find(o => o.node === node)
                     if (o.node.contains(e.target)) o.fn.forEach(fn => fn.call(o.node, e))
+                    console.log(this.ActiveListeners, this.BacklogListeners)
                 }
                 this.root.addEventListener(ev, delegatedListener)
                 this.GlobalDelegates.set(ev, delegatedListener)
@@ -82,16 +79,16 @@ export class EventsModule extends DModule {
     unlisten(target, ev = '') {
         const nodes = isString(target) ? this.runtime.dom.find(target) : [target]
         let fn = n => {
-            const existing = this.#a.get(ev), o = existing.find(o => o.node === n)
-            if (!existing) return;
+            const existing = this.ActiveListeners.get(ev), o = existing.find(o => o.node === n)
+            if (!existing || !o) return;
 
             // Remove direct listeners for non-bubbling events
-                if (this.#unbubble.has(ev)) {
+                if (o) {
                     const e = find(n);
                     if (e) o.fn.forEach(fn => e.removeEventListener(ev, fn));
                 }
             if (!o.fn.length) existing.splice(0, existing.length, existing.filter(o => o !== existing))
-            this.#b.write({node: n, fn: existing.fn})
+            this.BacklogListeners.write({node: n, fn: existing.fn})
         }
         nodes.forEach(n => fn(n))
     }
