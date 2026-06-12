@@ -2,7 +2,7 @@
   "name": "ether_web_app",
   "version": "1.0.0",
   "description": "Ether is a productivity web app inspired by the best of Notion and Linear. The goal is to provide users with powerful tools for task and project management, note-taking, and eventually more—all in one seamless experience.",
-  "main": "linear.codesnipet_01.js",
+  "main": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -17,5 +17,9 @@
   "bugs": {
     "url": "https://github.com/drewIt273/Ether_web_app/issues"
   },
-  "homepage": "https://github.com/drewIt273/Ether_web_app#readme"
+  "homepage": "https://github.com/drewIt273/Ether_web_app#readme",
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16"
+  }
 }
