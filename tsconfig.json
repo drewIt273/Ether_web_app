@@ -40,5 +40,9 @@
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
+    "paths": {
+      "@core/*": ["./src/runtime/core/*"],
+      "@dom/*": ["./src/runtime/dom/*"],
+    },
   }
 }
