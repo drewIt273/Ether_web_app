@@ -26,4 +26,13 @@ function toKebab(s: string): string {
     return s.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
 }
 
-export {strictObject, isValidJSONString, toKebab}
+function safeParse(v: any) {
+    try {
+        return JSON.parse(v)
+    }
+    catch {
+        return v
+    }
+}
+
+export {strictObject, isValidJSONString, toKebab, safeParse}
