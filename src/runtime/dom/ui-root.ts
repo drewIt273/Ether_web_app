@@ -40,4 +40,9 @@ export class UINode {
         for (const [k, v] of Object.entries(o)) Object.assign(this.node.style, {[toKebab(k)]: v})
         return this
     }
+
+    find(n: (HTMLElement | string)) {
+        if (n instanceof HTMLElement && this.node.contains(n)) return n
+        else if (typeof n === 'string') return Array.from(document.querySelectorAll(n))
+    }
 }
