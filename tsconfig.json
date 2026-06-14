@@ -43,6 +43,7 @@
     "paths": {
       "@core/*": ["./src/runtime/core/*"],
       "@dom/*": ["./src/runtime/dom/*"],
+      "@assets/*": ["./src/assets/*"],
     },
   }
 }
