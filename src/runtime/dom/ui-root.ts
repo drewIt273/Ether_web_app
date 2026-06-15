@@ -8,7 +8,7 @@ import {ranstring, toKebab} from "@assets/any";
 export const UIReg = new Registry;
 export const UINodeMap = new WeakMap<HTMLElement, UICell|UIBlock|UIComponent>
 
-class UINode {
+export class UINode {
 
     node: HTMLElement
     parent: ParentNode|null
@@ -54,7 +54,7 @@ export class UICell extends UINode {
     ID: string
     emittedData: any
     receivedData: any
-    mappedData: Map<any, () => any>
+    mappedData: Map<any, HandlerList>
     constructor(n: string|HTMLElement = 'div') {
         super(n)
         this.ID = ranstring(4, 1)
@@ -74,7 +74,7 @@ export class UIBlock extends UINode {
     ID: string
     emittedData: any
     receivedData: any
-    mappedData: Map<any, () => any>
+    mappedData: Map<any, HandlerList>
     constructor(n: string|HTMLElement = 'div') {
         super(n)
         this.ID = ranstring(3, 1)
