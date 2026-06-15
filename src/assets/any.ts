@@ -35,4 +35,11 @@ function safeParse(v: any) {
     }
 }
 
-export {strictObject, isValidJSONString, toKebab, safeParse}
+const ranstring = (length: number, count: number, end = '') => {
+    const chars = 'abcdefd', vchars = chars + '1234567890';
+    let f = (s: string, c: number) => Array.from({length: c}, () => s[Math.floor(Math.random() * s.length)]).join(''), key = f(chars, 1);
+    key += Array.from({length: count}, () => f(vchars, length)).join('-')
+    return (end.length) ? key += `${end}` : key
+}
+
+export {strictObject, isValidJSONString, toKebab, safeParse, ranstring}
