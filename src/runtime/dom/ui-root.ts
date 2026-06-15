@@ -11,12 +11,14 @@ export const UINodeMap = new WeakMap<HTMLElement, UICell|UIBlock|UIComponent>
 class UINode {
 
     node: HTMLElement
-    parent: ParentNode | null
+    parent: ParentNode|null
     childNodes: ChildNode[]
+    mounted: boolean
     constructor(n: string|HTMLElement = 'div') {
         this.node = n instanceof HTMLElement ? n : document.createElement(n)
-        this.parent = this.node.parentNode
+        this.parent = this.node.parentElement
         this.childNodes = Array.from(this.node.childNodes)
+        this.mounted = !1
     }
 
     get key() {
@@ -32,19 +34,18 @@ class UINode {
         return this
     }
 
-    dataset(o: Record<string, string>) {
-        for (const [k, v] of Object.entries(o)) this.node.setAttribute(toKebab(`data-${k}`), v)
-        return this
-    }
-
     style(o: Record<string, any>) {
         for (const [k, v] of Object.entries(o)) Object.assign(this.node.style, {[toKebab(k)]: v})
         return this
     }
 
-    find(n: (HTMLElement | string)) {
-        if (n instanceof HTMLElement && this.node.contains(n)) return n
-        else if (typeof n === 'string') return Array.from(document.querySelectorAll(n))
+    findAll(n: string) {
+        return Array.from(this.node.querySelectorAll(n))
+    }
+
+    unmount() {
+        if (this.mounted) this.node.parentElement?.removeChild(this.node)
+        this.mounted = !1
     }
 }
 
@@ -52,6 +53,7 @@ export class UICell extends UINode {
 
     ID: string
     emittedData: any
+    receivedData: any
     mappedData: Map<any, () => any>
     constructor(n: string|HTMLElement = 'div') {
         super(n)
@@ -61,8 +63,9 @@ export class UICell extends UINode {
         UINodeMap.set(this.node, this)
     }
 
-    append(...n: Node[]) {
-        this.node.append(...n)
+    mount(n: Node|UIBlock|UIComponent) {
+        n instanceof Node ? n.appendChild(this.node) : n.node.append(this.node)
+        this.mounted = !0
     }
 }
 
@@ -70,6 +73,7 @@ export class UIBlock extends UINode {
 
     ID: string
     emittedData: any
+    receivedData: any
     mappedData: Map<any, () => any>
     constructor(n: string|HTMLElement = 'div') {
         super(n)
@@ -77,6 +81,15 @@ export class UIBlock extends UINode {
         this.attrs({'ui-block-id': this.ID})
         this.mappedData = new Map
         UINodeMap.set(this.node, this)
+    }
+
+    get childCells() {
+        return [...this.findAll('[ui-cell-id]')]
+    }
+
+    mount(n: UIComponent|Node) {
+        n instanceof Node ? n.appendChild(this.node) : n.node.append(this.node)
+        this.mounted = !0
     }
 }
 
@@ -86,6 +99,20 @@ export class UIComponent extends UINode {
     constructor(n: string|HTMLElement = 'div') {
         super(n)
         this.ID = ranstring(4, 1)
+        this.attrs({'ui-comp-id': this.ID})
         UINodeMap.set(this.node, this)
+    }
+
+    get childBlocks() {
+        return [...this.findAll('[ui-block-id]')]
+    }
+
+    get childCells() {
+        return [...this.findAll('[ui-cell-id]')]
+    }
+
+    mount(n: Node) {
+        n.appendChild(this.node)
+        this.mounted = !0
     }
 }
