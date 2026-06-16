@@ -6,7 +6,7 @@ import {Registry} from "@assets/registry";
 import {ranstring, toKebab} from "@assets/any";
 
 export const UIReg = new Registry;
-export const UINodeMap = new WeakMap<HTMLElement, UICell|UIBlock|UIComponent>
+export const UINodeMap = new WeakMap<Node, UINode>
 
 export class UINode {
 
