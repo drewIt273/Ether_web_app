@@ -13,7 +13,7 @@ class NodeMessageResolver {
 
     resolve(sender: CellOrBlock, receiver: CellOrBlock, data: any, ...args: any[]) {
         const hs = receiver.mappedData.get(data)
-        if (hs) this.#call(receiver, hs, args)
+        if (hs) this.#call(receiver, hs, ...args)
         sender.emittedData = data
     }
 
@@ -37,8 +37,10 @@ export class DOMInterface extends Module {
     observer: MutationObserver
     nodeMsg: NodeMessageResolver
     nodelist: Node[]
-    constructor() {
+    rune: Rune
+    constructor(r: Rune) {
         super()
+        this.rune = r
         this.observer = new MutationObserver(muts => {
             for (const mut of muts) {
                 if (mut.addedNodes) for (const added of mut.addedNodes) {

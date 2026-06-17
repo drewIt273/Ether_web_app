@@ -2,14 +2,16 @@
  * Instance by DrewIt
  */
 
-import {UICell as cell, UIBlock as block, UIComponent as comp, UINode as U} from "@dom/ui-root"
+import {UICell as C, UIBlock as B, UIComponent as K, UINode as U} from "@dom/ui-root"
+import {Rune as R} from "@core/runtime";
 
 declare global {
     type UINode = U;
-    type UICell = cell;
-    type UIBlock = block;
-    type UIComponent = comp;
-    type CellOrBlock = cell | block;
+    type UICell = C;
+    type UIBlock = B;
+    type UIComponent = K;
+    type CellOrBlock = C | B;
     type Handler = (...args: any[]) => any;
     type HandlerList = Handler[];
+    type Rune = R
 }
