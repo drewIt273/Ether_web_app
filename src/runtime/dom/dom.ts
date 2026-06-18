@@ -38,9 +38,10 @@ export class DOMInterface extends Module {
     observer: MutationObserver
     nodeMsg: NodeMessageResolver
     nodelist: Node[]
+    root: HTMLElement
     rune: Rune
     constructor(r: Rune) {
-        super()
+        super(r)
         this.rune = r
         this.observer = new MutationObserver(muts => {
             for (const mut of muts) {
@@ -53,6 +54,7 @@ export class DOMInterface extends Module {
         })
         this.nodeMsg = new NodeMessageResolver
         this.nodelist = []
+        this.root = document.querySelector(`[${this.rune.config.approot}]`) ?? document.body
         this.observer.observe(document, {childList: true, subtree: true})
     }
 
