@@ -5,6 +5,19 @@
 import {safeParse, strictObject} from "./any"
 import {CacheError} from "@core/error"
 
+interface StorageAPI {
+    syncCache: () => CacheError | undefined
+    setCache: () => CacheError | undefined
+    isValidBackend: (o: any) => boolean
+    log: () => void
+    o: {
+        get(k: string): any;
+        set(k: string, v?: any): ((p: string, o: any) => void) | undefined;
+        has(k: string): boolean;
+        remove(k: string): void;
+    }
+}
+
 const cache: Record<string, any> = {}
 const stores = [cache]
 
@@ -71,4 +84,4 @@ function syncCache() {
     catch(e) {return new CacheError(`${e}`)}
 }
 
-export const storageapi = {syncCache, setCache, isValidBackend, log: () => console.log(cache), o: memory}
+export const storageapi: StorageAPI = {syncCache, setCache, isValidBackend, log: () => console.log(cache), o: memory}
