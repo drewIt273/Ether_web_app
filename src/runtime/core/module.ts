@@ -39,10 +39,34 @@ export class Module {
     ready: boolean
     sentData: any
     receivedData: any
-    mappedData: Map<any, (...args: any[]) => any>
-    constructor() {
+    emittedData: any
+    mappedData: Map<any, HandlerList>
+    rune: Rune
+    constructor(r: Rune) {
+        this.rune = r
         this.init = !1
         this.ready = !1
         this.mappedData = new Map
+    }
+
+    emit(data: any) {
+        const o = {
+            to: (n: Module) => {
+                IMC.resolve(this, n, data)
+                return o
+            },
+            /**
+             * Returns emit.map for continues mapping
+             */
+            map: (...fn: HandlerList) => {
+                IMC.subscribe(this, data, ...fn)
+                return o.map
+            },
+            unmap: (fn: Handler|null) => {
+                IMC.unsubscribe(this, data, fn)
+                return o
+            }
+        }
+        return o
     }
 }
