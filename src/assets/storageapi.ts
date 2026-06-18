@@ -2,7 +2,7 @@
  * Instance by DrewIt
  */
 
-import {safeParse} from "./any"
+import {safeParse, strictObject} from "./any"
 import {CacheError} from "@core/error"
 
 const cache: Record<string, any> = {}
@@ -27,13 +27,16 @@ const memory = {
         return cache[k]
     },
     set(k: string, v: any = undefined) {
-        if (v === undefined) {
+        if (v !== undefined) {
             cache[k] = v
             setItem(k, v)
         }
         else return (p: string, o: any) => {
-            const n = cache[k]; n[p] = o; cache[k] = o
-            setItem(k, n)
+            const n = cache[k]
+            if (strictObject(n)) {
+                n[p] = o; cache[k] = o
+                setItem(k, n)
+            }
         }
     },
     has(k: string) {
