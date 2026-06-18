@@ -84,7 +84,7 @@ export class UIBlock extends UINode {
     }
 
     get childCells() {
-        return [...this.findAll('[ui-cell-id]')]
+        return childCells(this)
     }
 
     mount(n: UIComponent|Node) {
@@ -104,15 +104,33 @@ export class UIComponent extends UINode {
     }
 
     get childBlocks() {
-        return [...this.findAll('[ui-block-id]')]
+        return childBlocks(this)
     }
 
     get childCells() {
-        return [...this.findAll('[ui-cell-id]')]
+        return childCells(this)
     }
 
     mount(n: Node) {
         n.appendChild(this.node)
         this.mounted = !0
     }
+}
+
+function childCells(n: UINode) {
+    const k: UICell[] = []
+    n.childNodes.forEach(n => {
+        const o = UINodeMap.get(n)
+        if (o && o instanceof UICell) k.push(o)
+    })
+    return k
+}
+
+function childBlocks(n: UINode) {
+    const k: UIBlock[] = []
+    n.childNodes.forEach(n => {
+        const o = UINodeMap.get(n)
+        if (o && o instanceof UIBlock) k.push(o)
+    })
+    return k
 }
