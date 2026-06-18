@@ -1,0 +1,44 @@
+/**
+ * Instance by DrewIt
+ */
+//
+
+export type ErrorCode = 'RUNTIME' | 'NODE_HIERARCHY' | 'DOM_INTERFACE_OBJECT'
+
+declare global {
+    interface ErrorConstructor {
+        captureStackTrace?: (target: any, constructorOpt?: Function) => void
+    }
+}
+
+export {}
+
+class RuntimeError extends Error {
+
+    code: ErrorCode
+    constructor(msg: string) {
+        super(`${RuntimeError.name}: ${msg}`)
+        Object.setPrototypeOf(this, new.target.prototype)
+        if (typeof Error.captureStackTrace === 'function') {
+            Error.captureStackTrace(this, this.constructor)
+        }
+        this.code = 'RUNTIME'
+    }
+    toJSON() {
+        return {name: this.name, cause: this.cause, message: this.message, stack: this.stack};
+    }
+}
+
+export class DOMInterfaceError extends RuntimeError {
+    constructor(msg: string) {
+        super(msg)
+        this.code = 'DOM_INTERFACE_OBJECT'
+    }
+}
+
+export class NodeHierarchyError extends RuntimeError {
+    constructor(msg: string) {
+        super(msg)
+        this.code = 'NODE_HIERARCHY'
+    }
+}
