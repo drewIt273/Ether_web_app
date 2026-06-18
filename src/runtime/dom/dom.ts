@@ -4,6 +4,7 @@
 
 import {Module} from "@core/module";
 import {UINodeMap, UICell, UIBlock, UIComponent} from "./ui-root";
+import {DOMInterfaceError, NodeHierarchyError} from "@core/error";
 
 class NodeMessageResolver {
 
