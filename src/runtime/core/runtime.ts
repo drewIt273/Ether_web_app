@@ -10,8 +10,8 @@ interface RuntimeConfig {
 }
 
 interface RuntimeHooks {
-    init: (() => any) [],
-    ready: (() => any) []
+    init: HandlerList,
+    ready: HandlerList
 }
 
 export class Rune {

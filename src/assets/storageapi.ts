@@ -35,7 +35,7 @@ const memory = {
             setItem(k, n)
         }
     },
-    has(k: string): boolean {
+    has(k: string) {
         return Object.hasOwn(cache, k)
     },
     remove(k: string) {
