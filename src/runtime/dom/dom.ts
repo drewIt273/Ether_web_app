@@ -21,6 +21,7 @@ class NodeMessageResolver {
     subscribe(node: CellOrBlock, key: any, ...fn: Handler[]) {
         const existing = node.mappedData.get(key)
         if (!existing) node.mappedData.set(key, [...fn])
+        else existing.push(...fn)
     }
 
     unsubscribe(node: CellOrBlock, key: any, fn: Handler|null = null) {
