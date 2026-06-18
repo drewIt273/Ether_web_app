@@ -3,6 +3,7 @@
  */
 
 import {safeParse} from "./any"
+import {CacheError} from "@core/error"
 
 const cache: Record<string, any> = {}
 const stores = [cache]
@@ -18,7 +19,7 @@ function setCache() {
             if (k) cache[k] = safeParse(localStorage.getItem(k));
         }
     }
-    catch(e) {return `Cache ${e}`}
+    catch(e) {return new CacheError(`${e}`)}
 }
 
 const memory = {
@@ -64,7 +65,7 @@ function syncCache() {
             }
         }
     }
-    catch(e) {return `Cache: ${e}`}
+    catch(e) {return new CacheError(`${e}`)}
 }
 
 export const storageapi = {syncCache, setCache, isValidBackend, log: () => console.log(cache), o: memory}
