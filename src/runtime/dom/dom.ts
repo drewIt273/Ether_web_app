@@ -46,9 +46,7 @@ export class DOMInterface extends Module {
             for (const mut of muts) {
                 if (mut.addedNodes) for (const added of mut.addedNodes) {
                     if (!UINodeMap.has(added)) this.nodelist.push(added)
-                    else {
-                        let e = NodeHierachyCheck(added)
-                    }
+                    else {}
                 }
                 if (mut.removedNodes) for (const removed of mut.removedNodes) {}
             }
@@ -68,28 +66,34 @@ export class DOMInterface extends Module {
     }
 }
 
-function NodeHierachyCheck(n: Node) {
+function NodeHierarchyCheck(n: Node) {
     const o = UINodeMap.get(n), p = n.parentElement; let h;
     if (p) h = UINodeMap.get(p)
     if (o && p && h) {
         const i = hierOrder(o), c = hierOrder(h)
-        if (n.childNodes.length) n.childNodes.forEach(k => NodeHierachyCheck(k))
+        if (n.childNodes.length) {
+            n.childNodes.forEach(k => {
+                let e = NodeHierarchyCheck(k)
+                if (e) throw e
+            })
+        }
         if (i > c) {
-            try {
-                p?.removeChild(n)
-                throw new Error(`NodeHierachyError: ${r(o)} cannot mount ${r(h)}`)
-            }
-            finally {return n}
+            p?.removeChild(n)
+            return new NodeHierarchyError(`${r(o)} cannot mount ${r(h)}`)
         }
     }
     else return;
-    function hierOrder(n: UINode) {
-        if (n instanceof UICell) return 1
-        else if (n instanceof UIBlock) return 2
-        else if (n instanceof UIComponent) return 3
-        else return 0
-    }
-    function r(n: UINode) {
-        return `a ${n.node.hasAttribute('ui-cell-id') ? 'UICell' : n.node.hasAttribute('ui-block-id') ? 'UIBlock' : 'UIComponent'}`
-    }
+}
+
+function r(n: UINode) {
+    if (n instanceof UIComponent) return 'UIComponent'
+    else if (n instanceof UIBlock) return 'UIBlock'
+    else return 'UICell'
+}
+
+function hierOrder(n: UINode) {
+    if (n instanceof UICell) return 1
+    else if (n instanceof UIBlock) return 2
+    else if (n instanceof UIComponent) return 3
+    else return 0
 }
