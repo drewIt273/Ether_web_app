@@ -3,7 +3,7 @@
  */
 //
 
-export type ErrorCode = 'RUNTIME' | 'NODE_HIERARCHY' | 'DOM_INTERFACE_OBJECT'
+export type ErrorCode = 'RUNTIME' | 'NODE_HIERARCHY' | 'DOM_INTERFACE_OBJECT' | 'CACHE_OBJECT'
 
 declare global {
     interface ErrorConstructor {
@@ -13,11 +13,11 @@ declare global {
 
 export {}
 
-class RuntimeError extends Error {
+class GlobalError extends Error {
 
     code: ErrorCode
     constructor(msg: string) {
-        super(`${RuntimeError.name}: ${msg}`)
+        super(`${GlobalError.name}: ${msg}`)
         Object.setPrototypeOf(this, new.target.prototype)
         if (typeof Error.captureStackTrace === 'function') {
             Error.captureStackTrace(this, this.constructor)
@@ -29,16 +29,23 @@ class RuntimeError extends Error {
     }
 }
 
-export class DOMInterfaceError extends RuntimeError {
+export class DOMInterfaceError extends GlobalError {
     constructor(msg: string) {
         super(msg)
         this.code = 'DOM_INTERFACE_OBJECT'
     }
 }
 
-export class NodeHierarchyError extends RuntimeError {
+export class NodeHierarchyError extends GlobalError {
     constructor(msg: string) {
         super(msg)
         this.code = 'NODE_HIERARCHY'
+    }
+}
+
+export class CacheError extends GlobalError {
+    constructor(msg: string) {
+        super(msg)
+        this.code = 'CACHE_OBJECT'
     }
 }
