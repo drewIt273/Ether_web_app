@@ -67,6 +67,17 @@ export class DOMInterface extends Module {
     async onReady() {
         this.ready = !1
     }
+
+    append(node: Node, into: Node = this.root) {
+        if (this.root.contains(into)) {
+            const e = NodeHierarchyCheck(node), n = UINodeMap.get(into), k = UINodeMap.get(node)
+            if (e) throw e
+            if (n && k) 
+                if ((hierOrder(n) > hierOrder(k))) into.appendChild(node)
+                else throw new NodeHierarchyError(`${r(n)} cannot mount ${r(k)}`)
+        }
+        else throw new DOMInterfaceError(`This DOMInterface has no access to node: ${into}`)
+    }
 }
 
 function NodeHierarchyCheck(n: Node) {
