@@ -5,7 +5,7 @@
 
 import {ArrayLogLock} from "@assets/registry"
 
-export type ErrorCode = 'RUNTIME' | 'NODE_HIERARCHY' | 'DOM_INTERFACE_OBJECT' | 'CACHE_OBJECT'
+export type ErrorCode = 'RUNTIME' | 'NODE_HIERARCHY' | 'DOM_INTERFACE_OBJECT' | 'CACHE_OBJECT' | 'RUNTIME_PROXY'
 
 declare global {
     interface ErrorConstructor {
@@ -19,12 +19,14 @@ interface ErrorLog {
     readonly DOMInterface: ArrayLogLock<DOMInterfaceError>
     readonly NodeHierarchy: ArrayLogLock<NodeHierarchyError>
     readonly Cache: ArrayLogLock<CacheError>
+    readonly RuntimeProxy: ArrayLogLock<RuntimeProxyError>
 }
 
 export const ErrorLog: ErrorLog = {
     DOMInterface: new ArrayLogLock,
     NodeHierarchy: new ArrayLogLock,
-    Cache: new ArrayLogLock
+    Cache: new ArrayLogLock,
+    RuntimeProxy: new ArrayLogLock
 }
 
 class GlobalError extends Error {
@@ -75,6 +77,19 @@ export class CacheError extends GlobalError {
     }
 
     #e: ErrorCode = 'CACHE_OBJECT'
+
+    get code() {
+        return this.#e
+    }
+}
+
+export class RuntimeProxyError extends GlobalError {
+    constructor(msg: string) {
+        super(msg)
+        ErrorLog.RuntimeProxy.log(this)
+    }
+
+    #e: ErrorCode = 'RUNTIME_PROXY'
 
     get code() {
         return this.#e
