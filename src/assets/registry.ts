@@ -167,6 +167,11 @@ export class ArrayLogLock<K extends any> {
         return this.#a
     }
 
+    remove(o: K) {
+        let i = this.#a.indexOf(o)
+        if (i !== -1) this.#a.splice(i, 1)
+    }
+
     get size() {
         return this.#a.length
     }
