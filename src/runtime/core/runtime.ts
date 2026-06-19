@@ -38,7 +38,9 @@ export class Rune {
     ready: boolean
     hooks: RuntimeHooks
     config: RuntimeConfig
-    constructor() {
+    proxies: RuntimeProxy[]
+    proxyInterface: ProxyInterface
+    constructor(o: RuntimeAPI = {proxyTargets: null}) {
         this.dom = new DOMInterface(this)
         this.hooks = {
             init: [storageapi.setCache],
@@ -48,6 +50,23 @@ export class Rune {
         this.ready = !1
         this.config = {
             approot: 'lazy-app'
+        }
+        this.proxies = []
+        o.proxyTargets?.forEach(r => {
+            this.proxies.push(new RuntimeProxy(r))
+        })
+        this.proxyInterface = {
+            allowed: true,
+            received: [],
+            mappedBehavior: new Map,
+            send(msg, to) {
+                const o = this.This.proxies.find(p => p.target === to)
+                if (o) o.send(msg)
+            },
+            behavior(msg, fn) {
+                this.mappedBehavior.set(msg, fn)
+            },
+            This: this,
         }
         RuneInstancesLog.log(this)
         this.ID = `R0${RuneInstancesLog.read().length}`
