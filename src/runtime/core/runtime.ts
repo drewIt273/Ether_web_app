@@ -17,6 +17,7 @@ interface RuntimeHooks {
 
 export class Rune {
 
+    ID: string
     dom: DOMInterface
     init: boolean
     ready: boolean
@@ -34,5 +35,6 @@ export class Rune {
             approot: 'lazy-app'
         }
         RuneInstancesLog.log(this)
+        this.ID = `R0${RuneInstancesLog.read().length}`
     }
 }
