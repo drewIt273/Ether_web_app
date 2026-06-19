@@ -29,15 +29,14 @@ export const ErrorLog: ErrorLog = {
 
 class GlobalError extends Error {
 
-    code: ErrorCode
     constructor(msg: string) {
         super(`${GlobalError.name}: ${msg}`)
         Object.setPrototypeOf(this, new.target.prototype)
         if (typeof Error.captureStackTrace === 'function') {
             Error.captureStackTrace(this, this.constructor)
         }
-        this.code = 'RUNTIME'
     }
+
     toJSON() {
         return {name: this.name, cause: this.cause, message: this.message, stack: this.stack};
     }
@@ -46,20 +45,38 @@ class GlobalError extends Error {
 export class DOMInterfaceError extends GlobalError {
     constructor(msg: string) {
         super(msg)
-        this.code = 'DOM_INTERFACE_OBJECT'
+        ErrorLog.DOMInterface.log(this)
+    }
+
+    #e: ErrorCode = 'DOM_INTERFACE_OBJECT'
+
+    get code() {
+        return this.#e
     }
 }
 
 export class NodeHierarchyError extends GlobalError {
     constructor(msg: string) {
         super(msg)
-        this.code = 'NODE_HIERARCHY'
+        ErrorLog.NodeHierarchy.log(this)
+    }
+
+    #e: ErrorCode = 'NODE_HIERARCHY'
+
+    get code() {
+        return this.#e
     }
 }
 
 export class CacheError extends GlobalError {
     constructor(msg: string) {
         super(msg)
-        this.code = 'CACHE_OBJECT'
+        ErrorLog.Cache.log(this)
+    }
+
+    #e: ErrorCode = 'CACHE_OBJECT'
+
+    get code() {
+        return this.#e
     }
 }
