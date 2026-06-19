@@ -3,6 +3,8 @@
  */
 //
 
+import {ArrayLogLock} from "@assets/registry"
+
 export type ErrorCode = 'RUNTIME' | 'NODE_HIERARCHY' | 'DOM_INTERFACE_OBJECT' | 'CACHE_OBJECT'
 
 declare global {
@@ -12,6 +14,18 @@ declare global {
 }
 
 export {}
+
+interface ErrorLog {
+    readonly DOMInterface: ArrayLogLock<DOMInterfaceError>
+    readonly NodeHierarchy: ArrayLogLock<NodeHierarchyError>
+    readonly Cache: ArrayLogLock<CacheError>
+}
+
+export const ErrorLog: ErrorLog = {
+    DOMInterface: new ArrayLogLock,
+    NodeHierarchy: new ArrayLogLock,
+    Cache: new ArrayLogLock
+}
 
 class GlobalError extends Error {
 
