@@ -5,6 +5,7 @@
 import {DOMInterface} from "@dom/dom";
 import {storageapi} from "@assets/storageapi";
 import {RuneInstancesLog} from "@assets/registry";
+import {RuntimeProxy, ProxyMessage, MessageHandler} from "./proxy";
 
 interface RuntimeConfig {
     approot: string
@@ -13,6 +14,20 @@ interface RuntimeConfig {
 interface RuntimeHooks {
     init: HandlerList,
     ready: HandlerList
+}
+
+interface RuntimeAPI {
+    proxyTargets?: Rune[] | null
+}
+
+interface ProxyInterface {
+    allowed: boolean
+    received: ProxyMessage[]
+    mappedBehavior: Map<ProxyMessage, Handler>
+    send: (msg: ProxyMessage, to: Rune) => void
+    behavior: (msg: ProxyMessage, fn: Handler) => void
+    onMessage?: MessageHandler
+    This: Rune
 }
 
 export class Rune {
