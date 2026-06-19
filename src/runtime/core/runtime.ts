@@ -4,6 +4,7 @@
 
 import {DOMInterface} from "@dom/dom";
 import {storageapi} from "@assets/storageapi";
+import {RuneInstancesLog} from "@assets/registry";
 
 interface RuntimeConfig {
     approot: string
@@ -32,5 +33,6 @@ export class Rune {
         this.config = {
             approot: 'lazy-app'
         }
+        RuneInstancesLog.log(this)
     }
 }
