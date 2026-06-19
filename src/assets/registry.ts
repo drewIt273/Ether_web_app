@@ -150,3 +150,26 @@ export class Registry {
         this.reg = {}
     }
 }
+
+export class ArrayLogLock<K extends any> {
+
+    #a: K[] = []
+
+    log(o: K) {
+        this.#a.push(o)
+    }
+
+    includes(o: K) {
+        return this.#a.includes(o)
+    }
+
+    read() {
+        return this.#a
+    }
+
+    get size() {
+        return this.#a.length
+    }
+}
+
+export const RuneInstancesLog: ArrayLogLock<Rune> = new ArrayLogLock;
