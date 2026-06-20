@@ -6,32 +6,10 @@ import {Module} from "@core/module";
 import {UINodeMap, UICell, UIBlock, UIComponent} from "./ui-root";
 import {DOMInterfaceError, NodeHierarchyError} from "@core/error";
 
-class NodeMessageResolver {
-
-    #call = (n: CellOrBlock, h: HandlerList, ...args: any[]) => {
-        for (const fn of h) fn.apply(n, args)
-    }
-
-    resolve(sender: CellOrBlock, receiver: CellOrBlock, data: any, ...args: any[]) {
-        const hs = receiver.mappedData.get(data)
-        if (hs) this.#call(receiver, hs, ...args)
-        sender.emittedData = data
-    }
-
-    subscribe(node: CellOrBlock, key: any, ...fn: Handler[]) {
-        const existing = node.mappedData.get(key)
-        if (!existing) node.mappedData.set(key, [...fn])
-        else existing.push(...fn)
-    }
-
-    unsubscribe(node: CellOrBlock, key: any, fn: Handler|null = null) {
-        const hs = node.mappedData.get(key)
-        if (hs)
-            if (fn) {
-                node.mappedData.set(key, hs.filter(h => h !== fn))
-            }
-            else node.mappedData.delete(key)
-    }
+interface NodeMessageResolver {
+    resolve(sender: CellOrBlock, receiver: CellOrBlock, data: any, ...args: any[]): void
+    subscribe(node: CellOrBlock, key: any, ...fn: HandlerList): void
+    unsubscribe(node: CellOrBlock, key: any, fn?: Handler|null): void
 }
 
 export class DOMInterface extends Module {
@@ -53,10 +31,38 @@ export class DOMInterface extends Module {
                 if (mut.removedNodes) for (const removed of mut.removedNodes) {}
             }
         })
-        this.nodeMsg = new NodeMessageResolver
         this.nodelist = []
         this.root = document.querySelector(`[${this.rune.config.approot}]`) ?? document.body
         this.observer.observe(document, {childList: true, subtree: true})
+        this.nodeMsg = {
+            resolve: (sender: CellOrBlock, receiver: CellOrBlock, data: any, ...args: any[]) => {
+                let o = receiver.meta.belongsTo
+                if (o && o === this) {
+                    const hs = receiver.mappedData.get(data)
+                    if (hs) for (const fn of hs) fn.apply(receiver, args)
+                    sender.emittedData = data
+                }
+            },
+            subscribe: (node: CellOrBlock, key: any, ...fn: Handler[]) => {
+                if (node.meta?.belongsTo === this) {
+                    const existing = node.mappedData.get(key)
+                    if (!existing) node.mappedData.set(key, [...fn])
+                    else existing.push(...fn)
+                }
+                else throw new DOMInterfaceError(`UINode ${node.ID} out of reach`)
+            },
+            unsubscribe: (node: CellOrBlock, key: any, fn: Handler|null = null) => {
+                if (node.meta?.belongsTo === this) {
+                    const hs = node.mappedData.get(key)
+                    if (hs)
+                        if (fn) {
+                            node.mappedData.set(key, hs.filter(h => h !== fn))
+                        }
+                        else node.mappedData.delete(key)
+                }
+                else throw new DOMInterfaceError(`UINode ${node.ID} out of reach`)
+            },
+        }
     }
 
     async onInit() {
