@@ -14,16 +14,10 @@ interface NodeMetaData {
 
 export class UINode {
 
-    node: HTMLElement
-    parent: ParentNode|null
-    childNodes: ChildNode[]
-    mounted: boolean
+    readonly node: HTMLElement
     meta: NodeMetaData
     constructor(n: string|HTMLElement = 'div') {
         this.node = n instanceof HTMLElement ? n : document.createElement(n)
-        this.parent = this.node.parentElement
-        this.childNodes = Array.from(this.node.childNodes)
-        this.mounted = !1
         this.meta = {}
     }
 
@@ -33,6 +27,18 @@ export class UINode {
 
     set UIKey(s: string) {
         this.attrs({'ui-data-key': s})
+    }
+
+    get parent() {
+        return this.node.parentNode
+    }
+
+    get childNodes() {
+        return Array.from(this.node.childNodes)
+    }
+
+    get mounted() {
+        return this.node.isConnected
     }
 
     attrs(o: Record<string, string>) {
@@ -51,13 +57,12 @@ export class UINode {
 
     unmount() {
         if (this.mounted) this.node.parentElement?.removeChild(this.node)
-        this.mounted = !1
     }
 }
 
 export class UICell extends UINode {
 
-    ID: string
+    readonly ID: string
     emittedData: any
     receivedData: any
     mappedData: Map<any, HandlerList>
@@ -71,7 +76,6 @@ export class UICell extends UINode {
 
     mount(n: Node|UIBlock|UIComponent) {
         n instanceof Node ? n.appendChild(this.node) : n.node.append(this.node)
-        this.mounted = !0
     }
     
     emit(data: any) {
@@ -92,7 +96,7 @@ export class UICell extends UINode {
 
 export class UIBlock extends UINode {
 
-    ID: string
+    readonly ID: string
     emittedData: any
     receivedData: any
     mappedData: Map<any, HandlerList>
@@ -110,7 +114,6 @@ export class UIBlock extends UINode {
 
     mount(n: UIComponent|Node) {
         n instanceof Node ? n.appendChild(this.node) : n.node.append(this.node)
-        this.mounted = !0
     }
 
     emit(data: any) {
@@ -131,7 +134,7 @@ export class UIBlock extends UINode {
 
 export class UIComponent extends UINode {
 
-    ID: string
+    readonly ID: string
     constructor(n: string|HTMLElement = 'div') {
         super(n)
         this.ID = ranstring(4, 1)
@@ -149,7 +152,6 @@ export class UIComponent extends UINode {
 
     mount(n: Node) {
         n.appendChild(this.node)
-        this.mounted = !0
     }
 }
 
