@@ -42,16 +42,34 @@ export class RuntimeProxy {
         this.#mh = fn
     }
 
-    send(msg: ProxyMessage) {
-        const o = this.target.proxyInterface
-        if (o.allowed) {
-            // Executes a function to be called (if defined using onMessage) on each use of the proxy
-                if (this.#mh) this.#mh.call(this.target, msg)
-            const p = o.mappedBehavior
-            if (o.onMessage) o.onMessage.call(this.target, msg)
-            if (p.has(msg)) p.get(msg)?.call(this.target)
-            o.received.push(msg)
+    /**
+     * Sends a ProxyMessage to a target runtime (receiver) and if the receiver allows communication, returns a possible answer (ProxyMessage) from the receiver
+     */
+    async send(msg: ProxyMessage, to: Rune): Promise<ProxyMessage | undefined> {
+        if (this.targets.includes(to)) {
+            const o = to.proxyInterface
+            if (o.allowed) {
+                // Executes a function to be called (if defined using onMessage) on each use of the proxy
+                    this.#mh?.call(to, msg)
+                // Executes handler to be called on each received message by the receiver, if defined
+                    if (o.onMessage) {
+                        const a = await o.onMessage.call(to, msg)
+                        if (a) {
+                            if (o.resolve && o.resolve(a)) fn()
+                            return a
+                        }
+                        else fn()
+                    }
+                // Execute mapped handler if any and log received msg
+                    else fn()
+                    function fn() {
+                        const p = o.mapped
+                        if (p.has(msg)) p.get(msg)?.call(to)
+                        o.received.push(msg)
+                    }
+            }
+            else throw new RuntimeProxyError(`Runtime ${to.ID} did not allowed the message to be received.`)
         }
-        else throw new RuntimeProxyError(`${this.target} did not allowed the message to be received.`)
+        else throw new RuntimeProxyError(`Runtime ${to.ID} is out of reach`)
     }
 }
