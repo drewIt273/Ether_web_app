@@ -156,7 +156,7 @@ export class ArrayLogLock<K extends any> {
     #a: K[] = []
 
     log(o: K) {
-        this.#a.push(o)
+        if (!this.includes(o)) this.#a.push(o)
     }
 
     includes(o: K) {
@@ -170,6 +170,10 @@ export class ArrayLogLock<K extends any> {
     remove(o: K) {
         let i = this.#a.indexOf(o)
         if (i !== -1) this.#a.splice(i, 1)
+    }
+
+    forEach(predicate: (o: K) => void) {
+        this.#a.forEach(predicate)
     }
 
     get size() {
