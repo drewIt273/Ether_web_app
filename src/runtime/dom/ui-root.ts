@@ -73,6 +73,21 @@ export class UICell extends UINode {
         n instanceof Node ? n.appendChild(this.node) : n.node.append(this.node)
         this.mounted = !0
     }
+    
+    emit(data: any) {
+        const k = this.meta.belongsTo
+        return {
+            to: (target: CellOrBlock, ...args: any[]) => {
+                if (k) k.nodeMsg.resolve(this, target, data, ...args)
+            },
+            map: (...fn: Handler[]) => {
+                if (k) k.nodeMsg.subscribe(this, data, ...fn)
+            },
+            unmap: (fn: Handler) => {
+                if (k) k.nodeMsg.unsubscribe(this, data, fn)
+            }
+        }
+    }
 }
 
 export class UIBlock extends UINode {
@@ -96,6 +111,21 @@ export class UIBlock extends UINode {
     mount(n: UIComponent|Node) {
         n instanceof Node ? n.appendChild(this.node) : n.node.append(this.node)
         this.mounted = !0
+    }
+
+    emit(data: any) {
+        const k = this.meta.belongsTo
+        return {
+            to: (target: CellOrBlock, ...args: any[]) => {
+                if (k) k.nodeMsg.resolve(this, target, data, ...args)
+            },
+            map: (...fn: Handler[]) => {
+                if (k) k.nodeMsg.subscribe(this, data, ...fn)
+            },
+            unmap: (fn: Handler) => {
+                if (k) k.nodeMsg.unsubscribe(this, data, fn)
+            }
+        }
     }
 }
 
