@@ -8,17 +8,23 @@ import {ranstring, toKebab} from "@assets/any";
 export const UIReg = new Registry;
 export const UINodeMap = new WeakMap<Node, UINode>
 
+interface NodeMetaData {
+    belongsTo?: DOMInterface
+}
+
 export class UINode {
 
     node: HTMLElement
     parent: ParentNode|null
     childNodes: ChildNode[]
     mounted: boolean
+    meta: NodeMetaData
     constructor(n: string|HTMLElement = 'div') {
         this.node = n instanceof HTMLElement ? n : document.createElement(n)
         this.parent = this.node.parentElement
         this.childNodes = Array.from(this.node.childNodes)
         this.mounted = !1
+        this.meta = {}
     }
 
     get key() {
