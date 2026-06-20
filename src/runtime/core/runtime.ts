@@ -5,7 +5,7 @@
 import {DOMInterface} from "@dom/dom";
 import {storageapi} from "@assets/storageapi";
 import {RuneInstancesLog} from "@assets/registry";
-import {RuntimeProxy, ProxyMessage, MessageHandler} from "./proxy";
+import {RuneProxies, ProxyMessage, MessageHandler, RuntimeProxy} from "./proxy";
 
 interface RuntimeConfig {
     approot: string
@@ -18,6 +18,7 @@ interface RuntimeHooks {
 
 interface RuntimeAPI {
     proxyTargets?: Rune[] | null
+    shared?: boolean
 }
 
 interface ProxyInterface {
@@ -40,7 +41,7 @@ export class Rune {
     config: RuntimeConfig
     proxies: RuntimeProxy[]
     proxyInterface: ProxyInterface
-    constructor(o: RuntimeAPI = {proxyTargets: null}) {
+    constructor(o: RuntimeAPI = {proxyTargets: null, shared: false}) {
         this.dom = new DOMInterface(this)
         this.hooks = {
             init: [storageapi.setCache],
