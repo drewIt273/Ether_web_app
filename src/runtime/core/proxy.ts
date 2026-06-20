@@ -5,9 +5,9 @@
 import { ArrayLogLock } from "@assets/registry";
 import { RuntimeProxyError } from "./error";
 
-type ProxyMessageType = 'request'
+type ProxyMessageType = 'request' | 'nodeMsg' | 'rejected' | undefined
 
-export type MessageHandler = (msg: ProxyMessage) => void | Promise<void>
+export type MessageHandler = (msg: ProxyMessage) => null | Promise<ProxyMessage>
 
 export interface ProxyMessage {
     type: ProxyMessageType
