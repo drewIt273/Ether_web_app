@@ -18,14 +18,22 @@ export const RuneProxies: ArrayLogLock<RuntimeProxy> = new ArrayLogLock()
 
 export class RuntimeProxy {
 
-    target: Rune
-    constructor(target: Rune) {
-        this.target = target
-        this.target.proxies.push(this)
-        RuneProxies.log(this)
+    targets: Rune[]
+    shared: boolean
+    constructor(...targets: Rune[]) {
+        this.targets = targets
+        this.shared = targets.length > 2 ? true : false
     }
 
     #mh: MessageHandler | null = null
+
+    push(r: Rune) {
+        if (!this.targets.includes(r)) this.targets.push(r)
+    }
+
+    append(r: Rune) {
+        if (this.shared) this.targets.push(r)
+    }
 
     /**
      * Sets a function to be called each time the proxy is used to send messages
