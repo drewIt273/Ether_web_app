@@ -24,11 +24,13 @@ interface RuntimeAPI {
 interface ProxyInterface {
     allowed: boolean
     received: ProxyMessage[]
-    mappedBehavior: Map<ProxyMessage, Handler>
-    send: (msg: ProxyMessage, to: Rune) => void
+    mapped: Map<ProxyMessage, Handler>
+    send: (msg: ProxyMessage, to: Rune) => Promise<ProxyMessage | undefined>
     behavior: (msg: ProxyMessage, fn: Handler) => void
+    connect: (proxy: RuntimeProxy) => void
+    resolve?: (msg: ProxyMessage) => boolean
     onMessage?: MessageHandler
-    This: Rune
+    readonly This: Rune
 }
 
 export class Rune {
@@ -59,15 +61,18 @@ export class Rune {
         this.proxyInterface = {
             allowed: true,
             received: [],
-            mappedBehavior: new Map,
-            send(msg, to) {
-                const o = this.This.proxies.find(p => p.target === to)
-                if (o) o.send(msg)
+            mapped: new Map,
+            async send(msg, to) {
+                const o = RuneProxies.read().find(o => o.targets.includes(to))
+                return o?.send(msg, to)
             },
             behavior(msg, fn) {
-                this.mappedBehavior.set(msg, fn)
+                this.mapped.set(msg, fn)
             },
-            This: this,
+            connect(proxy) {
+                proxy.append(this.This)
+            },
+            This: this
         }
         RuneInstancesLog.log(this)
         this.ID = `R0${RuneInstancesLog.read().length}`
