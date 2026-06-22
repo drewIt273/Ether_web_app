@@ -35,7 +35,7 @@ interface ProxyInterface {
 
 export class Rune {
 
-    ID: string
+    readonly ID: string
     dom: DOMInterface
     init: boolean
     ready: boolean

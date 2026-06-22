@@ -45,53 +45,37 @@ class GlobalError extends Error {
 }
 
 export class DOMInterfaceError extends GlobalError {
+    readonly code: ErrorCode
     constructor(msg: string) {
         super(msg)
+        this.code = 'DOM_INTERFACE_OBJECT'
         ErrorLog.DOMInterface.log(this)
-    }
-
-    #e: ErrorCode = 'DOM_INTERFACE_OBJECT'
-
-    get code() {
-        return this.#e
     }
 }
 
 export class NodeHierarchyError extends GlobalError {
+    readonly code: ErrorCode
     constructor(msg: string) {
         super(msg)
+        this.code = 'NODE_HIERARCHY'
         ErrorLog.NodeHierarchy.log(this)
-    }
-
-    #e: ErrorCode = 'NODE_HIERARCHY'
-
-    get code() {
-        return this.#e
     }
 }
 
 export class CacheError extends GlobalError {
+    readonly code: ErrorCode
     constructor(msg: string) {
         super(msg)
+        this.code = 'CACHE_OBJECT'
         ErrorLog.Cache.log(this)
-    }
-
-    #e: ErrorCode = 'CACHE_OBJECT'
-
-    get code() {
-        return this.#e
     }
 }
 
 export class RuntimeProxyError extends GlobalError {
+    readonly code: ErrorCode
     constructor(msg: string) {
         super(msg)
+        this.code = 'RUNTIME_PROXY'
         ErrorLog.RuntimeProxy.log(this)
-    }
-
-    #e: ErrorCode = 'RUNTIME_PROXY'
-
-    get code() {
-        return this.#e
     }
 }
