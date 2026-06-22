@@ -60,7 +60,7 @@ export class Rune {
             mapped: new Map,
             async send(msg, to) {
                 const o = RuneProxies.read().find(o => o.targets.includes(to))
-                return o?.send(msg, to)
+                return o?.send(msg, to, this.This)
             },
             behavior(msg, fn) {
                 this.mapped.set(msg, fn)
@@ -80,7 +80,7 @@ export class Rune {
         if (this.#o?.shared) {
             const k = new RuntimeProxy(this);
             k.shared = true
-            this.#o.proxyTargets?.forEach(n => k.push(n))
+            this.#o.proxyTargets?.forEach(n => k.append(n))
             RuneProxies.log(k)
         }
         else {

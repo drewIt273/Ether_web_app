@@ -25,11 +25,7 @@ export class RuntimeProxy {
         this.shared = targets.length > 2 ? true : false
     }
 
-    #mh: MessageHandler | null = null
-
-    push(r: Rune) {
-        if (!this.targets.includes(r)) this.targets.push(r)
-    }
+    #mh: Handler | null = null
 
     append(r: Rune) {
         if (this.shared) this.targets.push(r)
@@ -38,19 +34,19 @@ export class RuntimeProxy {
     /**
      * Sets a function to be called each time the proxy is used to send messages
      */
-    onMessage(fn: MessageHandler) {
+    onMessage(fn: (msg: ProxyMessage, sender: Rune, receiver: Rune) => void) {
         this.#mh = fn
     }
 
     /**
-     * Sends a ProxyMessage to a target runtime (receiver) and if the receiver allows communication, returns a possible answer (ProxyMessage) from the receiver
+     * Sends a ProxyMessage to a target runtime (receiver, param - to) and if the receiver allows communication, returns a possible answer (ProxyMessage) from the receiver
      */
-    async send(msg: ProxyMessage, to: Rune): Promise<ProxyMessage | undefined> {
+    async send(msg: ProxyMessage, to: Rune, by: Rune): Promise<ProxyMessage | undefined> {
         if (this.targets.includes(to)) {
             const o = to.proxyInterface
             if (o.allowed) {
                 // Executes a function to be called (if defined using onMessage) on each use of the proxy
-                    this.#mh?.call(to, msg)
+                    this.#mh?.call(this, msg, by, to)
                 // Executes handler to be called on each received message by the receiver, if defined
                     if (o.onMessage) {
                         const a = await o.onMessage.call(to, msg)
