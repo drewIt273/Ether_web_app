@@ -41,7 +41,7 @@ export class EventsModule extends Module {
 
     listen(ev: GlobalEvents, node: Node, ...handlers: EventHandler[]) {
         const existing = this.ActiveListeners.get(ev)
-        if (!existing) this.ActiveListeners.write([{node: node, fn: [...handlers]}], ev)
+        if (!existing) this.ActiveListeners.includesKey(ev) ? this.ActiveListeners.reg[ev]?.push({node: node, fn: [...handlers]}) : this.ActiveListeners.write([{node: node, fn: [...handlers]}], ev)
         else {
             let n = existing.find(o => o.node === node)
             if (n) handlers.forEach(fn => {
