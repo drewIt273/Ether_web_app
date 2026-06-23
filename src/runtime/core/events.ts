@@ -3,10 +3,10 @@
  */
 
 import {Module} from "./module";
+import {UINodeMap} from "@dom/ui-root";
 import {Registry} from "@assets/registry";
 
 type EventHandler = (e: Event) => any
-type GlobalEvents = keyof DocumentEventMap
 
 interface EventRecordValue {
     node: Node
@@ -76,6 +76,43 @@ export class EventsModule extends Module {
 
         this.BacklogListeners.includesKey(ev) ? this.BacklogListeners.reg[ev]?.push({node: node, fn: o.fn}) : this.BacklogListeners.write([{node: o.node, fn: o.fn}], ev)
 
-        this.ActiveListeners.splice(0, this.ActiveListeners.size, this.ActiveListeners.filter(o => o.some(v => v.node === node)))
+            this.ActiveListeners = this.ActiveListeners.filter(o => !o.some(v => v.node === node))
+    }
+
+    restore(target: Node) {
+        const o = this.BacklogListeners.find(v => v.some(o => o.node === target))
+        if (o) {
+            const e = this.BacklogListeners.keyOf(o)
+            if (e) o.forEach(r => this.listen(e, target, ...r.fn))
+        }
+    }
+
+    keybind(keys: string[], node: Node, fn: Handler) {
+        if (!UINodeMap.has(node)) return;
+        else this.Keybinds.has(node) ? this.Keybinds.get(node)?.push([keys, fn]) : this.Keybinds.set(node, [[keys, fn]])
+        return this.keycall
+    }
+
+    keycall(node: Node) {
+        if (!this.Keybinds.has(node)) return;
+        function k(c: string[], e: KeyboardEvent) {
+            const map = {ctrl: e.ctrlKey, shift: e.shiftKey, alt: e.altKey, meta: e.metaKey, [e.key]: e.key}
+            for (const k of c) {
+                if (map[k] === !1) return !1
+                if (!map[k] && e.key.toLowerCase() !== k) return !1
+            }
+            return !0
+        }
+        const p = this.Keybinds.get(node)
+        function listener(e: KeyboardEvent) {
+            p?.forEach(([ks, h]) => {
+                if (k(ks, e)) {
+                    e.preventDefault()
+                    h.call(node)
+                }
+            })
+        }
+        // @ts-expect-error
+        this.listen('keydown', node, listener)
     }
 }
