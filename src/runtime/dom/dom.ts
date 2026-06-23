@@ -87,7 +87,19 @@ export class DOMInterface extends Module {
         }
         else throw new DOMInterfaceError(`Node ${into} out of reach`)
     }
+
+    onEvent(ev: keyof DocumentEventMap, node: Node, ...handlers: ((ev: Event) => void)[]) {
+        if (this.root.contains(node)) this.rune.events.listen(ev, node, ...handlers)
+        else throw OutOfReachError(node)
+    }
+
+    unEvent(node: Node, ev: keyof DocumentEventMap) {
+        if (this.root.contains(node)) this.rune.events.unlisten(node, ev)
+        else throw OutOfReachError(node)
+    }
 }
+
+const OutOfReachError = (n: Node) => new DOMInterfaceError(`Node ${n} out of reach`)
 
 function NodeHierarchyCheck(n: Node) {
     const o = UINodeMap.get(n), p = n.parentElement; let h;
