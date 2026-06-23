@@ -58,6 +58,14 @@ export class UINode {
     unmount() {
         if (this.mounted) this.node.parentElement?.removeChild(this.node)
     }
+
+    on(ev: keyof DocumentEventMap, ...calls: ((ev: Event) => void)[]) {
+        this.meta.belongsTo?.onEvent(ev, this.node, ...calls)
+    }
+
+    off(ev: keyof DocumentEventMap) {
+        this.meta.belongsTo?.unEvent(this.node, ev)
+    }
 }
 
 export class UICell extends UINode {
