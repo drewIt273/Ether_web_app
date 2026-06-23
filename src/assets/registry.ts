@@ -67,14 +67,14 @@ export class Registry<V extends any> {
     /**
      * Returns the key of the specified value o if found in the registry
      */
-    keyOf(o: V): string | undefined {
+    keyOf(o: V): any {
         for (const [k, v] of Object.entries(this.reg)) if (o === v) return k
     }
 
     /**
      * Returns first value where predicate returns true
      */
-    find(predicate: (v: V, k?: string) => boolean): any {
+    find(predicate: (v: V, k?: string) => boolean) {
         for (const [k, v] of Object.entries(this.reg)) if (predicate(v, k)) return v
     }
 
@@ -86,7 +86,7 @@ export class Registry<V extends any> {
         Object.entries(this.reg).forEach(([a, b]) => {
             if (predicate(b, a)) filtered[a] = b
         })
-        return filtered
+        return new Registry(filtered)
     }
 
     /**
@@ -114,6 +114,7 @@ export class Registry<V extends any> {
      * @param start The zero-based location in the array from which to start removing elements.
      * @param deleteCount The number of elements to remove. If value of this argument is either a negative number, zero, undefined, or a type that cannot be converted to an integer, the function will evaluate the argument as zero and not remove any elements.
      * @param items  Elements to insert into the array in place of the deleted elements.
+     * @returns An array containing the elements that where deleted.
      */
     splice(start: number, deleteCount: number, ...items: any[]) {
         return Object.entries(this.reg).splice(start, deleteCount, ...items)
