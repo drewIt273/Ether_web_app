@@ -39,7 +39,7 @@ export class EventsModule extends Module {
 
     #unbubble = new Set(['mouseenter', 'mouseleave', 'blur', 'focus', 'pointerenter', 'pointerleave'])
 
-    listen(ev: GlobalEvents, node: Node, ...handlers: EventHandler[]) {
+    listen(ev: keyof DocumentEventMap, node: Node, ...handlers: ((e: Event) => any)[]) {
         const existing = this.ActiveListeners.get(ev)
         if (!existing) this.ActiveListeners.includesKey(ev) ? this.ActiveListeners.reg[ev]?.push({node: node, fn: [...handlers]}) : this.ActiveListeners.write([{node: node, fn: [...handlers]}], ev)
         else {
@@ -49,7 +49,7 @@ export class EventsModule extends Module {
             })
         }
 
-        this.BacklogListeners.splice(0, this.BacklogListeners.size, this.BacklogListeners.filter(o => o.some(v => v.node === node)))
+            this.BacklogListeners = this.BacklogListeners.filter(o => !o.some(v => v.node === node))
 
         if (!this.ActiveGlobals.has(ev)) {
             this.ActiveGlobals.add(ev)
@@ -67,7 +67,7 @@ export class EventsModule extends Module {
         }
     }
 
-    unlisten(node: Node, ev: GlobalEvents) {
+    unlisten(node: Node, ev: keyof DocumentEventMap) {
         const existing = this.ActiveListeners.get(ev), o = existing?.find(o => o.node === node)
         if (!existing || !o) return;
         // Remove direct listeners for non-bubbling events
