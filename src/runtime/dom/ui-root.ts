@@ -16,7 +16,7 @@ export class UINode {
 
     readonly node: HTMLElement
     meta: NodeMetaData
-    constructor(n: string|HTMLElement = 'div') {
+    constructor(n: keyof HTMLElementTagNameMap | HTMLElement = 'div') {
         this.node = n instanceof HTMLElement ? n : document.createElement(n)
         this.meta = {}
     }
@@ -74,7 +74,7 @@ export class UICell extends UINode {
     emittedData: any
     receivedData: any
     mappedData: Map<any, HandlerList>
-    constructor(n: string|HTMLElement = 'div') {
+    constructor(n: keyof HTMLElementTagNameMap | HTMLElement = 'div') {
         super(n)
         this.ID = ranstring(4, 1)
         this.attrs({'ui-cell-id': this.ID})
@@ -108,7 +108,7 @@ export class UIBlock extends UINode {
     emittedData: any
     receivedData: any
     mappedData: Map<any, HandlerList>
-    constructor(n: string|HTMLElement = 'div') {
+    constructor(n: keyof HTMLElementTagNameMap | HTMLElement = 'div') {
         super(n)
         this.ID = ranstring(3, 1)
         this.attrs({'ui-block-id': this.ID})
@@ -143,7 +143,7 @@ export class UIBlock extends UINode {
 export class UIComponent extends UINode {
 
     readonly ID: string
-    constructor(n: string|HTMLElement = 'div') {
+    constructor(n: keyof HTMLElementTagNameMap | HTMLElement = 'div') {
         super(n)
         this.ID = ranstring(4, 1)
         this.attrs({'ui-comp-id': this.ID})
