@@ -2,17 +2,25 @@
  * Instance by DrewIt
  */
 
-import { ArrayLogLock } from "@assets/registry";
-import { RuntimeProxyError } from "./error";
+import {ArrayLogLock} from "@assets/registry";
+import {RuntimeProxyError} from "./error";
 
-type ProxyMessageType = 'request' | 'nodeMsg' | 'rejected' | undefined
+interface uiEventMsg {
+    type: 'uiEvent'
+    msg: Node
+}
+interface rejectedMsg {
+    type: 'rejected'
+    msg: string
+}
+interface requestMsg {
+    type: 'request'
+    msg: Handler
+}
 
 export type MessageHandler = (msg: ProxyMessage) => null | Promise<ProxyMessage>
 
-export interface ProxyMessage {
-    type: ProxyMessageType
-    msg: any
-}
+export type ProxyMessage = uiEventMsg | rejectedMsg | requestMsg
 
 export const RuneProxies: ArrayLogLock<RuntimeProxy> = new ArrayLogLock()
 
@@ -25,7 +33,7 @@ export class RuntimeProxy {
         this.shared = targets.length > 2 ? true : false
     }
 
-    #mh: Handler | null = null
+    #mh: ((msg: ProxyMessage, sender: Rune, receiver: Rune) => void) | null = null
 
     append(r: Rune) {
         if (this.shared) this.targets.push(r)
