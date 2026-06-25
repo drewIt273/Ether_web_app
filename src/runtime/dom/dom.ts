@@ -90,16 +90,36 @@ export class DOMInterface extends Module {
 
     onEvent(ev: keyof DocumentEventMap, node: Node, ...handlers: ((ev: Event) => void)[]) {
         if (this.root.contains(node)) this.rune.events.listen(ev, node, ...handlers)
-        else throw OutOfReachError(node)
+        else {
+            const o = UINodeMap.get(node), r = o?.meta.belongsTo?.rune
+            if (r) {
+                const o = this.rune.proxyInterface.send({type: 'uiEvent', msg: node}, r)
+                if (o) o.then(v => {
+                    if (v?.type === 'rejected') throw OutOfReachError(node)
+                })
+            }
+            else throw OutOfReachError(node)
+        }
     }
 
     unEvent(node: Node, ev: keyof DocumentEventMap) {
         if (this.root.contains(node)) this.rune.events.unlisten(node, ev)
-        else throw OutOfReachError(node)
+        else {
+            const o = UINodeMap.get(node), r = o?.meta.belongsTo?.rune
+            if (r) {
+                const o = this.rune.proxyInterface.send({type: 'uiEvent', msg: node}, r)
+                if (o) o.then(v => {
+                    if (v?.type === 'rejected') throw OutOfReachError(node)
+                })
+            }
+            else throw OutOfReachError(node)
+        }
     }
 }
 
-const OutOfReachError = (n: Node) => new DOMInterfaceError(`Node ${n} out of reach`)
+function OutOfReachError(n: Node) {
+    return new DOMInterfaceError(`Node ${n} out of reach`)
+}
 
 function NodeHierarchyCheck(n: Node) {
     const o = UINodeMap.get(n), p = n.parentElement; let h;
