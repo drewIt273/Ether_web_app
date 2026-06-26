@@ -13,7 +13,7 @@ interface EventRecordValue {
     fn: EventHandler[]
 }
 
-export class EventsModule extends Module {
+export class UiEventsModule extends Module {
 
     ActiveListeners: Registry<EventRecordValue[]>
     BacklogListeners: Registry<EventRecordValue[]>
