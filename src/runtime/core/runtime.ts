@@ -3,7 +3,8 @@
  */
 
 import {DOMInterface} from "@dom/dom";
-import {EventsModule} from "./events";
+import {UiEventsModule} from "./events";
+import {UiStateManager} from "./state";
 import {storageapi} from "@assets/storageapi";
 import {ArrayLogLock} from "@assets/registry";
 import {RuneProxies, ProxyMessage, MessageHandler, RuntimeProxy} from "./proxy";
@@ -40,7 +41,8 @@ export class Rune {
 
     readonly ID: string
     dom: DOMInterface
-    events: EventsModule
+    events: UiEventsModule
+    states: UiStateManager
     init: boolean
     ready: boolean
     hooks: RuntimeHooks
@@ -48,7 +50,8 @@ export class Rune {
     proxyInterface: ProxyInterface
     constructor(o: RuntimeAPI = {proxyTargets: null, shared: false}) {
         this.dom = new DOMInterface(this)
-        this.events = new EventsModule(this)
+        this.events = new UiEventsModule(this)
+        this.states = new UiStateManager(this)
         this.hooks = {
             init: [storageapi.setCache],
             ready: [this.#pn]
