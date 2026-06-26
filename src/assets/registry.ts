@@ -155,6 +155,11 @@ export class Registry<V extends any> {
 
 export class ArrayLogLock<K extends any> {
 
+    readonly locked: boolean
+    constructor(lock: boolean = true) {
+        this.locked = lock
+    }
+
     #a: K[] = []
 
     log(o: K) {
@@ -166,7 +171,11 @@ export class ArrayLogLock<K extends any> {
     }
 
     read() {
-        return this.#a
+        if (!this.locked) return this.#a
+    }
+
+    find(predicate: (value: K) => boolean) {
+        return this.#a.find(a => predicate(a))
     }
 
     remove(o: K) {
@@ -182,5 +191,3 @@ export class ArrayLogLock<K extends any> {
         return this.#a.length
     }
 }
-
-export const RuneInstancesLog: ArrayLogLock<Rune> = new ArrayLogLock;

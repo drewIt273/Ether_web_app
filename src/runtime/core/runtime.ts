@@ -5,7 +5,7 @@
 import {DOMInterface} from "@dom/dom";
 import {EventsModule} from "./events";
 import {storageapi} from "@assets/storageapi";
-import {RuneInstancesLog} from "@assets/registry";
+import {ArrayLogLock} from "@assets/registry";
 import {RuneProxies, ProxyMessage, MessageHandler, RuntimeProxy} from "./proxy";
 
 interface RuntimeConfig {
@@ -33,6 +33,8 @@ interface ProxyInterface {
     onMessage?: MessageHandler
     readonly This: Rune
 }
+
+export const RuneInstancesLog: ArrayLogLock<Rune> = new ArrayLogLock;
 
 export class Rune {
 
@@ -62,7 +64,7 @@ export class Rune {
             received: [],
             mapped: new Map,
             async send(msg, to) {
-                const o = RuneProxies.read().find(o => o.targets.includes(to))
+                const o = RuneProxies.find(o => o.targets.includes(to))
                 return o?.send(msg, to, this.This)
             },
             behavior(msg, fn) {
