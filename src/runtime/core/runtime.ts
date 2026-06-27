@@ -5,6 +5,7 @@
 import {DOMInterface} from "@dom/dom";
 import {UiEventsModule} from "./events";
 import {UiStateManager} from "./state";
+import {Scheduler} from "./scheduler";
 import {storageapi} from "@assets/storageapi";
 import {ArrayLogLock} from "@assets/registry";
 import {RuneProxies, ProxyMessage, MessageHandler, RuntimeProxy} from "./proxy";
@@ -43,6 +44,7 @@ export class Rune {
     dom: DOMInterface
     events: UiEventsModule
     states: UiStateManager
+    scheduler: Scheduler
     init: boolean
     ready: boolean
     hooks: RuntimeHooks
@@ -52,6 +54,7 @@ export class Rune {
         this.dom = new DOMInterface(this)
         this.events = new UiEventsModule(this)
         this.states = new UiStateManager(this)
+        this.scheduler = new Scheduler()
         this.hooks = {
             init: [storageapi.setCache],
             ready: [this.#pn]
