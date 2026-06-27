@@ -86,7 +86,7 @@ export class UiStateManager extends Module {
 
     define(node: UINode, state: string, fn = (n: UINode) => {}) {
         const map = this.reg.get(node.node) ?? {}
-        map[state] = {t: 'static', fn: () => {if (node.mounted) node.attrs({[`data-${state}`]: state}), fn.call(node, node)}}
+        map[state] = {t: 'static', fn: () => {if (node.mounted) node.attrs({dataState: state}), fn.call(node, node)}}
         this.reg.set(node.node, map)
     }
 
@@ -94,7 +94,7 @@ export class UiStateManager extends Module {
         const map = this.reg.get(node.node) ?? {}, c = computed(() => fn.call(node, node))
         map[state] = {t: 'computed', fn: () => c.get()}
         effect(() => {
-            node.attrs({state: c.get()})
+            node.attrs({dataState: c.get()})
             if (node.key) persist(node.key, state)
         })
         this.reg.set(node.node, map)

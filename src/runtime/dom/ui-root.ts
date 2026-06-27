@@ -42,7 +42,7 @@ export class UINode {
     }
 
     attrs(o: Record<string, string>) {
-        for (const [k, v] of Object.entries(o)) this.node.setAttribute(toKebab(k), v)
+        for (const [k, v] of Object.entries(o)) this.node.setAttribute(toKebab(k), String(v))
         return this
     }
 
