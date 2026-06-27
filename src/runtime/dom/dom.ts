@@ -79,11 +79,9 @@ export class DOMInterface extends Module {
             const e = NodeHierarchyCheck(node), n = UINodeMap.get(into), k = UINodeMap.get(node)
             if (e) throw e
             if (n && k) 
-                if ((hierOrder(n) > hierOrder(k))) {
-                    into.appendChild(node)
-                    k.meta.belongsTo = this
-                }
+                if ((hierOrder(n) > hierOrder(k))) into.appendChild(node)
                 else throw new NodeHierarchyError(`${r(n)} cannot mount ${r(k)}`)
+            else into.appendChild(node)
         }
         else throw new DOMInterfaceError(`Node ${into} out of reach`)
     }
