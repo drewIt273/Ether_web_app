@@ -25,10 +25,21 @@ export class DOMInterface extends Module {
         this.observer = new MutationObserver(muts => {
             for (const mut of muts) {
                 if (mut.addedNodes) for (const added of mut.addedNodes) {
-                    if (!UINodeMap.has(added)) this.nodelist.push(added)
-                    else {}
+                    const o = UINodeMap.get(added)
+                    if (!o) this.nodelist.push(added)
+                    else {
+                        o.meta.belongsTo = this
+                        o.meta.onEventMap.forEach((v, k) => this.onEvent(k, o.node, ...v)), o.meta.onEventMap.clear()
+                    }
                 }
-                if (mut.removedNodes) for (const removed of mut.removedNodes) {}
+                if (mut.removedNodes) for (const removed of mut.removedNodes) {
+                    const o = UINodeMap.get(removed)
+                    this.unEvent(removed)
+                    if (!o) {}
+                    else {
+                        o.meta.unEventSet.clear()
+                    }
+                }
             }
         })
         this.nodelist = []
