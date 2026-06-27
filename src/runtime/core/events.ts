@@ -67,16 +67,23 @@ export class UiEventsModule extends Module {
         }
     }
 
-    unlisten(node: Node, ev: keyof DocumentEventMap) {
-        const existing = this.ActiveListeners.get(ev), o = existing?.find(o => o.node === node)
-        if (!existing || !o) return;
-        // Remove direct listeners for non-bubbling events
-            if (o) o.fn.forEach(fn => node.removeEventListener(ev, fn))
-        if (!o.fn.length) existing.splice(0, existing.length, ...existing.filter(o => o.node !== node))
+    unlisten(node: Node, ev: keyof DocumentEventMap | null = null) {
+        if (ev) {
+            const existing = this.ActiveListeners.get(ev), o = existing?.find(o => o.node === node)
+            if (!existing || !o) return;
+            // Remove direct listeners for non-bubbling events
+                if (o) o.fn.forEach(fn => node.removeEventListener(ev, fn))
+            if (!o.fn.length) existing.splice(0, existing.length, ...existing.filter(o => o.node !== node))
 
-        this.BacklogListeners.includesKey(ev) ? this.BacklogListeners.reg[ev]?.push({node: node, fn: o.fn}) : this.BacklogListeners.write([{node: o.node, fn: o.fn}], ev)
+            this.BacklogListeners.includesKey(ev) ? this.BacklogListeners.reg[ev]?.push({node: node, fn: o.fn}) : this.BacklogListeners.write([{node: o.node, fn: o.fn}], ev)
 
-            this.ActiveListeners = this.ActiveListeners.filter(o => !o.some(v => v.node === node))
+                this.ActiveListeners = this.ActiveListeners.filter(o => !o.some(v => v.node === node))
+        }
+        else {
+            for (const [k, v] of Object.entries(this.ActiveListeners.reg)) v.forEach(o => {
+                if (o.node === node) o.fn.forEach(fn => node.removeEventListener(k, fn))
+            })
+        }
     }
 
     restore(target: Node) {
