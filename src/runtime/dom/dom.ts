@@ -96,20 +96,22 @@ export class DOMInterface extends Module {
                 const o = this.rune.proxyInterface.send({type: 'uiEvent', msg: node}, r)
                 if (o) o.then(v => {
                     if (v?.type === 'rejected') throw OutOfReachError(node)
+                    else r.events.listen(ev, node, ...handlers)
                 })
             }
             else throw OutOfReachError(node)
         }
     }
 
-    unEvent(node: Node, ev: keyof DocumentEventMap) {
+    unEvent(node: Node, ev: keyof DocumentEventMap | null = null) {
         if (this.root.contains(node)) this.rune.events.unlisten(node, ev)
         else {
             const o = UINodeMap.get(node), r = o?.meta.belongsTo?.rune
             if (r) {
                 const o = this.rune.proxyInterface.send({type: 'uiEvent', msg: node}, r)
-                if (o) o.then(v => {
+                o?.then(v => {
                     if (v?.type === 'rejected') throw OutOfReachError(node)
+                    else r.events.unlisten(node, ev)
                 })
             }
             else throw OutOfReachError(node)
