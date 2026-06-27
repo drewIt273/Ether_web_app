@@ -33,7 +33,7 @@ export class DOMInterface extends Module {
         })
         this.nodelist = []
         this.root = document.querySelector(`[${this.rune.config.approot}]`) ?? document.body
-        this.observer.observe(document, {childList: true, subtree: true})
+        this.observer.observe(this.root, {childList: true, subtree: true})
         this.nodeMsg = {
             resolve: (sender: CellOrBlock, receiver: CellOrBlock, data: any, ...args: any[]) => {
                 let o = receiver.meta.belongsTo
