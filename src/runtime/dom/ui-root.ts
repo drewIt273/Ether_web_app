@@ -10,6 +10,8 @@ export const UINodeMap = new WeakMap<Node, UINode>
 
 interface NodeMetaData {
     belongsTo?: DOMInterface
+    onEventMap: Map<keyof DocumentEventMap, ((ev: Event) => void)[]>
+    unEventSet: Set<keyof DocumentEventMap>
 }
 
 export class UINode {
@@ -18,7 +20,10 @@ export class UINode {
     meta: NodeMetaData
     constructor(n: keyof HTMLElementTagNameMap | HTMLElement = 'div') {
         this.node = n instanceof HTMLElement ? n : document.createElement(n)
-        this.meta = {}
+        this.meta = {
+            onEventMap: new Map(),
+            unEventSet: new Set()
+        }
     }
 
     get key() {
@@ -60,11 +65,15 @@ export class UINode {
     }
 
     on(ev: keyof DocumentEventMap, ...calls: ((ev: Event) => void)[]) {
-        this.meta.belongsTo?.onEvent(ev, this.node, ...calls)
+        const o = this.meta
+        if (o.belongsTo) o.belongsTo.onEvent(ev, this.node, ...calls)
+        else o.onEventMap.set(ev, calls)
     }
 
-    off(ev: keyof DocumentEventMap) {
-        this.meta.belongsTo?.unEvent(this.node, ev)
+    off(ev: keyof DocumentEventMap | null = null) {
+        const o = this.meta
+        if (o.belongsTo) o.belongsTo.unEvent(this.node, ev)
+        else if (ev) o.unEventSet.add(ev)
     }
 }
 
