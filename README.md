@@ -1,5 +1,7 @@
 # Ether Web App
 
+Ether is an Electron-based productivity application currently under active development. It is powered by Rune, a custom runtime engine being built alongside the application.
+
 Ether is a productivity web app inspired by the best of Notion and Linear. The goal is to provide users with powerful tools for task and project management, note-taking, and eventually more—all in one seamless experience.
 
 ## Project Vision
@@ -7,12 +9,12 @@ Ether is a productivity web app inspired by the best of Notion and Linear. The g
 Unlike Notion and Linear, **Ether is desktop-first**. The first versions will focus on letting users save their projects, files, and notes directly on their own device.  
 Future updates may include features like syncing across devices, cloud backups, and server-side storage.
 
-This project is also a learning journey—to help me level up my skills in **HTML, CSS, TypeScript, and (eventually) Electron** by building a solid, real-world app from scratch.
+This project is also a learning journey—to help me level up skills in **TypeScript, and (eventually) Electron** by building a solid, real-world app from scratch.
 
 ## Features (Planned)
 
 - **Task & Project Management:**  
-  Organize your work with boards, lists, and timelines—just like Notion and Linear.
+  Organize your work with boards, lists, and timelines.
 
 - **Notes:**  
   Take, edit, and organize notes easily.
@@ -28,7 +30,6 @@ This project is also a learning journey—to help me level up my skills in **HTM
 
 ## Tech Stack
 
-- **HTML**
 - **CSS**
 - **TypeScript**
 - **JSON** (planned for storage)
