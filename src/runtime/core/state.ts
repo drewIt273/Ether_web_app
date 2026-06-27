@@ -102,11 +102,13 @@ export class UiStateManager extends Module {
 
     set(node: UINode, state: string, opts = {schedule: false}) {
         const map = this.reg.get(node.node), entry = map ? map[state] : null
-        if (!map || !map[state]) throw new Error(`State ${state} not defined for node ${node.key}`)
-        if (opts.schedule === !1 && entry) {
-            if (entry.t === 'static') entry.fn.call(node)
-        }
-         if (node.key)persist(node.key, state)
+        if (!map || !map[state]) throw new Error(`State ${state} not defined for node ${node.node}`)
+        if (entry)
+            if (opts.schedule === !1) {
+                if (entry.t === 'static') entry.fn.call(node)
+            }
+            else this.rune.scheduler.schedule(node, entry.fn)
+        if (node.key) persist(node.key, state)
         // Computed states are not manually set
     }
 }
