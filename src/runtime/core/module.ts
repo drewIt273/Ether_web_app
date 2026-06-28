@@ -74,6 +74,7 @@ interface EventsModuleData {
     'ln': [keyof DocumentEventMap, Node, ((ev: Event) => void)[]]
     'un': [Node, keyof DocumentEventMap | null]
     'kc': [string[], Node, Handler]
+    're': [Node]
 }
 
 type ModulesMappedData = EventsModuleData

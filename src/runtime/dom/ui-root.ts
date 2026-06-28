@@ -27,7 +27,7 @@ export class UINode {
     }
 
     get key() {
-        return this.node?.getAttribute('ui-data-key')
+        return this.node.getAttribute('ui-data-key')
     }
 
     set UIKey(s: string) {
