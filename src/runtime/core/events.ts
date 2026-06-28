@@ -27,6 +27,10 @@ export class UiEventsModule extends Module {
         this.ActiveGlobals = new Set()
         this.GlobalDelegates = new Map()
         this.Keybinds = new WeakMap()
+
+        this.IMC.map('ln', (ev: keyof DocumentEventMap, n: Node, ...fn: EventHandler[]) => this.listen(ev, n, ...fn))
+        this.IMC.map('un', (n: Node, ev: keyof DocumentEventMap | null) => this.unlisten(n, ev))
+        this.IMC.map('kc', (k: string[], n: Node, fn: Handler) => this.keybind(k, n, fn)(n))
     }
 
     async onInit() {
@@ -95,8 +99,7 @@ export class UiEventsModule extends Module {
     }
 
     keybind(keys: string[], node: Node, fn: Handler) {
-        if (!UINodeMap.has(node)) return;
-        else this.Keybinds.has(node) ? this.Keybinds.get(node)?.push([keys, fn]) : this.Keybinds.set(node, [[keys, fn]])
+        this.Keybinds.has(node) ? this.Keybinds.get(node)?.push([keys, fn]) : this.Keybinds.set(node, [[keys, fn]])
         return this.keycall
     }
 
