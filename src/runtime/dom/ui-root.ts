@@ -75,6 +75,11 @@ export class UINode {
         if (o.belongsTo) o.belongsTo.unEvent(this.node, ev)
         else if (ev) o.unEventSet.add(ev)
     }
+
+    keycall(keys: string[], fn: (ev: Event) => void) {
+        const o = this.meta
+        if (o.belongsTo) o.belongsTo.keyEvent(this.node, keys, fn)
+    }
 }
 
 export class UICell extends UINode {
