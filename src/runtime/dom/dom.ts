@@ -98,29 +98,26 @@ export class DOMInterface extends Module {
     }
 
     onEvent(ev: keyof DocumentEventMap, node: Node, ...handlers: ((ev: Event) => void)[]) {
-        if (this.root.contains(node)) this.rune.events.listen(ev, node, ...handlers)
-        else {
-            const o = UINodeMap.get(node), r = o?.meta.belongsTo?.rune
-            if (r) {
-                const o = this.rune.proxyInterface.send({type: 'uiEvent', msg: node}, r)
-                if (o) o.then(v => {
-                    if (v?.type === 'rejected') throw OutOfReachError(node)
-                    else r.events.listen(ev, node, ...handlers)
-                })
-            }
-            else throw OutOfReachError(node)
-        }
+        this.#ne(node, () => this.IMC.emit('ln', this.rune.events, [ev, node, handlers]))
     }
 
     unEvent(node: Node, ev: keyof DocumentEventMap | null = null) {
-        if (this.root.contains(node)) this.rune.events.unlisten(node, ev)
+        this.#ne(node, () => this.IMC.emit('un', this.rune.events, [node, ev]))
+    }
+
+    keyEvent(node: Node, keys: string[], handler: ((ev: Event) => void)) {
+        this.#ne(node, () => this.IMC.emit('kc', this.rune.events, [keys, node, handler]))
+    }
+
+    #ne(node: Node, emit: Handler) {
+        if (this.root.contains(node)) emit()
         else {
             const o = UINodeMap.get(node), r = o?.meta.belongsTo?.rune
             if (r) {
                 const o = this.rune.proxyInterface.send({type: 'uiEvent', msg: node}, r)
-                o?.then(v => {
+                o.then(v => {
                     if (v?.type === 'rejected') throw OutOfReachError(node)
-                    else r.events.unlisten(node, ev)
+                    else emit()
                 })
             }
             else throw OutOfReachError(node)
