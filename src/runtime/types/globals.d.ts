@@ -3,7 +3,7 @@
  */
 
 import {UICell as C, UIBlock as B, UIComponent as K, UINode as U} from "@dom/ui-root"
-import {Rune as R} from "@core/runtime";
+import {Rune as R} from "@core/rune";
 import {DOMInterface as D} from "@dom/dom";
 
 declare global {
