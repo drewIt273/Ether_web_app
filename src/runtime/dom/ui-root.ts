@@ -12,6 +12,7 @@ interface NodeMetaData {
     belongsTo?: DOMInterface
     onEventMap: Map<keyof DocumentEventMap, ((ev: Event) => void)[]>
     unEventSet: Set<keyof DocumentEventMap>
+    backStates: Map<string, {type: 'static' | 'computed', fn: Handler}>
 }
 
 export class UINode {
@@ -22,7 +23,8 @@ export class UINode {
         this.node = n instanceof HTMLElement ? n : document.createElement(n)
         this.meta = {
             onEventMap: new Map(),
-            unEventSet: new Set()
+            unEventSet: new Set(),
+            backStates: new Map()
         }
     }
 
@@ -66,19 +68,42 @@ export class UINode {
 
     on(ev: keyof DocumentEventMap, ...calls: ((ev: Event) => void)[]) {
         const o = this.meta
-        if (o.belongsTo) o.belongsTo.onEvent(ev, this.node, ...calls)
+        if (o.belongsTo) o.belongsTo.GlobalEvents.onEvent(ev, this.node, ...calls)
         else o.onEventMap.set(ev, calls)
     }
 
     off(ev: keyof DocumentEventMap | null = null) {
         const o = this.meta
-        if (o.belongsTo) o.belongsTo.unEvent(this.node, ev)
+        if (o.belongsTo) o.belongsTo.GlobalEvents.unEvent(this.node, ev)
         else if (ev) o.unEventSet.add(ev)
     }
 
     keycall(keys: string[], fn: (ev: Event) => void) {
         const o = this.meta
-        if (o.belongsTo) o.belongsTo.keyEvent(this.node, keys, fn)
+        if (o.belongsTo) o.belongsTo.GlobalEvents.keyEvent(this.node, keys, fn)
+    }
+
+    defineState(state: string, call: Handler = () => {}) {
+        const o = this.meta.belongsTo, a = this.meta.backStates, v = a.get(state)
+        if (o) {
+            if (v && v.type === 'static') o.GlobalStates.defineState(this, state, () => {v.fn.apply(this), call.apply(this)}), a.delete(state)
+            else o.GlobalStates.defineState(this, state, call)
+        }
+        else a.set(state, {type: 'static', fn: call})
+    }
+
+    defineComputedState(state: string, call: Handler = () => {}) {
+        const o = this.meta.belongsTo, a = this.meta.backStates, v = a.get(state)
+        if (o) {
+            if (v && v.type === 'computed') o.GlobalStates.defineState(this, state, () => {v.fn.apply(this), call.apply(this)}), a.delete(state)
+            else o.GlobalStates.defineState(this, state, call)
+        }
+        else a.set(state, {type: 'computed', fn: call})
+    }
+
+    setState(state: string, opts = {schedule: false}) {
+        const o = this.meta
+        if (o.belongsTo) o.belongsTo.GlobalStates.setState(this, state, opts)
     }
 }
 
