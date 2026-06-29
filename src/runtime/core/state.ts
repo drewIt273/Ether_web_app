@@ -73,6 +73,10 @@ export class UiStateManager extends Module {
     constructor(r: Rune) {
         super(r)
         this.reg = new WeakMap
+
+        this.IMC.map('df', (n: UINode, s: string, fn: Handler) => this.define(n, s, fn))
+        this.IMC.map('dc', (n: UINode, s: string, fn: Handler) => this.defineComputed(n, s, fn))
+        this.IMC.map('set', (n: UINode, s: string, opts: {schedule: boolean} = {schedule: false}) => this.set(n, s, opts))
     }
 
     async onInit() {
@@ -84,14 +88,14 @@ export class UiStateManager extends Module {
         this.ready = !0
     }
 
-    define(node: UINode, state: string, fn = (n: UINode) => {}) {
+    define(node: UINode, state: string, fn: Handler) {
         const map = this.reg.get(node.node) ?? {}
-        map[state] = {t: 'static', fn: () => {if (node.mounted) node.attrs({dataState: state}), fn.call(node, node)}}
+        map[state] = {t: 'static', fn: () => {if (node.mounted) node.attrs({dataState: state}), fn.call(node)}}
         this.reg.set(node.node, map)
     }
 
-    defineComputed(node: UINode, state: string, fn = (n: UINode) => {}) {
-        const map = this.reg.get(node.node) ?? {}, c = computed(() => fn.call(node, node))
+    defineComputed(node: UINode, state: string, fn: Handler) {
+        const map = this.reg.get(node.node) ?? {}, c = computed(() => fn.call(node))
         map[state] = {t: 'computed', fn: () => c.get()}
         effect(() => {
             node.attrs({dataState: c.get()})
