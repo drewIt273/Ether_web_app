@@ -15,17 +15,35 @@ interface NodeMetaData {
     backStates: Map<string, {type: 'static' | 'computed', fn: Handler}>
 }
 
+interface NodeJSX<K extends unknown> {
+    tag: keyof HTMLElementTagNameMap
+    attrs?: Record<string, unknown>
+    className?: string
+    textContent?: string
+    style?: Partial<Record<keyof CSSStyleProperties, string>>
+    append?: K[]
+    UIKey?: string
+
+}
+
+type newnode<K extends unknown> = () => K
+
+interface CellJSX extends NodeJSX<Node | newnode<Node>> {}
+interface BlockJSX extends NodeJSX<Node | UICell | newnode<Node | UICell>> {}
+interface ComponentJSX extends NodeJSX<Node | UICell | UIBlock | newnode<Node | UICell | UIBlock>> {}
+
 export class UINode {
 
     readonly node: HTMLElement
     meta: NodeMetaData
-    constructor(n: keyof HTMLElementTagNameMap | HTMLElement = 'div') {
-        this.node = n instanceof HTMLElement ? n : document.createElement(n)
+    constructor(o: NodeJSX<Node | unknown>) {
+        this.node = document.createElement(o.tag)
         this.meta = {
             onEventMap: new Map(),
             unEventSet: new Set(),
             backStates: new Map()
         }
+        jsx(o, this.node)
     }
 
     get key() {
@@ -113,8 +131,8 @@ export class UICell extends UINode {
     emittedData: any
     receivedData: any
     mappedData: Map<any, HandlerList>
-    constructor(n: keyof HTMLElementTagNameMap | HTMLElement = 'div') {
-        super(n)
+    constructor(o: CellJSX) {
+        super(o)
         this.ID = ranstring(4, 1)
         this.attrs({'ui-cell-id': this.ID})
         this.mappedData = new Map
@@ -147,8 +165,8 @@ export class UIBlock extends UINode {
     emittedData: any
     receivedData: any
     mappedData: Map<any, HandlerList>
-    constructor(n: keyof HTMLElementTagNameMap | HTMLElement = 'div') {
-        super(n)
+    constructor(o: BlockJSX) {
+        super(o)
         this.ID = ranstring(3, 1)
         this.attrs({'ui-block-id': this.ID})
         this.mappedData = new Map
@@ -182,8 +200,8 @@ export class UIBlock extends UINode {
 export class UIComponent extends UINode {
 
     readonly ID: string
-    constructor(n: keyof HTMLElementTagNameMap | HTMLElement = 'div') {
-        super(n)
+    constructor(o: ComponentJSX) {
+        super(o)
         this.ID = ranstring(4, 1)
         this.attrs({'ui-comp-id': this.ID})
         UINodeMap.set(this.node, this)
@@ -218,4 +236,49 @@ function childBlocks(n: UINode) {
         if (o && o instanceof UIBlock) k.push(o)
     })
     return k
+}
+
+const casiveAttrs = new Set(['viewBox'])
+
+function jsx(o: NodeJSX<unknown>, n: HTMLElement) {
+
+    for (const [key, value] of Object.entries(o)) {
+        if (key === 'className') {
+            n.className = value
+            continue;
+        }
+        if (key === 'style') {
+            Object.assign(n.style, value)
+            continue;
+        }
+        if (key === 'textContent') {
+            n.textContent = value
+            continue;
+        }
+        if (key === 'attrs') {
+            for (const [k, v] of Object.entries(value)) {
+                if (casiveAttrs.has(k)) n.setAttribute(k, String(v))
+                else n.setAttribute(toKebab(k), String(v))
+            }
+            continue;
+        }
+        if (key === 'UIKey') {
+            n.setAttribute('ui-data-key', value)
+            continue;
+        }
+        if (key === 'append') {
+            value.forEach((v: Node | UINode | newnode<Node | UINode>) => {
+                let a; v instanceof Node ? n.append(v) : v instanceof UINode ? n.append(v.node) : (a = v(), a instanceof Node ? n.append(a) : n.append(a.node))
+            })
+            continue;
+        }
+        const k = /^on[A-Z]/g
+        if (k.test(key) && typeof value === 'function') {
+            const l = key.slice(2).toLowerCase(), o = UINodeMap.get(n)
+            // @ts-expect-error
+            o ? o.on(l, value) : n.addEventListener(l, value)
+            continue;
+        }
+    }
+    return n
 }
