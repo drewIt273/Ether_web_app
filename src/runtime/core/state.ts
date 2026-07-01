@@ -80,11 +80,11 @@ export class UiStateManager extends Module {
     }
 
     async onInit() {
+        if (!storageapi.o.has('uistates')) storageapi.o.set('uistates', {})
         this.init = !0
     }
 
     async onReady() {
-        if (!storageapi.o.has('uistates')) storageapi.o.set('uistates', {})
         this.ready = !0
     }
 
