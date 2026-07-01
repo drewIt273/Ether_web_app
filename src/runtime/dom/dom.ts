@@ -41,19 +41,25 @@ export class DOMInterface extends Module {
         this.observer = new MutationObserver(muts => {
             for (const mut of muts) {
                 if (mut.addedNodes) for (const added of mut.addedNodes) {
+                    (added as Element).setAttribute('_hide_', '')
                     const o = UINodeMap.get(added)
                     if (!o) this.nodelist.push(added)
                     else {
                         o.meta.belongsTo = this
                         o.meta.onEventMap.forEach((v, k) => this.GlobalEvents.onEvent(k, o.node, ...v)), o.meta.onEventMap.clear()
+                        if (o.key) {
+                            const a = storageapi.o.get('uistates')?.[o.key]
+                            if (a) o.setState(a)
+                        }
                     }
+                    (added as Element).removeAttribute('_hide_')
                 }
                 if (mut.removedNodes) for (const removed of mut.removedNodes) {
-                    const o = UINodeMap.get(removed)
-                    this.GlobalEvents.unEvent(removed)
-                    if (!o) {}
+                    const o = UINodeMap.get(removed); this.GlobalEvents.unEvent(removed)
+                    if (!o) this.nodelist = this.nodelist.filter(n => n !== removed)
                     else {
                         o.meta.unEventSet.clear()
+                        if (o.key) storageapi.o.set('uistates')?.(o.key, o.currentstate)
                     }
                 }
             }
