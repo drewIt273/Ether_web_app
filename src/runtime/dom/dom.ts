@@ -16,6 +16,7 @@ interface UiEventsInterface {
     onEvent(ev: keyof DocumentEventMap, node: Node, ...handlers: ((ev: Event) => void)[]): void
     unEvent(node: Node, ev?: keyof DocumentEventMap | null): void
     keyEvent(node: Node, keys: string[], handler: ((ev: Event) => void)): void
+    unKey(node: Node): void
 }
 
 interface UiStatesInterface {
@@ -121,6 +122,10 @@ export class DOMInterface extends Module {
         keyEvent: (node: Node, keys: string[], handler: ((ev: Event) => void)) => {
             this.#ne(node, () => this.IMC.emit('kc', this.rune.events, [keys, node, handler]))
         },
+
+        unKey: (node: Node) => {
+            this.#ne(node, () => this.IMC.emit('ku', this.rune.events, [node]))
+        }
     }
 
     GlobalStates: UiStatesInterface = {

@@ -31,6 +31,7 @@ export class UiEventsModule extends Module {
         this.IMC.map('ln', (ev: keyof DocumentEventMap, n: Node, ...fn: EventHandler[]) => this.listen(ev, n, ...fn))
         this.IMC.map('un', (n: Node, ev: keyof DocumentEventMap | null) => this.unlisten(n, ev))
         this.IMC.map('kc', (k: string[], n: Node, fn: Handler) => this.keybind(k, n, fn)(n))
+        this.IMC.map('ku', (n: Node) => this.Keybinds.delete(n))
         this.IMC.map('re', (n: Node) => this.restore(n))
     }
 
