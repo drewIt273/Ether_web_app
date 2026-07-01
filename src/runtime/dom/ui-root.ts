@@ -2,11 +2,10 @@
  * Instance by DrewIt
  */
 
-import {Registry} from "@assets/registry";
 import {ranstring, toKebab} from "@assets/any";
 
-export const UIReg = new Registry;
 export const UINodeMap = new WeakMap<Node, UINode>
+export const NodeKeys: Set<string> = new Set()
 
 interface NodeMetaData {
     belongsTo?: DOMInterface
@@ -47,11 +46,12 @@ export class UINode {
     }
 
     get key() {
-        return this.node.getAttribute('ui-data-key')
+        return this.node.getAttribute('node-key')
     }
 
     set UIKey(s: string) {
-        this.attrs({'ui-data-key': s})
+        if (!NodeKeys.has(s)) this.attrs({'node-key': s}), NodeKeys.add(s)
+        else throw new Error(`An existing node already have the node-key ${s}`)
     }
 
     get parent() {
@@ -137,7 +137,7 @@ export class UICell extends UINode {
     constructor(o: CellJSX) {
         super(o)
         this.ID = ranstring(4, 1)
-        this.attrs({'ui-cell-id': this.ID})
+        this.attrs({'ui-cell': this.ID})
         this.mappedData = new Map
         UINodeMap.set(this.node, this)
     }
@@ -171,7 +171,7 @@ export class UIBlock extends UINode {
     constructor(o: BlockJSX) {
         super(o)
         this.ID = ranstring(3, 1)
-        this.attrs({'ui-block-id': this.ID})
+        this.attrs({'ui-block': this.ID})
         this.mappedData = new Map
         UINodeMap.set(this.node, this)
     }
@@ -206,7 +206,7 @@ export class UIComponent extends UINode {
     constructor(o: ComponentJSX) {
         super(o)
         this.ID = ranstring(4, 1)
-        this.attrs({'ui-comp-id': this.ID})
+        this.attrs({'ui-comp': this.ID})
         UINodeMap.set(this.node, this)
     }
 
@@ -266,7 +266,7 @@ function jsx(o: NodeJSX<unknown>, n: HTMLElement) {
             continue;
         }
         if (key === 'UIKey') {
-            n.setAttribute('ui-data-key', value)
+            n.setAttribute('node-key', value)
             continue;
         }
         if (key === 'append') {
