@@ -5,6 +5,8 @@
 import {Module} from "@core/module";
 import {UINodeMap, UICell, UIBlock, UIComponent} from "./ui-root";
 import {DOMInterfaceError, NodeHierarchyError} from "@core/error";
+import {storageapi} from "@assets/storageapi";
+import {stylesheet} from "@assets/stylesheet";
 
 interface NodeMessageResolver {
     resolve(sender: CellOrBlock, receiver: CellOrBlock, data: any, ...args: any[]): void
@@ -58,7 +60,6 @@ export class DOMInterface extends Module {
         })
         this.nodelist = []
         this.root = document.querySelector(`[${this.rune.config.approot}]`) ?? document.body
-        this.observer.observe(this.root, {childList: true, subtree: true})
         this.nodeMsg = {
             resolve: (sender: CellOrBlock, receiver: CellOrBlock, data: any, ...args: any[]) => {
                 let o = receiver.meta.belongsTo
@@ -92,11 +93,18 @@ export class DOMInterface extends Module {
 
     async onInit() {
         if (typeof window === 'undefined') return '[DOM] not running in browser environment'  
-        else this.init = !0
+        else {
+            this.init = !0
+        }
     }
 
     async onReady() {
-        this.ready = !1
+        const s = new stylesheet(); s.id = '_rune-injected-styles_'
+        s.CSS = {
+            '*[_hide_]': {display: 'none'}
+        }
+        this.observer.observe(this.root, {childList: true, subtree: true})
+        this.ready = !0
     }
 
     append(node: Node, into: Node = this.root) {
