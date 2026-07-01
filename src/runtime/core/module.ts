@@ -3,16 +3,17 @@
  */
 
 interface ModuleMessageResolver {
-    resolve<K extends keyof ModulesMappedData>(sender: Module, receiver: Module, data: K, args: ModulesMappedData[K]): void
+    resolve<K extends keyof ModulesMappedData>(sender: Module, receiver: Module, data: K, args: ModulesMappedData[K]): any
     subscribe(n: Module, key: any, ...fn: Handler[]): void
     unsubscribe(n: Module, key: any, fn?: Handler|null): void
 }
 
 const IMC: ModuleMessageResolver = {
     resolve(sender, receiver, data, args) {
-        const hs = receiver.IMC.mappedData.get(data)
-        if (hs) for (const fn of hs) fn.apply(receiver, args)
+        const hs = receiver.IMC.mappedData.get(data); let k;
+        if (hs) for (const fn of hs) k = fn.apply(receiver, args)
         sender.IMC.emittedData = receiver.IMC.receivedData = data
+        return k
     },
 
     subscribe(n, key, ...fn) {
@@ -37,7 +38,7 @@ interface MsgResolverUnit {
     mappedData: Map<any, HandlerList>
     map: (data: any, ...fn: HandlerList) => MsgResolverUnit
     unmap: (data: any, fn?: Handler | null) => MsgResolverUnit
-    emit<K extends keyof ModulesMappedData> (data: K, to: Module, args: ModulesMappedData[K]): MsgResolverUnit
+    emit<K extends keyof ModulesMappedData> (data: K, to: Module, args: ModulesMappedData[K]): any
 }
 
 export class Module {
@@ -63,8 +64,7 @@ export class Module {
                 return this.IMC
             },
             emit: (data, to: Module, args) => {
-                IMC.resolve(this, to, data, args)
-                return this.IMC
+                return IMC.resolve(this, to, data, args)
             }
         }
     }
