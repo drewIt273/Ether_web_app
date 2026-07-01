@@ -2,7 +2,7 @@
  * Instance by DrewIt
  */
 
-function strictObject(o: any): boolean {
+function strictObject(o: any): o is Record<string, any> {
     return o !== null && typeof o === 'object' && o?.constructor === Object
 }
 
