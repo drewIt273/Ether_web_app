@@ -97,8 +97,11 @@ export class UINode {
     }
 
     keycall(keys: string[], fn: (ev: Event) => void) {
-        const o = this.meta
-        if (o.belongsTo) o.belongsTo.GlobalEvents.keyEvent(this.node, keys, fn)
+        this.meta.belongsTo?.GlobalEvents.keyEvent(this.node, keys, fn)
+    }
+
+    unbindKeys() {
+        this.meta.belongsTo?.GlobalEvents.unKey(this.node)
     }
 
     defineState(state: string, call: Handler = () => {}) {

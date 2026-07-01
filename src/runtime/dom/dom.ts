@@ -23,6 +23,7 @@ interface UiStatesInterface {
     setState(node: UINode, state: string, opts: {schedule: boolean}): void
     defineState(node: UINode, state: string, call: Handler): void
     defineCompute(node: UINode, state: string, call: Handler): void
+    hasState(node: Node, state: string): boolean
 }
 
 export class DOMInterface extends Module {
@@ -139,7 +140,13 @@ export class DOMInterface extends Module {
 
         defineCompute: (node: UINode, state: string, call: Handler) => {
             this.#se(node, () => this.IMC.emit('dc', this.rune.states, [node, state, call]))
-        }
+        },
+
+        hasState: (node, state) => {
+            const o = this.rune.states.reg.get(node)
+            if (o) return Object.hasOwn(o, state)
+            else return false
+        },
     }
 
     #ne(node: Node, emit: Handler) {
