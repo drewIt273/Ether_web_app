@@ -5,20 +5,26 @@
 import {safeParse, strictObject} from "./any"
 import {CacheError} from "@core/error"
 
-interface StorageAPI {
+interface CacheAPI {
     syncCache: () => CacheError | undefined
     setCache: () => CacheError | undefined
     isValidBackend: (o: any) => boolean
     log: () => void
     o: {
-        get(k: string): any;
-        set(k: string, v?: any): ((p: string, o: any) => void) | undefined;
-        has(k: string): boolean;
-        remove(k: string): void;
+        get<K extends keyof CacheObject>(k: K): CacheObject[K];
+        set<K extends keyof CacheObject>(k: K, v?: CacheObject[K]): ((p: string, o: any) => void) | undefined;
+        has(k: keyof CacheObject): boolean;
+        remove(k: keyof CacheObject): void;
     }
 }
 
-const cache: Record<string, any> = {}
+type nodekey = string
+
+interface CacheObject {
+    uistates?: Record<nodekey, string>
+}
+
+const cache: CacheObject = {}
 const stores = [cache]
 
 function isValidBackend(o: any) {
@@ -29,6 +35,7 @@ function setCache() {
     try {
         for (let i = 0; i < localStorage.length; i++) {
             const k = localStorage.key(i)
+            // @ts-expect-error
             if (k) cache[k] = safeParse(localStorage.getItem(k));
         }
     }
@@ -36,10 +43,10 @@ function setCache() {
 }
 
 const memory = {
-    get(k: string) {
+    get<K extends keyof CacheObject>(k: K) {
         return cache[k]
     },
-    set(k: string, v: any = undefined) {
+    set<K extends keyof CacheObject>(k: K, v: CacheObject[K] | undefined = undefined) {
         if (v !== undefined) {
             cache[k] = v
             setItem(k, v)
@@ -52,17 +59,17 @@ const memory = {
             }
         }
     },
-    has(k: string) {
+    has(k: keyof CacheObject) {
         return Object.hasOwn(cache, k)
     },
-    remove(k: string) {
+    remove(k: keyof CacheObject) {
         delete cache[k]
         syncCache()
     }
 }
 
-function setItem(k: string, v: any) {
-    localStorage.setItem(k, JSON.stringify(v))
+function setItem(k: keyof CacheObject, v: any) {
+    localStorage.setItem(String(k), JSON.stringify(v))
 }
 
 function syncCache() {
@@ -84,4 +91,4 @@ function syncCache() {
     catch(e) {return new CacheError(`${e}`)}
 }
 
-export const storageapi: StorageAPI = {syncCache, setCache, isValidBackend, log: () => console.log(cache), o: memory}
+export const storageapi: CacheAPI = {syncCache, setCache, isValidBackend, log: () => console.log(cache), o: memory}
