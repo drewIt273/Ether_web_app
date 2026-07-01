@@ -3,6 +3,7 @@
  */
 
 import {ranstring, toKebab} from "@assets/any";
+import {storageapi} from "@assets/storageapi";
 
 export const UINodeMap = new WeakMap<Node, UINode>
 export const NodeKeys: Set<string> = new Set()
@@ -66,6 +67,20 @@ export class UINode {
         return this.node.isConnected
     }
 
+    #p: {
+        curr?: string
+        prev?: string
+        ofn?: Handler
+    } = {}
+
+    get currentstate() {
+        return this.#p.curr
+    }
+
+    get prevstate() {
+        return this.#p.prev
+    }
+
     attrs(o: Record<string, string>) {
         for (const [k, v] of Object.entries(o)) this.node.setAttribute(toKebab(k), String(v))
         return this
@@ -124,7 +139,21 @@ export class UINode {
 
     setState(state: string, opts = {schedule: false}) {
         const o = this.meta
-        if (o.belongsTo) o.belongsTo.GlobalStates.setState(this, state, opts)
+        this.#p.prev = this.node.getAttribute('data-state') ?? ''
+        if (o.belongsTo) {
+            o.belongsTo.GlobalStates.setState(this, state, opts)
+            this.#p.curr = state
+            this.#p.ofn?.call(this)
+            if (this.key) storageapi.o.set('uistates')?.(this.key, state)
+        }
+    }
+
+    hasDefinedState(state: string) {
+        return this.meta.belongsTo?.GlobalStates.hasState(this.node, state)
+    }
+
+    onStateChange(fn: Handler) {
+        this.#p.ofn = fn
     }
 }
 

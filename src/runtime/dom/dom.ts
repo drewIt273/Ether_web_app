@@ -130,15 +130,15 @@ export class DOMInterface extends Module {
     }
 
     GlobalStates: UiStatesInterface = {
-        setState: (node: UINode, state: string, opts: {schedule: boolean}) => {
+        setState: (node, state, opts) => {
             this.#se(node, () => this.IMC.emit('set', this.rune.states, [node, state, opts]))
         },
 
-        defineState: (node: UINode, state: string, call: Handler) => {
+        defineState: (node, state, call) => {
             this.#se(node, () => this.IMC.emit('df', this.rune.states, [node, state, call]))
         },
 
-        defineCompute: (node: UINode, state: string, call: Handler) => {
+        defineCompute: (node, state, call) => {
             this.#se(node, () => this.IMC.emit('dc', this.rune.states, [node, state, call]))
         },
 
