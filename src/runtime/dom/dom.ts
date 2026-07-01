@@ -85,7 +85,7 @@ export class DOMInterface extends Module {
                         }
                         else node.mappedData.delete(key)
                 }
-                else throw new DOMInterfaceError(`UINode ${node.ID} out of reach`)
+                else throw new DOMInterfaceError(`UINode ${node.ID} is out of reach`)
             },
         }
     }
@@ -108,7 +108,11 @@ export class DOMInterface extends Module {
                 else throw new NodeHierarchyError(`${r(n)} cannot mount ${r(k)}`)
             else into.appendChild(node)
         }
-        else throw new DOMInterfaceError(`Node ${into} out of reach`)
+        else throw new DOMInterfaceError(`Node ${into} is out of reach`)
+    }
+
+    query(s: string) {
+        return Array.from(this.root.querySelectorAll(s))
     }
 
     GlobalEvents: UiEventsInterface = {
