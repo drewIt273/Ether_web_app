@@ -51,9 +51,6 @@ export class Rune {
     config: RuntimeConfig
     proxyInterface: ProxyInterface
     constructor(o: RuntimeAPI = {proxyTargets: null, shared: false}) {
-        this.dom = new DOMInterface(this)
-        this.events = new UiEventsModule(this)
-        this.states = new UiStateManager(this)
         this.scheduler = new Scheduler()
         this.hooks = {
             init: [storageapi.setCache],
@@ -83,6 +80,9 @@ export class Rune {
         }
         RuneInstancesLog.log(this)
         this.ID = `R0${RuneInstancesLog.size}`
+        this.dom = new DOMInterface(this)
+        this.events = new UiEventsModule(this)
+        this.states = new UiStateManager(this)
     }
 
     #o: RuntimeAPI | null = null
