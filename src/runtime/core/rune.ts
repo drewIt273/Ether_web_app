@@ -15,8 +15,8 @@ interface RuntimeConfig {
 }
 
 interface RuntimeHooks {
-    init: HandlerList,
-    ready: HandlerList
+    init: (() => Error | unknown)[],
+    ready: (() => Error | unknown)[]
 }
 
 interface RuntimeAPI {
@@ -54,7 +54,7 @@ export class Rune {
         this.scheduler = new Scheduler()
         this.hooks = {
             init: [storageapi.setCache],
-            ready: [this.#pn]
+            ready: [() => this.#pn.call(this)]
         }
         this.init = !1
         this.ready = !1
@@ -88,14 +88,50 @@ export class Rune {
     #o: RuntimeAPI | null = null
 
     #pn() {
-        if (this.#o?.shared) {
-            const k = new RuntimeProxy(this);
-            k.shared = true
-            this.#o.proxyTargets?.forEach(n => k.append(n))
-            RuneProxies.log(k)
+        if (this.#o)
+            if (this.#o.shared) {
+                const k = new RuntimeProxy(this); k.shared = true
+                this.#o.proxyTargets?.forEach(n => k.append(n))
+                RuneProxies.log(k)
+            }
+            else {
+                if (this.#o.proxyTargets?.length) this.#o.proxyTargets.forEach(n => RuneProxies.log(new RuntimeProxy(this, n)))
+            }
+    }
+
+    async boot() {
+        const a = await this.#preboot()
+        return a === undefined ? await this.#runstartupHooks() : a
+    }
+
+    async #preboot() {
+        const a = [this.dom, this.states, this.events]
+        try {
+            for (const k of a) {
+                // @ts-expect-error
+                this.hooks.init.push(() => k.onInit.call(k))
+                this.hooks.ready.push(() => k.onReady.call(k))
+            }
         }
-        else {
-            this.#o?.proxyTargets?.forEach(n => RuneProxies.log(new RuntimeProxy(this, n)))
+        catch(e) {return new Error(`${e}`)}
+    }
+
+    async #runstartupHooks() {
+        for (const fn of this.hooks.init) {
+            const v = await fn()
+            if (v instanceof Error) {
+                this.init = !1
+                return v
+            }
+            else this.init = !0
+        }
+        if (this.init) for (const fn of this.hooks.ready) {
+            const v = await fn()
+            if (v instanceof Error) {
+                this.init = !1
+                return v
+            }
+            else this.init = !0
         }
     }
 }
