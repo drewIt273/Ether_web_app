@@ -68,6 +68,14 @@ export class Module {
             }
         }
     }
+
+    async onInit(): Promise<any> {
+        this.init = !0
+    }
+
+    async onReady(): Promise<any> {
+        this.init = !0
+    }
 }
 
 interface EventsModuleData {
