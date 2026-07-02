@@ -98,7 +98,7 @@ export class DOMInterface extends Module {
     }
 
     async onInit() {
-        if (typeof window === 'undefined') return '[DOM] not running in browser environment'  
+        if (typeof window === 'undefined') return new Error('[DOM] not running in browser environment')
         else {
             this.init = !0
         }
@@ -114,6 +114,7 @@ export class DOMInterface extends Module {
     }
 
     append(node: Node, into: Node = this.root) {
+        (node as Element).setAttribute('_hide_', '')
         if (this.root.contains(into)) {
             const e = NodeHierarchyCheck(node), n = UINodeMap.get(into), k = UINodeMap.get(node)
             if (e) throw e
