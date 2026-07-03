@@ -53,6 +53,15 @@ body, web-app {
     height: 100%;
     margin: 0;
 }
+aside {
+    height: 100%;
+    max-width: 340px;
+}
+aside[data-state="relative"][expand] {
+    width: 340px;
+    position: relative;
+    background-color: var(--bg-aside-color);
+}
 html button {
     height: 100%;
     display: block;

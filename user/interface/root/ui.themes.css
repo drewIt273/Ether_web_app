@@ -6,7 +6,7 @@
 
 @import url("ui.roots.css");
 
-html[data-theme="notion-dark-theme"] {
+html[data-theme="dark"] {
     --bg-base-color: #181818;
     --bg-aside-color: #1F1F1F;
     --bg-border-color: #4d4d4d3d;
@@ -25,7 +25,7 @@ html[data-theme="notion-dark-theme"] {
     --vector-bg: #181818;
     --vector-border: #97979a;
 }
-html[data-theme="notion-light-theme"] {
+html[data-theme="light"] {
     --bg-base-color: #FCFCFC;
     --bg-aside-color: #F8F8F6;
     --bg-secondrary-color: #FCFCFC;
