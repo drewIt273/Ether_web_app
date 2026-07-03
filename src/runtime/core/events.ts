@@ -8,6 +8,12 @@ import {Registry} from "@assets/registry";
 
 type EventHandler = (e: Event) => any
 
+interface CustomEvents {
+    'append': Event
+}
+
+type GlobalEvents = DocumentEventMap & CustomEvents
+
 interface EventRecordValue {
     node: Node
     fn: EventHandler[]
@@ -28,7 +34,7 @@ export class UiEventsModule extends Module {
         this.GlobalDelegates = new Map()
         this.Keybinds = new WeakMap()
 
-        this.IMC.map('ln', (ev: keyof DocumentEventMap, n: Node, ...fn: EventHandler[]) => this.listen(ev, n, ...fn))
+        this.IMC.map('ln', (ev: keyof GlobalEvents, n: Node, ...fn: EventHandler[]) => this.listen(ev, n, ...fn))
         this.IMC.map('un', (n: Node, ev: keyof DocumentEventMap | null) => this.unlisten(n, ev))
         this.IMC.map('kc', (k: string[], n: Node, fn: Handler) => this.keybind(k, n, fn)(n))
         this.IMC.map('ku', (n: Node) => this.Keybinds.delete(n))
@@ -45,7 +51,7 @@ export class UiEventsModule extends Module {
 
     #unbubble = new Set(['mouseenter', 'mouseleave', 'blur', 'focus', 'pointerenter', 'pointerleave'])
 
-    listen(ev: keyof DocumentEventMap, node: Node, ...handlers: ((e: Event) => any)[]) {
+    listen(ev: keyof GlobalEvents, node: Node, ...handlers: ((e: Event) => any)[]) {
         const existing = this.ActiveListeners.get(ev)
         if (!existing) this.ActiveListeners.includesKey(ev) ? this.ActiveListeners.reg[ev]?.push({node: node, fn: [...handlers]}) : this.ActiveListeners.write([{node: node, fn: [...handlers]}], ev)
         else {
@@ -73,7 +79,7 @@ export class UiEventsModule extends Module {
         }
     }
 
-    unlisten(node: Node, ev: keyof DocumentEventMap | null = null) {
+    unlisten(node: Node, ev: keyof GlobalEvents | null = null) {
         if (ev) {
             const existing = this.ActiveListeners.get(ev), o = existing?.find(o => o.node === node)
             if (!existing || !o) return;
@@ -128,3 +134,5 @@ export class UiEventsModule extends Module {
         this.listen('keydown', node, listener)
     }
 }
+
+export type G = GlobalEvents
