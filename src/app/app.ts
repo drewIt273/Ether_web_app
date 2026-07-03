@@ -2,10 +2,7 @@
  * Instance by DrewIt
  */
 
-import {Rune} from "@core/rune";
+import {dom} from "./boot";
+import {fn} from "./sidebar";
 
-const rune = new Rune(), a = rune.boot()
-
-if (a instanceof Error) throw a;
-
-export const dom = rune.dom, scheduler = rune.scheduler
+if (dom.ready) dom.append(fn().node)
