@@ -2,9 +2,10 @@
  * Instance by DrewIt
  */
 
-import {UICell as C, UIBlock as B, UIComponent as K, UINode as U} from "@dom/ui-root"
+import {UICell as C, UIBlock as B, UIComponent as K, U} from "@dom/ui-root"
 import {Rune as R} from "@core/rune";
 import {DOMInterface as D} from "@dom/dom";
+import {G} from "@core/events";
 
 declare global {
     type UICell = C;
@@ -16,4 +17,11 @@ declare global {
     type HandlerList = Handler[];
     type Rune = R
     type DOMInterface = D
+    type GlobalEvents = G
+    interface Node {
+        rune: {
+            id: string
+            isRuneRoot: boolean
+        }
+    }
 }

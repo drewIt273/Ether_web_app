@@ -10,20 +10,20 @@ export const NodeKeys: Set<string> = new Set()
 
 interface NodeMetaData {
     belongsTo?: DOMInterface
-    onEventMap: Map<keyof DocumentEventMap, ((ev: Event) => void)[]>
-    unEventSet: Set<keyof DocumentEventMap>
+    onEventMap: Map<keyof GlobalEvents, ((ev?: Event) => void)[]>
+    unEventSet: Set<keyof GlobalEvents>
     backStates: Map<string, {type: 'static' | 'computed', fn: Handler}>
 }
 
 interface NodeJSX<K extends unknown> {
-    tag: keyof HTMLElementTagNameMap
+    tag?: keyof HTMLElementTagNameMap
     attrs?: Record<string, unknown>
     className?: string
     textContent?: string
-    style?: Partial<Record<keyof CSSStyleProperties, string>>
+    style?: Partial<Record<keyof CSSStyleProperties, any>>
     append?: K[]
     UIKey?: string
-
+    on?: [keyof DocumentEventMap, ...Handler[]]
 }
 
 type newnode<K extends unknown> = () => K
@@ -99,13 +99,13 @@ export class UINode {
         if (this.mounted) this.node.parentElement?.removeChild(this.node)
     }
 
-    on(ev: keyof DocumentEventMap, ...calls: ((ev: Event) => void)[]) {
+    on(ev: keyof GlobalEvents, ...calls: ((ev?: Event) => void)[]) {
         const o = this.meta
         if (o.belongsTo) o.belongsTo.GlobalEvents.onEvent(ev, this.node, ...calls)
         else o.onEventMap.set(ev, calls)
     }
 
-    off(ev: keyof DocumentEventMap | null = null) {
+    off(ev: keyof GlobalEvents | null = null) {
         const o = this.meta
         if (o.belongsTo) o.belongsTo.GlobalEvents.unEvent(this.node, ev)
         else if (ev) o.unEventSet.add(ev)
@@ -314,3 +314,9 @@ function jsx(o: NodeJSX<unknown>, n: HTMLElement) {
     }
     return n
 }
+
+export function newnode(n: keyof HTMLElementTagNameMap, o: NodeJSX<Node | UINode | nodefn<Node | UINode>> = {}) {
+    return jsx(o, document.createElement(n))
+}
+
+export type U = UINode
