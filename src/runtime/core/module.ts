@@ -79,8 +79,8 @@ export class Module {
 }
 
 interface EventsModuleData {
-    'ln': [keyof DocumentEventMap, Node, ((ev: Event) => void)[]]
-    'un': [Node, keyof DocumentEventMap | null]
+    'ln': [keyof GlobalEvents, Node, ((ev: Event) => void)[]]
+    'un': [Node, keyof GlobalEvents | null]
     'kc': [string[], Node, Handler]
     'ku': [Node]
     're': [Node]
