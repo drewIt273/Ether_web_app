@@ -15,8 +15,8 @@ interface NodeMessageResolver {
 }
 
 interface UiEventsInterface {
-    onEvent(ev: keyof DocumentEventMap, node: Node, ...handlers: ((ev: Event) => void)[]): void
-    unEvent(node: Node, ev?: keyof DocumentEventMap | null): void
+    onEvent(ev: keyof GlobalEvents, node: Node, ...handlers: ((ev: Event) => void)[]): void
+    unEvent(node: Node, ev?: keyof GlobalEvents | null): void
     keyEvent(node: Node, keys: string[], handler: ((ev: Event) => void)): void
     unKey(node: Node): void
 }
@@ -114,6 +114,10 @@ export class DOMInterface extends Module {
                 else throw new DOMInterfaceError(`UINode ${node.ID} is out of reach`)
             },
         }
+        this.root.rune = {
+            id: this.rune.ID,
+            isRuneRoot: true
+        }
     }
 
     async onInit() {
@@ -149,11 +153,12 @@ export class DOMInterface extends Module {
     }
 
     GlobalEvents: UiEventsInterface = {
-        onEvent: (ev: keyof DocumentEventMap, node: Node, ...handlers: ((ev: Event) => void)[]) => {
+        onEvent: (ev: keyof GlobalEvents, node: Node, ...handlers: ((ev: Event) => void)[]) => {
+            console.log('heyyy')
             this.#ne(node, () => this.IMC.emit('ln', this.rune.events, [ev, node, handlers]))
         },
 
-        unEvent: (node: Node, ev: keyof DocumentEventMap | null = null) => {
+        unEvent: (node: Node, ev: keyof GlobalEvents | null = null) => {
             this.#ne(node, () => this.IMC.emit('un', this.rune.events, [node, ev]))
         },
 
