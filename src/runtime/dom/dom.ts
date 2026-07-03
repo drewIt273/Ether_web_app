@@ -39,28 +39,47 @@ export class DOMInterface extends Module {
         super(r)
         this.rune = r
         this.observer = new MutationObserver(muts => {
+            const rn = (n: Node) => {
+                n.rune = {
+                    id: this.rune.ID,
+                    isRuneRoot: false
+                }
+                console.log(n.rune)
+            }
             for (const mut of muts) {
                 if (mut.addedNodes) for (const added of mut.addedNodes) {
                     (added as Element).setAttribute('_hide_', '')
-                    const o = UINodeMap.get(added)
-                    if (!o) this.nodelist.push(added)
-                    else {
-                        o.meta.belongsTo = this
-                        o.meta.onEventMap.forEach((v, k) => this.GlobalEvents.onEvent(k, o.node, ...v)), o.meta.onEventMap.clear()
-                        if (o.key) {
-                            const a = storageapi.o.get('uistates')?.[o.key]
-                            if (a) o.setState(a)
+                    const call = (n: Node) => {
+                        const o = UINodeMap.get(n)
+                        if (o === undefined) this.nodelist.push(n)
+                        else {
+                            o.meta.belongsTo = this
+                            o.meta.onEventMap.forEach((v, k) => {
+                                if (k === 'append') v.forEach(h => h())
+                                else this.GlobalEvents.onEvent(k, o.node, ...v)
+                            }), o.meta.onEventMap
+                            if (o.key) {
+                                const a = storageapi.o.get('uistates')?.[o.key]
+                                if (a) o.setState(a)
+                            }
                         }
+                        n.childNodes.forEach(a => call(a))
+                        rn(n); n.childNodes.forEach(c => rn(c))
                     }
+                    call(added),
                     (added as Element).removeAttribute('_hide_')
                 }
                 if (mut.removedNodes) for (const removed of mut.removedNodes) {
-                    const o = UINodeMap.get(removed); this.GlobalEvents.unEvent(removed)
-                    if (!o) this.nodelist = this.nodelist.filter(n => n !== removed)
-                    else {
-                        o.meta.unEventSet.clear()
-                        if (o.key) storageapi.o.set('uistates')?.(o.key, o.currentstate)
+                    const call = (n: Node) => {
+                        const o = UINodeMap.get(n); this.GlobalEvents.unEvent(n)
+                        if (!o) this.nodelist = this.nodelist.filter(r => r !== n)
+                        else {
+                            o.meta.unEventSet.clear()
+                            if (o.key) storageapi.o.set('uistates')?.(o.key, o.currentstate)
+                        }
+                        n.childNodes.forEach(n => call(n))
                     }
+                    call(removed)
                 }
             }
         })
@@ -105,7 +124,7 @@ export class DOMInterface extends Module {
     }
 
     async onReady() {
-        const s = new stylesheet(); s.id = '_rune-injected-styles_'
+        const s = new stylesheet(); s.id = '_rune-injected-styles_'; s.append()
         s.CSS = {
             '*[_hide_]': {display: 'none'}
         }
@@ -114,7 +133,6 @@ export class DOMInterface extends Module {
     }
 
     append(node: Node, into: Node = this.root) {
-        (node as Element).setAttribute('_hide_', '')
         if (this.root.contains(into)) {
             const e = NodeHierarchyCheck(node), n = UINodeMap.get(into), k = UINodeMap.get(node)
             if (e) throw e
