@@ -4,6 +4,7 @@
 
 import {ranstring, toKebab} from "@assets/any";
 import {storageapi} from "@assets/storageapi";
+import {RuneInstancesLog} from "@core/rune";
 
 export const UINodeMap = new WeakMap<Node, UINode>
 export const NodeKeys: Set<string> = new Set()
@@ -26,24 +27,27 @@ interface NodeJSX<K extends unknown> {
     on?: [keyof DocumentEventMap, ...Handler[]]
 }
 
-type newnode<K extends unknown> = () => K
+type nodefn<K extends unknown> = () => K
 
-interface CellJSX extends NodeJSX<Node | newnode<Node>> {}
-interface BlockJSX extends NodeJSX<Node | UICell | newnode<Node | UICell>> {}
-interface ComponentJSX extends NodeJSX<Node | UICell | UIBlock | newnode<Node | UICell | UIBlock>> {}
+interface CellJSX extends NodeJSX<Node | nodefn<Node>> {}
+interface BlockJSX extends NodeJSX<Node | UICell | nodefn<Node | UICell>> {}
+interface ComponentJSX extends NodeJSX<Node | UICell | UIBlock | nodefn<Node | UICell | UIBlock>> {}
 
-export class UINode {
+class UINode {
 
     readonly node: HTMLElement
     meta: NodeMetaData
     constructor(o: NodeJSX<Node | unknown>) {
-        this.node = document.createElement(o.tag)
+        this.node = o.tag ? document.createElement(o.tag) : document.createElement('div')
         this.meta = {
             onEventMap: new Map(),
             unEventSet: new Set(),
             backStates: new Map()
         }
-        jsx(o, this.node)
+        this.node.rune = {
+            id: '',
+            isRuneRoot: false
+        }
     }
 
     get key() {
@@ -126,6 +130,7 @@ export class UINode {
             else o.GlobalStates.defineState(this, state, call)
         }
         else a.set(state, {type: 'static', fn: call})
+        return (state: string, call: Handler = () => {}) => this.defineState.call(this, state, call)
     }
 
     defineComputedState(state: string, call: Handler = () => {}) {
@@ -135,6 +140,7 @@ export class UINode {
             else o.GlobalStates.defineState(this, state, call)
         }
         else a.set(state, {type: 'computed', fn: call})
+        return this.defineComputedState
     }
 
     setState(state: string, opts = {schedule: false}) {
@@ -169,6 +175,7 @@ export class UICell extends UINode {
         this.attrs({'ui-cell': this.ID})
         this.mappedData = new Map
         UINodeMap.set(this.node, this)
+        jsx(o, this.node)
     }
 
     mount(n: Node|UIBlock|UIComponent) {
@@ -203,6 +210,7 @@ export class UIBlock extends UINode {
         this.attrs({'ui-block': this.ID})
         this.mappedData = new Map
         UINodeMap.set(this.node, this)
+        jsx(o, this.node)
     }
 
     get childCells() {
@@ -237,6 +245,7 @@ export class UIComponent extends UINode {
         this.ID = ranstring(4, 1)
         this.attrs({'ui-comp': this.ID})
         UINodeMap.set(this.node, this)
+        jsx(o, this.node)
     }
 
     get childBlocks() {
@@ -274,7 +283,12 @@ const casiveAttrs = new Set(['viewBox'])
 
 function jsx(o: NodeJSX<unknown>, n: HTMLElement) {
 
+    const u = UINodeMap.get(n)
     for (const [key, value] of Object.entries(o)) {
+        if (key === 'UIKey') {
+            if (u) u.UIKey = value
+            continue;
+        }
         if (key === 'className') {
             n.className = value
             continue;
@@ -294,22 +308,16 @@ function jsx(o: NodeJSX<unknown>, n: HTMLElement) {
             }
             continue;
         }
-        if (key === 'UIKey') {
-            n.setAttribute('node-key', value)
-            continue;
-        }
         if (key === 'append') {
-            value.forEach((v: Node | UINode | newnode<Node | UINode>) => {
+            value.forEach((v: Node | UINode | nodefn<Node | UINode>) => {
                 let a; v instanceof Node ? n.append(v) : v instanceof UINode ? n.append(v.node) : (a = v(), a instanceof Node ? n.append(a) : n.append(a.node))
             })
             continue;
         }
-        const k = /^on[A-Z]/g
-        if (k.test(key) && typeof value === 'function') {
-            const l = key.slice(2).toLowerCase(), o = UINodeMap.get(n)
-            // @ts-expect-error
-            o ? o.on(l, value) : n.addEventListener(l, value)
-            continue;
+        if (key === 'on' && Array.isArray(value)) {
+            let f = () => console.log(n.rune.id, Date.now())
+            RuneInstancesLog.find(v => v.ID === n.rune.id)?.dom.GlobalEvents.onEvent(value[0], n, ...value[1])
+            f(); continue;
         }
     }
     return n
