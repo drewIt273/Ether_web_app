@@ -7,12 +7,6 @@ import {ArrayLogLock} from "@assets/registry"
 
 export type ErrorCode = 'RUNTIME' | 'NODE_HIERARCHY' | 'DOM_INTERFACE_OBJECT' | 'CACHE_OBJECT' | 'RUNTIME_PROXY'
 
-declare global {
-    interface ErrorConstructor {
-        captureStackTrace?: (target: any, constructorOpt?: Function) => void
-    }
-}
-
 export {}
 
 interface ErrorLog {
@@ -32,7 +26,7 @@ export const ErrorLog: ErrorLog = {
 class GlobalError extends Error {
 
     constructor(msg: string) {
-        super(`${GlobalError.name}: ${msg}`)
+        super(`${msg}`)
         Object.setPrototypeOf(this, new.target.prototype)
         if (typeof Error.captureStackTrace === 'function') {
             Error.captureStackTrace(this, this.constructor)
