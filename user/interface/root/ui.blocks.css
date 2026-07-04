@@ -112,6 +112,15 @@
 .row-resizer.down-side {
     bottom: -1px;
 }
+.sidebar-con {
+    width: fit-content;
+}
+.sidebar-con[collapse] {
+    width: 8px;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
 .flex-wrapper {
     display: flex;
     flex-direction: row;

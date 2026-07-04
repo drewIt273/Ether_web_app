@@ -3,6 +3,7 @@
  */
 
 import {dom} from "./boot";
-import {fn} from "./sidebar";
+import {sidebar$} from "./sidebar";
 
-if (dom.ready) dom.append(fn().node)
+if (dom.ready) dom.append(sidebar$())
+console.log(dom.rune.states.reg)

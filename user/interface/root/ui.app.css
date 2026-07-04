@@ -41,13 +41,13 @@ body [default-scrollbar] {
     scrollbar-color: var(--bg-scrollbar-color);
 }
 web-app {
-    background-color: var(--bg-base-color);
     font-family: var(--font-display);
     color: var(--fg-base-color);
     display: block;
 }
 html, body, web-app {
     overflow: hidden;
+    background-color: var(--bg-base-color);
 }
 body, web-app {
     height: 100%;
@@ -57,10 +57,21 @@ aside {
     height: 100%;
     max-width: 340px;
 }
-aside[data-state="relative"][expand] {
-    width: 340px;
-    position: relative;
+[node-key="sidebar"] {
     background-color: var(--bg-aside-color);
+}
+[node-key="sidebar"][data-state="relative"] {
+    position: relative;
+    width: 0;
+    border-right: 2px solid var(--bg-border-color);
+}
+[node-key="sidebar"][data-state="relative"][expand] {
+    width: 340px;
+}
+[node-key="sidebar"][data-state="absolute"] {
+    position: absolute;
+    border-radius: 15px;
+    border: 1px solid var(--bg-border-color);
 }
 html button {
     height: 100%;
