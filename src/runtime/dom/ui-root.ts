@@ -27,7 +27,7 @@ interface NodeJSX<K extends unknown> {
     on?: [keyof DocumentEventMap, ...Handler[]]
 }
 
-type nodefn<K extends unknown> = () => K
+type nodefn<K extends unknown> = ($: HTMLElement) => K
 
 interface CellJSX extends NodeJSX<Node | nodefn<Node>> {}
 interface BlockJSX extends NodeJSX<Node | UICell | nodefn<Node | UICell>> {}
@@ -308,16 +308,17 @@ function jsx(o: NodeJSX<unknown>, n: HTMLElement) {
             }
             continue;
         }
-        if (key === 'append') {
-            value.forEach((v: Node | UINode | nodefn<Node | UINode>) => {
-                let a; v instanceof Node ? n.append(v) : v instanceof UINode ? n.append(v.node) : (a = v(), a instanceof Node ? n.append(a) : n.append(a.node))
-            })
+        if (key === 'on' && Array.isArray(value)) {
+            const o = RuneInstancesLog.find(v => v.ID === n.rune.id)
+            if (o) o.dom.GlobalEvents.onEvent(value[0], n, value[1])
+            else EventMap.set(n, {ev: value[0], fn: value[1]})
             continue;
         }
-        if (key === 'on' && Array.isArray(value)) {
-            let f = () => console.log(n.rune.id, Date.now())
-            RuneInstancesLog.find(v => v.ID === n.rune.id)?.dom.GlobalEvents.onEvent(value[0], n, ...value[1])
-            f(); continue;
+        if (key === 'append') {
+            value.forEach((v: Node | UINode | nodefn<Node | UINode>) => {
+                let a; v instanceof Node ? n.append(v) : v instanceof UINode ? n.append(v.node) : (a = v(n), a instanceof Node ? n.append(a) : n.append(a.node))
+            })
+            continue;
         }
     }
     return n

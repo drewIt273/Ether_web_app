@@ -79,7 +79,7 @@ export class Module {
 }
 
 interface EventsModuleData {
-    'ln': [keyof GlobalEvents, Node, ((ev: Event) => void)[]]
+    'ln': [keyof GlobalEvents, Node, ...((ev: Event) => void)[]]
     'un': [Node, keyof GlobalEvents | null]
     'kc': [string[], Node, Handler]
     'ku': [Node]
