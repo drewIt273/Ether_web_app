@@ -8,6 +8,7 @@ import {RuneInstancesLog} from "@core/rune";
 
 export const UINodeMap = new WeakMap<Node, UINode>
 export const NodeKeys: Set<string> = new Set()
+export const EventMap = new WeakMap<Node, {ev: GlobalEvents, fn: Handler}>()
 
 interface NodeMetaData {
     belongsTo?: DOMInterface

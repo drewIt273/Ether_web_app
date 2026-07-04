@@ -3,7 +3,7 @@
  */
 
 import {Module} from "@core/module";
-import {UINodeMap, UICell, UIBlock, UIComponent} from "./ui-root";
+import {UINodeMap, UICell, UIBlock, UIComponent, EventMap} from "./ui-root";
 import {DOMInterfaceError, NodeHierarchyError} from "@core/error";
 import {storageapi} from "@assets/storageapi";
 import {stylesheet} from "@assets/stylesheet";
@@ -44,27 +44,32 @@ export class DOMInterface extends Module {
                     id: this.rune.ID,
                     isRuneRoot: false
                 }
-                console.log(n.rune)
             }
             for (const mut of muts) {
                 if (mut.addedNodes) for (const added of mut.addedNodes) {
+                    rn(added), added.childNodes.forEach(c => rn(c));
                     (added as Element).setAttribute('_hide_', '')
                     const call = (n: Node) => {
                         const o = UINodeMap.get(n)
-                        if (o === undefined) this.nodelist.push(n)
+                        if (o === undefined) {
+                            this.nodelist.push(n)
+                            if (EventMap.has(n)) {const k = EventMap.get(n)
+                                // @ts-expect-error
+                                this.GlobalEvents.onEvent(k.ev, n, k.fn)
+                            }
+                        }
                         else {
                             o.meta.belongsTo = this
                             o.meta.onEventMap.forEach((v, k) => {
                                 if (k === 'append') v.forEach(h => h())
                                 else this.GlobalEvents.onEvent(k, o.node, ...v)
-                            }), o.meta.onEventMap
+                            }), o.meta.onEventMap.clear()
                             if (o.key) {
                                 const a = storageapi.o.get('uistates')?.[o.key]
                                 if (a) o.setState(a)
                             }
                         }
-                        n.childNodes.forEach(a => call(a))
-                        rn(n); n.childNodes.forEach(c => rn(c))
+                        n.childNodes.forEach(a => call(a));
                     }
                     call(added),
                     (added as Element).removeAttribute('_hide_')
@@ -155,7 +160,7 @@ export class DOMInterface extends Module {
     GlobalEvents: UiEventsInterface = {
         onEvent: (ev: keyof GlobalEvents, node: Node, ...handlers: ((ev: Event) => void)[]) => {
             console.log('heyyy')
-            this.#ne(node, () => this.IMC.emit('ln', this.rune.events, [ev, node, handlers]))
+            this.#ne(node, () => this.IMC.emit('ln', this.rune.events, [ev, node, ...handlers]))
         },
 
         unEvent: (node: Node, ev: keyof GlobalEvents | null = null) => {
