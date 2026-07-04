@@ -100,6 +100,10 @@ class UINode {
         return Array.from(this.node.querySelectorAll(n))
     }
 
+    find(n: string) {
+        return this.node.querySelector(n) as HTMLElement
+    }
+
     unmount() {
         if (this.mounted) this.node.parentElement?.removeChild(this.node)
     }
@@ -108,6 +112,11 @@ class UINode {
         const o = this.meta
         if (o.belongsTo) o.belongsTo.GlobalEvents.onEvent(ev, this.node, ...calls)
         else o.onEventMap.set(ev, calls)
+    }
+
+    delegate(target: Node | string, ev: keyof GlobalEvents, ...calls: ((ev?: Event) => void)[]) {
+        const n = target instanceof Node ? target : this.find(target)
+        if (n) this.meta.belongsTo?.GlobalEvents.onEvent(ev, n, ...calls)
     }
 
     off(ev: keyof GlobalEvents | null = null) {
@@ -246,8 +255,11 @@ export class UIComponent extends UINode {
         this.ID = ranstring(4, 1)
         this.attrs({'ui-comp': this.ID})
         UINodeMap.set(this.node, this)
-        jsx(o, this.node)
+        this.node.rune = {id: 'node', isRuneRoot: false}, console.log(this.node.rune)
+        this.#o = () => jsx(o, this.node)
     }
+
+    #o;
 
     get childBlocks() {
         return childBlocks(this)
@@ -259,6 +271,10 @@ export class UIComponent extends UINode {
 
     mount(n: Node) {
         n.appendChild(this.node)
+    }
+
+    init() {
+        this.#o()
     }
 }
 
