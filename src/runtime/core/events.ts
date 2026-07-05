@@ -19,6 +19,12 @@ interface EventRecordValue {
     fn: EventHandler[]
 }
 
+interface UnbubbleListener {
+    node: Node
+    fn: EventHandler[]
+    wrappers: EventHandler[]
+}
+
 export class UiEventsModule extends Module {
 
     ActiveListeners: Registry<EventRecordValue[]>
@@ -35,7 +41,7 @@ export class UiEventsModule extends Module {
         this.Keybinds = new WeakMap()
 
         this.IMC.map('ln', (ev: keyof GlobalEvents, n: Node, ...fn: EventHandler[]) => this.listen(ev, n, ...fn))
-        this.IMC.map('un', (n: Node, ev: keyof DocumentEventMap | null) => this.unlisten(n, ev))
+        this.IMC.map('un', (n: Node, ev: keyof GlobalEvents | null) => this.unlisten(n, ev))
         this.IMC.map('kc', (k: string[], n: Node, fn: Handler) => this.keybind(k, n, fn)(n))
         this.IMC.map('ku', (n: Node) => this.Keybinds.delete(n))
         this.IMC.map('re', (n: Node) => this.restore(n))
@@ -50,28 +56,53 @@ export class UiEventsModule extends Module {
     }
 
     #unbubble = new Set(['mouseenter', 'mouseleave', 'blur', 'focus', 'pointerenter', 'pointerleave'])
+    #unmap: Record<string, UnbubbleListener[]> = {}
 
     listen(ev: keyof GlobalEvents, node: Node, ...handlers: ((e: Event) => any)[]) {
         const existing = this.ActiveListeners.get(ev)
-        if (!existing) this.ActiveListeners.includesKey(ev) ? this.ActiveListeners.reg[ev]?.push({node: node, fn: [...handlers]}) : this.ActiveListeners.write([{node: node, fn: [...handlers]}], ev)
+        if (!existing) {
+            this.ActiveListeners.includesKey(ev)
+                ? this.ActiveListeners.reg[ev]?.push({node, fn: [...handlers]})
+                : this.ActiveListeners.write([{node, fn: [...handlers]}], ev)
+        }
         else {
             let n = existing.find(o => o.node === node)
-            if (n) handlers.forEach(fn => {
-                if (!n.fn.includes(fn)) n.fn.push(fn)
-            })
+            if (n) {
+                handlers.forEach(fn => {
+                    if (!n!.fn.includes(fn)) n!.fn.push(fn)
+                })
+            }
+            else existing.push({node, fn: [...handlers]})
         }
 
-            this.BacklogListeners = this.BacklogListeners.filter(o => !o.some(v => v.node === node))
+        this.BacklogListeners = this.BacklogListeners.filter(o => !o.some(v => v.node === node))
 
-        if (!this.ActiveGlobals.has(ev)) {
-            this.ActiveGlobals.add(ev)
-            if (this.#unbubble.has(ev)) {
-                handlers.forEach(handler => node.addEventListener(ev, e => handler.call(node, e)))
+        if (this.#unbubble.has(ev)) {
+            let entry = this.#unmap[ev]?.find(e => e.node === node)
+            if (!entry) {
+                entry = {node, fn: [], wrappers: []}
+                this.#unmap[ev] ? this.#unmap[ev].push(entry) : this.#unmap[ev] = [entry]
             }
-            else {
+            handlers.forEach(handler => {
+                if (!entry!.fn.includes(handler)) {
+                    entry!.fn.push(handler)
+                    const wrapper = (e: Event) => handler.call(node, e)
+                    entry!.wrappers.push(wrapper)
+                    node.addEventListener(ev, wrapper)
+                }
+            })
+            this.ActiveGlobals.add(ev)
+        }
+        else {
+            if (!this.ActiveGlobals.has(ev)) {
+                this.ActiveGlobals.add(ev)
                 const delegatedListener = (e: Event) => {
-                    const o = this.ActiveListeners.get(ev)?.find(o => o.node === node)
-                    if (o && e.target instanceof Node && o.node.contains(e.target)) o.fn.forEach(fn => fn.call(o.node, e))
+                    if (!(e.target instanceof Node)) return
+                    const listeners = this.ActiveListeners.get(ev)
+                    if (!listeners) return
+                    for (const o of listeners) {
+                        if (o.node.contains(e.target)) o.fn.forEach(fn => fn.call(o.node, e))
+                    }
                 }
                 this.rune.dom.root.addEventListener(ev, delegatedListener)
                 this.GlobalDelegates.set(ev, delegatedListener)
@@ -81,20 +112,69 @@ export class UiEventsModule extends Module {
 
     unlisten(node: Node, ev: keyof GlobalEvents | null = null) {
         if (ev) {
-            const existing = this.ActiveListeners.get(ev), o = existing?.find(o => o.node === node)
-            if (!existing || !o) return;
-            // Remove direct listeners for non-bubbling events
-                if (o) o.fn.forEach(fn => node.removeEventListener(ev, fn))
-            if (!o.fn.length) existing.splice(0, existing.length, ...existing.filter(o => o.node !== node))
+            const existing = this.ActiveListeners.get(ev)
+            const record = existing?.find(o => o.node === node)
 
-            this.BacklogListeners.includesKey(ev) ? this.BacklogListeners.reg[ev]?.push({node: node, fn: o.fn}) : this.BacklogListeners.write([{node: o.node, fn: o.fn}], ev)
+            if (this.#unbubble.has(ev)) {
+                const entry = this.#unmap[ev]?.find(a => a.node === node)
+                entry?.wrappers.forEach(fn => node.removeEventListener(ev, fn))
+                if (entry) {
+                    if (this.BacklogListeners.includesKey(ev)) this.BacklogListeners.reg[ev]?.push({node, fn: entry.fn})
+                    else this.BacklogListeners.write([{node, fn: entry.fn}], ev)
+                    this.#unmap[ev] = this.#unmap[ev]?.filter(a => a.node !== node) ?? []
+                    if (!this.#unmap[ev]?.length) delete this.#unmap[ev]
+                }
+                if (existing && existing.length === 1) this.ActiveGlobals.delete(ev)
+            }
+            else {
+                if (!record) return;
+                if (this.BacklogListeners.includesKey(ev)) this.BacklogListeners.reg[ev]?.push({node, fn: record.fn})
+                else this.BacklogListeners.write([{node, fn: record.fn}], ev)
+                if (existing?.length === 1) {
+                    const delegate = this.GlobalDelegates.get(ev)
+                    if (delegate) {
+                        this.rune.dom.root.removeEventListener(ev, delegate)
+                        this.GlobalDelegates.delete(ev)
+                    }
+                    this.ActiveGlobals.delete(ev)
+                }
+            }
 
-                this.ActiveListeners = this.ActiveListeners.filter(o => !o.some(v => v.node === node))
+            if (existing) {
+                const remaining = existing.filter(o => o.node !== node)
+                if (remaining.length) this.ActiveListeners.reg[ev] = remaining
+                else this.ActiveListeners.remove(ev)
+            }
         }
         else {
-            for (const [k, v] of Object.entries(this.ActiveListeners.reg)) v.forEach(o => {
-                if (o.node === node) o.fn.forEach(fn => node.removeEventListener(k, fn))
-            })
+            for (const [k, v] of Object.entries(this.ActiveListeners.reg)) {
+                const record = v.find(o => o.node === node)
+                if (!record) continue
+
+                if (this.#unbubble.has(k)) {
+                    const entry = this.#unmap[k]?.find(a => a.node === node)
+                    entry?.wrappers.forEach(fn => node.removeEventListener(k, fn))
+                    this.#unmap[k] = this.#unmap[k]?.filter(a => a.node !== node) ?? []
+                    if (!this.#unmap[k]?.length) delete this.#unmap[k]
+                }
+
+                if (this.BacklogListeners.includesKey(k)) this.BacklogListeners.reg[k]?.push({node, fn: record.fn})
+                else this.BacklogListeners.write([{node, fn: record.fn}], k)
+
+                const remaining = v.filter(o => o.node !== node)
+                if (remaining.length) this.ActiveListeners.reg[k] = remaining
+                else {
+                    this.ActiveListeners.remove(k)
+                    if (!this.#unbubble.has(k)) {
+                        const delegate = this.GlobalDelegates.get(k)
+                        if (delegate) {
+                            this.rune.dom.root.removeEventListener(k, delegate)
+                            this.GlobalDelegates.delete(k)
+                        }
+                        this.ActiveGlobals.delete(k)
+                    }
+                }
+            }
         }
     }
 
