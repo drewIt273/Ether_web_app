@@ -114,9 +114,11 @@
 }
 .sidebar-con {
     width: fit-content;
+    transition: all .3s ease-in-out;
 }
 .sidebar-con[collapse] {
-    width: 8px;
+    width: 10px;
+    height: 100%;
     position: absolute;
     top: 0;
     left: 0;

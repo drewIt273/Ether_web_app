@@ -53,25 +53,30 @@ body, web-app {
     height: 100%;
     margin: 0;
 }
-aside {
+[node-key="sidebar"] {
     height: 100%;
     max-width: 340px;
-}
-[node-key="sidebar"] {
+    min-width: 300px;
+    transition: all .3s ease-in-out;
     background-color: var(--bg-aside-color);
+    border: 2px solid var(--cr-transparent);
 }
 [node-key="sidebar"][data-state="relative"] {
     position: relative;
     width: 0;
-    border-right: 2px solid var(--bg-border-color);
+    border-right-color: var(--bg-border-color);
 }
 [node-key="sidebar"][data-state="relative"][expand] {
     width: 340px;
+    top: 0;
 }
 [node-key="sidebar"][data-state="absolute"] {
     position: absolute;
     border-radius: 15px;
     border: 1px solid var(--bg-border-color);
+    height: calc(100dvh - 20px);
+    top: 10px;
+    overflow: hidden;
 }
 html button {
     height: 100%;
