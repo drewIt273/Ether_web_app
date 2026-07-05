@@ -49,3 +49,20 @@ export function onResizeY(on: Node, target: Node = on.parentNode as ParentNode, 
         resizer.addEventListener('pointerup', onUp)
     }
 }
+
+/**
+ * Toggles between two states s1 and s2. If a different state was set initially, sets s1 as n's state.
+ */
+export function toggleUINodeState(n: UINode, s1: string, s2: string) {
+    let s = n.currentstate; console.log(s);
+    if (s === s1) n.setState(s2)
+    else if (s === s2) n.setState(s1)
+    else n.setState(s1)
+}
+
+export function toggleElementState(n: HTMLElement, s1: string, s2: string) {
+    let s = 'data-state', g = n.getAttribute(s)
+    if (g === s1) n.setAttribute(s, s2)
+    else if (g === s2) n.setAttribute(s, s1)
+    else n.setAttribute(s, s1)
+}
