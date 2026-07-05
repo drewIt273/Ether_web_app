@@ -159,7 +159,6 @@ export class DOMInterface extends Module {
 
     GlobalEvents: UiEventsInterface = {
         onEvent: (ev: keyof GlobalEvents, node: Node, ...handlers: ((ev: Event) => void)[]) => {
-            console.log('heyyy')
             this.#ne(node, () => this.IMC.emit('ln', this.rune.events, [ev, node, ...handlers]))
         },
 
