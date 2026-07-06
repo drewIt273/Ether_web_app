@@ -19,6 +19,7 @@ interface NodeMetaData {
 
 interface NodeJSX<K extends unknown> {
     tag?: keyof HTMLElementTagNameMap
+    id?: string
     attrs?: Record<string, unknown>
     className?: string
     textContent?: string
@@ -26,6 +27,7 @@ interface NodeJSX<K extends unknown> {
     append?: K[]
     UIKey?: string
     on?: [keyof DocumentEventMap, ...Handler[]]
+    innerHTML?: string
 }
 
 type nodefn<K extends unknown> = ($: HTMLElement) => K
@@ -310,12 +312,20 @@ function jsx(o: NodeJSX<unknown>, n: HTMLElement) {
             n.className = value
             continue;
         }
+        if (key === 'id') {
+            n.id = value
+            continue;
+        }
         if (key === 'style') {
             Object.assign(n.style, value)
             continue;
         }
         if (key === 'textContent') {
             n.textContent = value
+            continue;
+        }
+        if (key === 'innerHTML') {
+            n.innerHTML = value
             continue;
         }
         if (key === 'attrs') {
