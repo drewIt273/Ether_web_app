@@ -151,6 +151,7 @@ export class DOMInterface extends Module {
             else into.appendChild(node)
         }
         else throw new DOMInterfaceError(`Node ${into} is out of reach`)
+        return (node: Node, into: Node = this.root) => this.append(node, into)
     }
 
     query(s: string) {
