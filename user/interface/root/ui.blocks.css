@@ -75,6 +75,10 @@
 .base-bg-hover:hover {
     background-color: var(--bg-secondrary-base-color);
 }
+.bg-hover:hover {
+    background-color: var(--bg-hover-color);
+    border: 1px solid var(--bg-border-color);
+}
 .hover-incr-opacity:hover {
     opacity: 1;
 }
@@ -115,6 +119,7 @@
 .sidebar-con {
     width: fit-content;
     transition: all .3s ease-in-out;
+    z-index: 1;
 }
 .sidebar-con[collapse] {
     width: 10px;
@@ -122,6 +127,25 @@
     position: absolute;
     top: 0;
     left: 0;
+}
+.da-tab {
+    padding: 2px 9px;
+    border-radius: 6px;
+    border: 1px solid var(--cr-transparent);
+}
+.i-tab {
+    padding: 3px;
+    border-radius: 6px;
+    width: 27px; height: 27px;
+    border: 1px solid var(--cr-transparent);
+}
+.i-tab:hover:not([inactive]), .i-tab[active]:not([inactive]) {
+    background-color: var(--bg-hover-color);
+    border-color: var(--bg-border-color);
+}
+.i-tab[inactive] {
+    pointer-events: none;
+    opacity: .3;
 }
 .flex-wrapper {
     display: flex;

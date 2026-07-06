@@ -44,10 +44,12 @@ web-app {
     font-family: var(--font-display);
     color: var(--fg-base-color);
     display: block;
+    display: flex;
 }
 html, body, web-app {
     overflow: hidden;
     background-color: var(--bg-base-color);
+    font-size: 15px;
 }
 body, web-app {
     height: 100%;
@@ -77,6 +79,16 @@ body, web-app {
     height: calc(100dvh - 20px);
     top: 10px;
     overflow: hidden;
+}
+[node-key="sidebar"] {
+    #nav-controls {
+        display: flex;
+        gap: 6px;
+    }
+}
+[node-key="mainLayoutConstructive"] {
+    width: 100%;
+    position: relative;
 }
 html button {
     height: 100%;
