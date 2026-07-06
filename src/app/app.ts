@@ -4,6 +4,6 @@
 
 import {dom} from "./boot";
 import {sidebar$} from "./sidebar";
+import {main$} from "./main";
 
-if (dom.ready) dom.append(sidebar$())
-console.log(dom.rune.states.reg)
+if (dom.ready) dom.append(sidebar$())(main$())
