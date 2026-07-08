@@ -3,7 +3,7 @@
  */
 
 import {ranstring, toKebab} from "@assets/any";
-import {storageapi} from "@assets/storageapi";
+import {DOMInterfaceError} from "@core/error";
 import {RuneInstancesLog} from "@core/rune";
 
 export const UINodeMap = new WeakMap<Node, UINode>
@@ -11,10 +11,11 @@ export const NodeKeys: Set<string> = new Set()
 export const EventMap = new WeakMap<Node, {ev: GlobalEvents, fn: Handler}>()
 
 interface NodeMetaData {
-    belongsTo?: DOMInterface
+    belongsTo: DOMInterface
     onEventMap: Map<keyof GlobalEvents, ((ev?: Event) => void)[]>
     unEventSet: Set<keyof GlobalEvents>
     backStates: Map<string, {type: 'static' | 'computed', fn: Handler}>
+    readonly This: UINode
 }
 
 interface NodeJSX<K extends unknown> {
@@ -45,7 +46,17 @@ class UINode {
         this.meta = {
             onEventMap: new Map(),
             unEventSet: new Set(),
-            backStates: new Map()
+            backStates: new Map(),
+            set belongsTo(o: DOMInterface) {
+                if (!this.This.meta.belongsTo) this.This.meta.belongsTo = o
+                else throw new DOMInterfaceError(`UINode ${this.This.node} already belongs to a Rune instance and cannot be reset`)
+            },
+            get belongsTo() {
+                const o = this.This.meta.belongsTo
+                if (o) return o
+                else throw new DOMInterfaceError(`UINode ${this.This.node} belongs to no Rune instance`)
+            },
+            This: this
         }
         this.node.rune = {
             id: '',
