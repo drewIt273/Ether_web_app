@@ -53,9 +53,8 @@ export class DOMInterface extends Module {
                         const o = UINodeMap.get(n)
                         if (o === undefined) {
                             this.nodelist.push(n)
-                            if (EventMap.has(n)) {const k = EventMap.get(n)
-                                // @ts-expect-error
-                                this.GlobalEvents.onEvent(k.ev, n, k.fn)
+                            if (EventMap.has(n)) { const k = EventMap.get(n)
+                                if (k) this.GlobalEvents.onEvent(k.ev, n, k.fn)
                             }
                         }
                         else {
