@@ -6,9 +6,10 @@ import {ranstring, toKebab} from "@assets/any";
 import {DOMInterfaceError} from "@core/error";
 import {RuneInstancesLog} from "@core/rune";
 
-export const UINodeMap = new WeakMap<Node, UINode>
-export const NodeKeys: Set<string> = new Set()
-export const EventMap = new WeakMap<Node, {ev: GlobalEvents, fn: Handler}>()
+export const UINodeMap = new WeakMap<Node, UINode>()
+export const NodeKeys = new Set<string>()
+export const EventMap = new WeakMap<Node, {ev: keyof GlobalEvents, fn: Handler}>()
+export const StatesMap = new WeakMap<Node, string>()
 
 interface NodeMetaData {
     belongsTo: DOMInterface
@@ -128,7 +129,7 @@ class UINode {
     }
 
     delegate(target: Node | string, ev: keyof GlobalEvents, ...calls: ((ev?: Event) => void)[]) {
-        const n = target instanceof Node ? target : this.find(target)
+        const n = (target instanceof Node && this.node.contains(target)) ? target : this.find(target as string)
         if (n) this.meta.belongsTo?.GlobalEvents.onEvent(ev, n, ...calls)
     }
 
@@ -173,8 +174,8 @@ class UINode {
             o.belongsTo.GlobalStates.setState(this, state, opts)
             this.#p.curr = state
             this.#p.ofn?.call(this)
-            if (this.key) storageapi.o.set('uistates')?.(this.key, state)
         }
+        else StatesMap.set(this.node, state)
     }
 
     hasDefinedState(state: string) {
@@ -192,7 +193,7 @@ export class UICell extends UINode {
     emittedData: any
     receivedData: any
     mappedData: Map<any, HandlerList>
-    constructor(o: CellJSX) {
+    constructor(o: NodeJSX<Node | nodefn<Node>>) {
         super(o)
         this.ID = ranstring(4, 1)
         this.attrs({'ui-cell': this.ID})
@@ -227,7 +228,7 @@ export class UIBlock extends UINode {
     emittedData: any
     receivedData: any
     mappedData: Map<any, HandlerList>
-    constructor(o: BlockJSX) {
+    constructor(o: NodeJSX<Node | UICell | nodefn<Node | UICell>>) {
         super(o)
         this.ID = ranstring(3, 1)
         this.attrs({'ui-block': this.ID})
@@ -263,7 +264,7 @@ export class UIBlock extends UINode {
 export class UIComponent extends UINode {
 
     readonly ID: string
-    constructor(o: ComponentJSX) {
+    constructor(o: NodeJSX<Node | UICell | UIBlock | nodefn<Node | UICell | UIBlock>>) {
         super(o)
         this.ID = ranstring(4, 1)
         this.attrs({'ui-comp': this.ID})
