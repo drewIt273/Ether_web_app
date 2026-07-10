@@ -3,7 +3,7 @@
  */
 
 import {Module} from "@core/module";
-import {UINodeMap, UICell, UIBlock, UIComponent, EventMap} from "./ui-root";
+import {UINodeMap, UICell, UIBlock, UIComponent, EventMap, NodeMetaDataInit} from "./ui-root";
 import {DOMInterfaceError, NodeHierarchyError} from "@core/error";
 import {storageapi} from "@assets/storageapi";
 import {stylesheet} from "@assets/stylesheet";
@@ -127,6 +127,7 @@ export class DOMInterface extends Module {
     async onInit() {
         if (typeof window === 'undefined') return new Error('[DOM] not running in browser environment')
         else {
+            NodeMetaDataInit()
             this.init = !0
         }
     }
