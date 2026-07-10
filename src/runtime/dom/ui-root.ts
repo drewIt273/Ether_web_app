@@ -32,6 +32,24 @@ interface NodeJSX<K extends unknown> {
     innerHTML?: string
 }
 
+const META = Symbol("RuneMeta");
+
+export function NodeMetaDataInit() {
+    Object.defineProperty(Node.prototype, '$', {
+        get() {
+            if (!this[META]) this[META] = {tag: 'node', uinode: null, mounted: false};
+            return this[META];
+        },
+        set(v) {
+            if (typeof v === 'object' && v !== null) {
+                this[META] = v;
+            }
+        },
+        configurable: true,
+        enumerable: false
+    });
+}
+
 type nodefn<K extends unknown> = ($: HTMLElement) => K
 
 interface CellJSX extends NodeJSX<Node | nodefn<Node>> {}
