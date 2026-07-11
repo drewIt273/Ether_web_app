@@ -4,8 +4,8 @@
 
 export class Scheduler {
 
-    microQueue: Map<UINode, Handler>
-    frameQueue: Map<UINode, Handler>
+    microQueue: Map<Node, Handler>
+    frameQueue: Map<Node, Handler>
     microPending: boolean
     framePending: boolean
     isFlushing: boolean
@@ -17,7 +17,7 @@ export class Scheduler {
         this.isFlushing = !1
     }
 
-    schedule(node: UINode, job: Handler) {
+    schedule(node: Node, job: Handler) {
         this.microQueue.set(node, job)
         if (this.isFlushing) return;
         if (!this.microPending) {
