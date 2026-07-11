@@ -18,10 +18,26 @@ declare global {
     type Rune = R
     type DOMInterface = D
     type GlobalEvents = G
-    interface Node {
+    interface Node extends NodeMetaData {
         rune: {
             id: string
             isRuneRoot: boolean
         }
     }
+    interface NodeMetaData {
+        $: {
+            readonly ID: string
+            readonly tag: NodeMetaTag
+            readonly mounted: boolean
+            readonly uikey: string | undefined
+            belongsTo: DOMInterface
+            prevstate?: string
+            currentstate?: string
+            onevent: Map<keyof GlobalEvents, ((ev?: Event) => void)[]>
+            childCells: Node[]
+            childBlocks: Node[]
+        }
+    }
 }
+
+type NodeMetaTag = 'uicell' | 'uiblock' | 'uicomp' | 'node'
