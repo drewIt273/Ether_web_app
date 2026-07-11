@@ -38,6 +38,26 @@ interface CellJSX extends NodeJSX<Node | nodefn<Node>> {}
 interface BlockJSX extends NodeJSX<Node | UICell | nodefn<Node | UICell>> {}
 interface ComponentJSX extends NodeJSX<Node | UICell | UIBlock | nodefn<Node | UICell | UIBlock>> {}
 
+const META = Symbol('NodeMeta')
+
+export function NodeMetaDataInit() {
+    Object.defineProperty(Node.prototype, '$', {
+        get() {
+            if (!this[META]) {
+                this[META] = {tag: 'node', mounted: false};
+            }
+            return this[META];
+        },
+        set(v) {
+            if (typeof v === 'object' && v !== null) {
+                this[META] = v;
+            }
+        },
+        configurable: true,
+        enumerable: false
+    })
+}
+
 class UINode {
 
     readonly node: HTMLElement
@@ -150,8 +170,8 @@ class UINode {
     defineState(state: string, call: Handler = () => {}) {
         const o = this.meta.belongsTo, a = this.meta.backStates, v = a.get(state)
         if (o) {
-            if (v && v.type === 'static') o.GlobalStates.defineState(this, state, () => {v.fn.apply(this), call.apply(this)}), a.delete(state)
-            else o.GlobalStates.defineState(this, state, call)
+            if (v && v.type === 'static') o.GlobalStates.defineState(this.node, state, () => {v.fn.apply(this), call.apply(this)}), a.delete(state)
+            else o.GlobalStates.defineState(this.node, state, call)
         }
         else a.set(state, {type: 'static', fn: call})
         return (state: string, call: Handler = () => {}) => this.defineState.call(this, state, call)
@@ -160,8 +180,8 @@ class UINode {
     defineComputedState(state: string, call: Handler = () => {}) {
         const o = this.meta.belongsTo, a = this.meta.backStates, v = a.get(state)
         if (o) {
-            if (v && v.type === 'computed') o.GlobalStates.defineState(this, state, () => {v.fn.apply(this), call.apply(this)}), a.delete(state)
-            else o.GlobalStates.defineState(this, state, call)
+            if (v && v.type === 'computed') o.GlobalStates.defineState(this.node, state, () => {v.fn.apply(this), call.apply(this)}), a.delete(state)
+            else o.GlobalStates.defineState(this.node, state, call)
         }
         else a.set(state, {type: 'computed', fn: call})
         return this.defineComputedState
@@ -171,7 +191,7 @@ class UINode {
         const o = this.meta
         this.#p.prev = this.node.getAttribute('data-state') ?? ''
         if (o.belongsTo) {
-            o.belongsTo.GlobalStates.setState(this, state, opts)
+            o.belongsTo.GlobalStates.setState(this.node, state, opts)
             this.#p.curr = state
             this.#p.ofn?.call(this)
         }
