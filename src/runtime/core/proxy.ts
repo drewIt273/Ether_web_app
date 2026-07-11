@@ -55,7 +55,7 @@ export class RuntimeProxy {
      */
     async send(msg: ProxyMessage, to: Rune, by: Rune): Promise<ProxyMessage | undefined> {
         if (this.targets.includes(to)) {
-            const o = to.proxyInterface
+            const o = to.proxy
             if (o.allowed) {
                 // Executes a function to be called (if defined using onMessage) on each use of the proxy
                     this.#mh?.call(this, msg, by, to)
