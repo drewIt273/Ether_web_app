@@ -74,9 +74,9 @@ export class UiStateManager extends Module {
         super(r)
         this.reg = new WeakMap
 
-        this.IMC.map('df', (n: UINode, s: string, fn: Handler) => this.define(n, s, fn))
-        this.IMC.map('dc', (n: UINode, s: string, fn: Handler) => this.defineComputed(n, s, fn))
-        this.IMC.map('set', (n: UINode, s: string, opts: {schedule: boolean} = {schedule: false}) => this.set(n, s, opts))
+        this.IMC.map('df', (n: Node, s: string, fn: Handler) => this.define(n, s, fn))
+        this.IMC.map('dc', (n: Node, s: string, fn: Handler) => this.defineComputed(n, s, fn))
+        this.IMC.map('set', (n: Node, s: string, opts: {schedule: boolean} = {schedule: false}) => this.set(n, s, opts))
     }
 
     async onInit() {
@@ -88,31 +88,31 @@ export class UiStateManager extends Module {
         this.ready = !0
     }
 
-    define(node: UINode, state: string, fn: Handler) {
-        const map = this.reg.get(node.node) ?? {}
-        map[state] = {t: 'static', fn: () => {if (node.mounted) node.attrs({dataState: state}), fn.call(node)}}
-        this.reg.set(node.node, map)
+    define(node: Node, state: string, fn: Handler) {
+        const map = this.reg.get(node) ?? {}
+        map[state] = {t: 'static', fn: () => {if (node.$.mounted) (node as HTMLElement).setAttribute('data-state', state), fn.call(node)}}
+        this.reg.set(node, map)
     }
 
-    defineComputed(node: UINode, state: string, fn: Handler) {
-        const map = this.reg.get(node.node) ?? {}, c = computed(() => fn.call(node))
+    defineComputed(node: Node, state: string, fn: Handler) {
+        const map = this.reg.get(node) ?? {}, c = computed(() => fn.call(node))
         map[state] = {t: 'computed', fn: () => c.get()}
         effect(() => {
-            node.attrs({dataState: c.get()})
-            if (node.key) persist(node.key, state)
+            (node as HTMLElement).setAttribute('data-state', c.get())
+            if (node.$.uikey) persist(node.$.uikey, state)
         })
-        this.reg.set(node.node, map)
+        this.reg.set(node, map)
     }
 
-    set(node: UINode, state: string, opts = {schedule: false}) {
-        const map = this.reg.get(node.node), entry = map ? map[state] : null
-        if (!map || !map[state]) throw new Error(`State ${state} not defined for node ${node.node}`)
+    set(node: Node, state: string, opts = {schedule: false}) {
+        const map = this.reg.get(node), entry = map ? map[state] : null
+        if (!map || !map[state]) throw new Error(`State ${state} not defined for node ${node}`)
         if (entry)
             if (opts.schedule === !1) {
                 if (entry.t === 'static') entry.fn.call(node)
             }
             else this.rune.scheduler.schedule(node, entry.fn)
-        if (node.key) persist(node.key, state)
+        if (node.$.uikey) persist(node.$.uikey, state)
         // Computed states are not manually set
     }
 }
