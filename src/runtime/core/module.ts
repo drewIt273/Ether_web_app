@@ -87,9 +87,9 @@ interface EventsModuleData {
 }
 
 interface StatesModuleData {
-    'df': [UINode, string, Handler]
-    'dc': [UINode, string, Handler]
-    'set': [UINode, string, opts?: {schedule: boolean}]
+    'df': [Node, string, Handler]
+    'dc': [Node, string, Handler]
+    'set': [Node, string, opts?: {schedule: boolean}]
 }
 
 type ModulesMappedData = EventsModuleData & StatesModuleData
