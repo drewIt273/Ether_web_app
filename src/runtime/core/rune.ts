@@ -4,7 +4,7 @@
 
 import {DOMInterface} from "@dom/dom";
 import {UiEventsModule} from "./events";
-import {UiStateManager} from "./state";
+import {UiStateManager} from "@lifecycle/state";
 import {Scheduler} from "./scheduler";
 import {storageapi} from "@assets/storageapi";
 import {ArrayLogLock} from "@assets/registry";

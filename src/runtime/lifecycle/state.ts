@@ -3,7 +3,7 @@
  */
 
 import {storageapi} from "@assets/storageapi";
-import {Module} from "./module";
+import {Module} from "@core/module";
 
 let CURRENT_EFFECT: Handler | null = null
 
