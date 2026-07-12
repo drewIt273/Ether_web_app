@@ -11,7 +11,7 @@ export const NodeKeys = new Set<string>()
 export const EventMap = new WeakMap<Node, {ev: keyof GlobalEvents, fn: Handler}>()
 export const StatesMap = new WeakMap<Node, string>()
 
-interface NodeMetaData {
+interface NodeMeta {
     belongsTo: DOMInterface
     onEventMap: Map<keyof GlobalEvents, ((ev?: Event) => void)[]>
     unEventSet: Set<keyof GlobalEvents>
@@ -34,9 +34,16 @@ interface NodeJSX<K extends unknown> {
 
 type nodefn<K extends unknown> = ($: HTMLElement) => K
 
-interface CellJSX extends NodeJSX<Node | nodefn<Node>> {}
-interface BlockJSX extends NodeJSX<Node | UICell | nodefn<Node | UICell>> {}
-interface ComponentJSX extends NodeJSX<Node | UICell | UIBlock | nodefn<Node | UICell | UIBlock>> {}
+interface Fiber {
+    tag: keyof HTMLElementTagNameMap
+    type?: NodeMetaTag
+    id?: string
+    uikey?: string
+    style?: Partial<Record<keyof CSSStyleProperties, any>>
+    className?: string
+    append?: (nodefn<Node | UINode>)[]
+    [x: string]: any
+}
 
 const META = Symbol('NodeMeta')
 
@@ -44,7 +51,7 @@ export function NodeMetaDataInit() {
     Object.defineProperty(Node.prototype, '$', {
         get() {
             if (!this[META]) {
-                this[META] = {tag: 'node', mounted: false};
+                this[META] = {tag: 'node', uikey: 'node', prop: {}}
             }
             return this[META];
         },
@@ -58,22 +65,28 @@ export function NodeMetaDataInit() {
     })
 }
 
+var jsxs = (o: Fiber) => {
+    return o.type === 'uicell' ? new UICell(o) : o.type === 'uiblock' ? new UIBlock(o) : o.type === 'uicomp' ? new UIComponent(o) : new UINode(o)
+}
+
 class UINode {
 
     readonly node: HTMLElement
-    meta: NodeMetaData
-    constructor(o: NodeJSX<Node | unknown>) {
+    meta: NodeMeta
+    constructor(o: Fiber) {
         this.node = o.tag ? document.createElement(o.tag) : document.createElement('div')
+        this.node.$.tag = o.type ?? 'node' // @ts-expect-error
+        this.node.$.uinode = this
         this.meta = {
             onEventMap: new Map(),
             unEventSet: new Set(),
             backStates: new Map(),
             set belongsTo(o: DOMInterface) {
-                if (!this.This.meta.belongsTo) this.This.meta.belongsTo = o
+                if (!this.This.node.$.belongsTo) this.This.node.$.belongsTo = o
                 else throw new DOMInterfaceError(`UINode ${this.This.node} already belongs to a Rune instance and cannot be reset`)
             },
             get belongsTo() {
-                const o = this.This.meta.belongsTo
+                const o = this.This.node.$.belongsTo
                 if (o) return o
                 else throw new DOMInterfaceError(`UINode ${this.This.node} belongs to no Rune instance`)
             },
@@ -83,14 +96,21 @@ class UINode {
             id: '',
             isRuneRoot: false
         }
+        const p = new Set(['tag', 'type', 'uikey'])
+        for (const [k, v] of Object.entries(o)) {
+            if (k === 'className') this.node.className = v
+            else if (k.startsWith('$')) this.node.$.prop[k.replace('$', '')] = v
+            else if (casiveAttrs.has(k)) this.node.setAttribute(k, v)
+            else if (!p.has(k)) this.node.setAttribute(toKebab(k), v)
+        }
     }
 
     get key() {
-        return this.node.getAttribute('node-key')
+        return this.node.$.uikey
     }
 
     set UIKey(s: string) {
-        if (!NodeKeys.has(s)) this.attrs({'node-key': s}), NodeKeys.add(s)
+        if (!NodeKeys.has(s)) this.node.$.uikey = s, NodeKeys.add(s)
         else throw new Error(`An existing node already have the node-key ${s}`)
     }
 
@@ -180,8 +200,8 @@ class UINode {
     defineComputedState(state: string, call: Handler = () => {}) {
         const o = this.meta.belongsTo, a = this.meta.backStates, v = a.get(state)
         if (o) {
-            if (v && v.type === 'computed') o.GlobalStates.defineState(this.node, state, () => {v.fn.apply(this), call.apply(this)}), a.delete(state)
-            else o.GlobalStates.defineState(this.node, state, call)
+            if (v && v.type === 'computed') o.GlobalStates.defineCompute(this.node, state, () => {v.fn.apply(this), call.apply(this)}), a.delete(state)
+            else o.GlobalStates.defineCompute(this.node, state, call)
         }
         else a.set(state, {type: 'computed', fn: call})
         return this.defineComputedState
@@ -213,7 +233,7 @@ export class UICell extends UINode {
     emittedData: any
     receivedData: any
     mappedData: Map<any, HandlerList>
-    constructor(o: NodeJSX<Node | nodefn<Node>>) {
+    constructor(o: Fiber) {
         super(o)
         this.ID = ranstring(4, 1)
         this.attrs({'ui-cell': this.ID})
@@ -248,7 +268,7 @@ export class UIBlock extends UINode {
     emittedData: any
     receivedData: any
     mappedData: Map<any, HandlerList>
-    constructor(o: NodeJSX<Node | UICell | nodefn<Node | UICell>>) {
+    constructor(o: Fiber) {
         super(o)
         this.ID = ranstring(3, 1)
         this.attrs({'ui-block': this.ID})
@@ -284,7 +304,7 @@ export class UIBlock extends UINode {
 export class UIComponent extends UINode {
 
     readonly ID: string
-    constructor(o: NodeJSX<Node | UICell | UIBlock | nodefn<Node | UICell | UIBlock>>) {
+    constructor(o: Fiber) {
         super(o)
         this.ID = ranstring(4, 1)
         this.attrs({'ui-comp': this.ID})
