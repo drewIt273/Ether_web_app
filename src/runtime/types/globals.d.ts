@@ -2,7 +2,7 @@
  * Instance by DrewIt
  */
 
-import {UICell as C, UIBlock as B, UIComponent as K, U} from "@dom/ui-root"
+import {UICell as C, UIBlock as B, UIComponent as K, U, F} from "@dom/ui-root"
 import {Rune as R} from "@core/rune";
 import {DOMInterface as D} from "@dom/dom";
 import {G} from "@core/events";
@@ -18,6 +18,7 @@ declare global {
     type Rune = R
     type DOMInterface = D
     type GlobalEvents = G
+    type Fiber = F
     interface Node {
         rune: {
             id: string
@@ -26,17 +27,17 @@ declare global {
         $: NodeMetaData
     }
     interface NodeMetaData {
-        readonly ID: string
-        readonly tag: NodeMetaTag
+        tag: NodeMetaTag
         readonly mounted: boolean
-        readonly uikey: string | undefined
+        uikey: string
         belongsTo: DOMInterface
         prevstate?: string
         currentstate?: string
         onevent: Map<keyof GlobalEvents, ((ev?: Event) => void)[]>
-        childCells: Node[]
-        childBlocks: Node[]
+        prop: Record<string, any>
+        readonly uinode: UINode
     }
+    type NodeMetaTag = 'uicell' | 'uiblock' | 'uicomp' | 'node'
+    type NodeUpdateType = 'textcontent' | 'state' | 'any'
+    type FiberDepRecord = Record<string, {type: NodeUpdateType, value: any}>
 }
-
-type NodeMetaTag = 'uicell' | 'uiblock' | 'uicomp' | 'node'
