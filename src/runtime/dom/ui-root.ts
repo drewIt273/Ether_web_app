@@ -41,7 +41,7 @@ interface Fiber {
     uikey?: string
     style?: Partial<Record<keyof CSSStyleProperties, any>>
     className?: string
-    append?: (nodefn<Node | UINode>)[]
+    append?: (nodefn<UINode> | string | UINode)[]
     [x: string]: any
 }
 
@@ -51,7 +51,7 @@ export function NodeMetaDataInit() {
     Object.defineProperty(Node.prototype, '$', {
         get() {
             if (!this[META]) {
-                this[META] = {tag: 'node', uikey: 'node', prop: {}}
+                this[META] = {tag: 'node', prop: {}}
             }
             return this[META];
         },
@@ -69,12 +69,27 @@ var jsxs = (o: Fiber) => {
     return o.type === 'uicell' ? new UICell(o) : o.type === 'uiblock' ? new UIBlock(o) : o.type === 'uicomp' ? new UIComponent(o) : new UINode(o)
 }
 
+function r(n: HTMLElement, o: Fiber) {
+    const p = new Set(['tag', 'type', 'uikey'])
+    for (const [k, v] of Object.entries(o)) {
+        if (k === 'className') n.className = v
+        else if (k === 'append') {
+            v.forEach((a: UINode | string | nodefn<UINode>) => {
+                typeof a === 'function' ? n.append(a(n).node) : typeof a === 'string' ? n.append(a) : n.append(a.node)
+            })
+        }
+        else if (k.startsWith('$')) n.$.prop[k.replace('$', '')] = v
+        else if (casiveAttrs.has(k)) n.setAttribute(k, v)
+        else if (!p.has(k)) n.setAttribute(toKebab(k), v)
+    }
+}
+
 class UINode {
 
     readonly node: HTMLElement
     meta: NodeMeta
     constructor(o: Fiber) {
-        this.node = o.tag ? document.createElement(o.tag) : document.createElement('div')
+        this.node = document.createElement(o.tag)
         this.node.$.tag = o.type ?? 'node' // @ts-expect-error
         this.node.$.uinode = this
         this.meta = {
@@ -96,13 +111,8 @@ class UINode {
             id: '',
             isRuneRoot: false
         }
-        const p = new Set(['tag', 'type', 'uikey'])
-        for (const [k, v] of Object.entries(o)) {
-            if (k === 'className') this.node.className = v
-            else if (k.startsWith('$')) this.node.$.prop[k.replace('$', '')] = v
-            else if (casiveAttrs.has(k)) this.node.setAttribute(k, v)
-            else if (!p.has(k)) this.node.setAttribute(toKebab(k), v)
-        }
+        r(this.node, o)
+        if (o.uikey) this.UIKey = o.uikey
     }
 
     get key() {
@@ -111,7 +121,7 @@ class UINode {
 
     set UIKey(s: string) {
         if (!NodeKeys.has(s)) this.node.$.uikey = s, NodeKeys.add(s)
-        else throw new Error(`An existing node already have the node-key ${s}`)
+        else throw new Error(`An existing node already have the uikey ${s}`)
     }
 
     get parent() {
