@@ -9,9 +9,9 @@ import {storageapi} from "@assets/storageapi";
 import {stylesheet} from "@assets/stylesheet";
 
 interface NodeMessageResolver {
-    resolve(sender: CellOrBlock, receiver: CellOrBlock, data: any, ...args: any[]): void
-    subscribe(node: CellOrBlock, key: any, ...fn: HandlerList): void
-    unsubscribe(node: CellOrBlock, key: any, fn?: Handler|null): void
+    resolve(sender: Node, receiver: Node, data: any, ...args: any[]): void
+    subscribe(node: Node, key: any, ...fn: Handler[]): void
+    unsubscribe(node: Node, key: any, fn?: Handler|null): void
 }
 
 interface UiEventsInterface {
@@ -22,9 +22,9 @@ interface UiEventsInterface {
 }
 
 interface UiStatesInterface {
-    setState(node: UINode, state: string, opts: {schedule: boolean}): void
-    defineState(node: UINode, state: string, call: Handler): void
-    defineCompute(node: UINode, state: string, call: Handler): void
+    setState(node: Node, state: string, opts?: {schedule: boolean}): void
+    defineState(node: Node, state: string, call: Handler): void
+    defineCompute(node: Node, state: string, call: Handler): void
     hasState(node: Node, state: string): boolean
 }
 
@@ -32,7 +32,6 @@ export class DOMInterface extends Module {
 
     observer: MutationObserver
     nodeMsg: NodeMessageResolver
-    nodelist: Node[]
     root: HTMLElement
     rune: Rune
     constructor(r: Rune) {
@@ -50,23 +49,17 @@ export class DOMInterface extends Module {
                     rn(added), added.childNodes.forEach(c => rn(c));
                     (added as Element).setAttribute('_hide_', '')
                     const call = (n: Node) => {
-                        const o = UINodeMap.get(n)
-                        if (o === undefined) {
-                            this.nodelist.push(n)
-                            if (EventMap.has(n)) { const k = EventMap.get(n)
-                                if (k) this.GlobalEvents.onEvent(k.ev, n, k.fn)
-                            }
+                        if (EventMap.has(n)) { const k = EventMap.get(n)
+                            if (k) this.GlobalEvents.onEvent(k.ev, n, k.fn)
                         }
-                        else {
-                            o.meta.belongsTo = this
-                            o.meta.onEventMap.forEach((v, k) => {
-                                if (k === 'append') v.forEach(h => h())
-                                else this.GlobalEvents.onEvent(k, o.node, ...v)
-                            }), o.meta.onEventMap.clear()
-                            if (o.key) {
-                                const a = storageapi.o.get('uistates')?.[o.key]
-                                if (a) o.setState(a)
-                            }
+                        n.$.belongsTo = this
+                        n.$.onevent.forEach((v, k) => {
+                            if (k === 'append') v.forEach(h => h())
+                            else this.GlobalEvents.onEvent(k, n, ...v)
+                        }), n.$.onevent.clear()
+                        if (n.$.uikey) {
+                            const a = storageapi.o.get('uistates')?.[n.$.uikey]
+                            if (a) this.GlobalStates.setState(n, a)
                         }
                         n.childNodes.forEach(a => call(a));
                     }
@@ -75,47 +68,42 @@ export class DOMInterface extends Module {
                 }
                 if (mut.removedNodes) for (const removed of mut.removedNodes) {
                     const call = (n: Node) => {
-                        const o = UINodeMap.get(n); this.GlobalEvents.unEvent(n)
-                        if (!o) this.nodelist = this.nodelist.filter(r => r !== n)
-                        else {
-                            o.meta.unEventSet.clear()
-                            if (o.key) storageapi.o.set('uistates')?.(o.key, o.currentstate)
-                        }
+                        this.GlobalEvents.unEvent(n)
+                        if (n.$.uikey) storageapi.o.set('uistates')?.(n.$.uikey, n.$.currentstate)
                         n.childNodes.forEach(n => call(n))
                     }
                     call(removed)
                 }
             }
         })
-        this.nodelist = []
         this.root = document.querySelector(`[${this.rune.config.approot}]`) ?? document.body
         this.nodeMsg = {
-            resolve: (sender: CellOrBlock, receiver: CellOrBlock, data: any, ...args: any[]) => {
-                let o = receiver.meta.belongsTo
+            resolve: (sender: Node, receiver: Node, data: any, ...args: any[]) => {
+                let o = receiver.$.belongsTo
                 if (o && o === this) {
-                    const hs = receiver.mappedData.get(data)
+                    const hs = receiver.$.mappedData.get(data)
                     if (hs) for (const fn of hs) fn.apply(receiver, args)
-                    sender.emittedData = data
+                    sender.$.emittedData = data
                 }
             },
-            subscribe: (node: CellOrBlock, key: any, ...fn: Handler[]) => {
-                if (node.meta?.belongsTo === this) {
-                    const existing = node.mappedData.get(key)
-                    if (!existing) node.mappedData.set(key, [...fn])
+            subscribe: (node: Node, key: any, ...fn: Handler[]) => {
+                if (node.$.belongsTo === this) {
+                    const existing = node.$.mappedData.get(key)
+                    if (!existing) node.$.mappedData.set(key, [...fn])
                     else existing.push(...fn)
                 }
-                else throw new DOMInterfaceError(`UINode ${node.ID} out of reach`)
+                else throw new DOMInterfaceError(`UINode ${node.$.ID} out of reach`)
             },
-            unsubscribe: (node: CellOrBlock, key: any, fn: Handler|null = null) => {
-                if (node.meta?.belongsTo === this) {
-                    const hs = node.mappedData.get(key)
+            unsubscribe: (node: Node, key: any, fn: Handler|null = null) => {
+                if (node.$.belongsTo === this) {
+                    const hs = node.$.mappedData.get(key)
                     if (hs)
                         if (fn) {
-                            node.mappedData.set(key, hs.filter(h => h !== fn))
+                            node.$.mappedData.set(key, hs.filter(h => h !== fn))
                         }
-                        else node.mappedData.delete(key)
+                        else node.$.mappedData.delete(key)
                 }
-                else throw new DOMInterfaceError(`UINode ${node.ID} is out of reach`)
+                else throw new DOMInterfaceError(`UINode ${node.$.ID} is out of reach`)
             },
         }
         this.root.rune = {
@@ -143,12 +131,10 @@ export class DOMInterface extends Module {
 
     append(node: Node, into: Node = this.root) {
         if (this.root.contains(into)) {
-            const e = NodeHierarchyCheck(node), n = UINodeMap.get(into), k = UINodeMap.get(node)
+            const e = NodeHierarchyCheck(node)
             if (e) throw e
-            if (n && k) 
-                if ((hierOrder(n) > hierOrder(k))) into.appendChild(node)
-                else throw new NodeHierarchyError(`${r(n)} cannot mount ${r(k)}`)
-            else into.appendChild(node)
+            if ((h$(into) > h$(node))) into.appendChild(node)
+            else throw new NodeHierarchyError(`${into.$.tag} cannot mount ${node.$.tag}`)
         }
         else throw new DOMInterfaceError(`Node ${into} is out of reach`)
         return (node: Node, into: Node = this.root) => this.append(node, into)
@@ -177,7 +163,7 @@ export class DOMInterface extends Module {
     }
 
     GlobalStates: UiStatesInterface = {
-        setState: (node, state, opts) => {
+        setState: (node, state, opts = {schedule: false}) => {
             this.#se(node, () => this.IMC.emit('set', this.rune.states, [node, state, opts]))
         },
 
@@ -199,9 +185,9 @@ export class DOMInterface extends Module {
     #ne(node: Node, emit: Handler) {
         if (this.root.contains(node)) emit()
         else {
-            const o = UINodeMap.get(node), r = o?.meta.belongsTo?.rune
+            const r = node.$.belongsTo?.rune
             if (r) {
-                const o = this.rune.proxyInterface.send({type: 'uiEvent', msg: node}, r)
+                const o = this.rune.proxy.send({type: 'uiEvent', msg: node}, r)
                 o.then(v => {
                     if (v?.type === 'rejected') throw OutOfReachError(node)
                     else emit()
@@ -211,18 +197,18 @@ export class DOMInterface extends Module {
         }
     }
 
-    #se(node: UINode, emit: Handler) {
-        if (this.root.contains(node.node)) emit()
+    #se(node: Node, emit: Handler) {
+        if (this.root.contains(node)) emit()
         else {
-            const r = node.meta.belongsTo?.rune
+            const r = node.$.belongsTo?.rune
             if (r) {
-                const o = this.rune.proxyInterface.send({type: 'uiState', msg: node.node}, r)
+                const o = this.rune.proxy.send({type: 'uiState', msg: node}, r)
                 o?.then(v => {
-                    if (v?.type === 'rejected') throw OutOfReachError(node.node)
+                    if (v?.type === 'rejected') throw OutOfReachError(node)
                     else emit()
                 })
             }
-            else throw OutOfReachError(node.node)
+            else throw OutOfReachError(node)
         }
     }
 }
@@ -232,33 +218,22 @@ function OutOfReachError(n: Node) {
 }
 
 function NodeHierarchyCheck(n: Node) {
-    const o = UINodeMap.get(n), p = n.parentElement; let h;
-    if (p) h = UINodeMap.get(p)
-    if (o && p && h) {
-        const i = hierOrder(o), c = hierOrder(h)
-        if (n.childNodes.length) {
-            n.childNodes.forEach(k => {
-                let e = NodeHierarchyCheck(k)
-                if (e) throw e
-            })
-        }
-        if (i > c) {
-            p?.removeChild(n)
-            return new NodeHierarchyError(`${r(o)} cannot mount ${r(h)}`)
-        }
+    const p = n.parentElement
+    if (p) if (h$(n) > h$(p)) return new NodeHierarchyError(`${n.$.tag} cannot mount ${p.$.tag}`)
+    if (n.childNodes.length) {
+        n.childNodes.forEach(k => {
+            let e = NodeHierarchyCheck(k)
+            if (e) throw e
+        })
     }
-    else return;
 }
 
-function r(n: UINode) {
-    if (n instanceof UIComponent) return 'UIComponent'
-    else if (n instanceof UIBlock) return 'UIBlock'
-    else return 'UICell'
-}
-
-function hierOrder(n: UINode) {
-    if (n instanceof UICell) return 1
-    else if (n instanceof UIBlock) return 2
-    else if (n instanceof UIComponent) return 3
+function h$(n: Node) {
+    const t = n.$.tag
+    if (t === 'uicell') return 1
+    else if (t === 'uiblock') return 2
+    else if (t === 'uicomp') return 3
     else return 0
 }
+
+export type D = DOMInterface

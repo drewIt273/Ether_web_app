@@ -4,7 +4,7 @@
 
 import {DOMInterface} from "@dom/dom";
 import {UiEventsModule} from "./events";
-import {UiStateManager} from "./state";
+import {UiStateManager} from "@lifecycle/state";
 import {Scheduler} from "./scheduler";
 import {storageapi} from "@assets/storageapi";
 import {ArrayLogLock} from "@assets/registry";
@@ -50,7 +50,7 @@ export class Rune {
     ready: boolean
     hooks: RuntimeHooks
     config: RuntimeConfig
-    proxyInterface: ProxyInterface
+    proxy: ProxyInterface
     constructor(o: RuntimeAPI = {proxyTargets: null, shared: false}) {
         this.scheduler = new Scheduler()
         this.hooks = {
@@ -63,13 +63,13 @@ export class Rune {
             approot: 'lazy-app'
         }
         this.#o = o
-        this.proxyInterface = {
+        this.proxy = {
             allowed: true,
             received: [],
             mapped: new Map(),
             async send(msg, to) {
                 const o = RuneProxies.find(o => o.targets.includes(to))
-                return o?.send(msg, to, this.This)
+                return await o?.send(msg, to, this.This)
             },
             behavior(msg, fn) {
                 this.mapped.set(msg, fn)

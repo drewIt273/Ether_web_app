@@ -3,7 +3,6 @@
  */
 
 import {Module} from "./module";
-import {UINodeMap} from "@dom/ui-root";
 import {Registry} from "@assets/registry";
 
 type EventHandler = (e: Event) => any
