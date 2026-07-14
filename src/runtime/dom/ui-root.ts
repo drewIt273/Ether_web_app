@@ -41,46 +41,157 @@ interface Fiber {
     uikey?: string
     style?: Partial<Record<keyof CSSStyleProperties, any>>
     className?: string
-    append?: (nodefn<UINode> | string | UINode)[]
+    append?: (nodefn<Node> | string | Node)[]
     [x: string]: any
 }
 
-const META = Symbol('NodeMeta')
+const META = Symbol('NodeMeta'), RUNE = Symbol('Rune')
 
 export function NodeMetaDataInit() {
     Object.defineProperty(Node.prototype, '$', {
         get() {
             if (!this[META]) {
-                this[META] = {tag: 'node', prop: {}}
+                this[META] = nm(this)
             }
             return this[META];
         },
-        set(v) {
-            if (typeof v === 'object' && v !== null) {
-                this[META] = v;
+        configurable: true,
+        enumerable: false
+    })
+    Object.defineProperty(Node.prototype, 'rune', {
+        get() {
+            if (!this[RUNE]) {
+                this[RUNE] = {
+                    id: '',
+                    isRuneRoot: false
+                }
             }
+            return this[RUNE]
         },
         configurable: true,
         enumerable: false
     })
 }
 
-var jsxs = (o: Fiber) => {
-    return o.type === 'uicell' ? new UICell(o) : o.type === 'uiblock' ? new UIBlock(o) : o.type === 'uicomp' ? new UIComponent(o) : new UINode(o)
+function nm(o: HTMLElement): NodeMetaData {
+    const SRC = Symbol('src')
+    return {
+        ID: ranstring(5, 1),
+        tag: 'node',
+        prop: {},
+        ofn: null,
+        onevent: new Map(),
+        prevstate: null,
+        currentstate: null,
+        pendingStates: new Map(),
+        emittedData: null,
+        receivedData: null,
+        mappedData: new Map(),
+        get mounted() {
+            return (o.isConnected && o.parentNode && o.$.belongsTo) ? true : false
+        },
+        set belongsTo(o: DOMInterface) { // @ts-expect-error
+            if (!this[SRC].dom) this[SRC].dom = o
+            else throw new DOMInterfaceError(`Node ${o} already belongs to a Rune instance and cannot be reset`)
+        },
+        get belongsTo() { // @ts-expect-error
+            return this[SRC].dom
+        },
+        set onStateChange(fn: Handler) { // @ts-expect-error
+            this[SRC].ofn = fn
+        },
+        get onStateChange() { // @ts-expect-error
+            return this[SRC].ofn
+        },
+        map(data, ...fns) {
+            this.belongsTo?.nodeMsg.subscribe(o, data, ...fns)
+        },
+        unmap(data, fn: Handler | null = null) {
+            this.belongsTo?.nodeMsg.unsubscribe(o, data, fn)
+        },
+        emit(data, to, ...args: any[]) {
+            const n = typeof to === 'string' ? Array.from(document.body.childNodes).find(v => v.$.uikey === to) : to
+            if (n) this.belongsTo?.nodeMsg.resolve(o, n, data, ...args)
+        },
+        find(n: string) {
+            return o.querySelector(n)
+        },
+        findAll: (n: string) => {
+            return Array.from(o.querySelectorAll(n))
+        },
+        on(ev: keyof GlobalEvents, ...calls: ((ev?: Event) => any)[]) {
+            if (this.belongsTo) this.belongsTo.GlobalEvents.onEvent(ev, o, ...calls)
+            else this.onevent.set(ev, calls)
+        },
+        off(ev: keyof GlobalEvents | null = null) {
+            this.belongsTo?.GlobalEvents.unEvent(o, ev)
+        },
+        keycall(keys: string[], fn: Handler) {
+            this.belongsTo?.GlobalEvents.keyEvent(o, keys, fn)
+        },
+        unbindkeys() {
+            this.belongsTo?.GlobalEvents.unKey(o)
+        },
+        defineState(state: string, call: Handler = () => {}) {
+            const b = this.belongsTo, a = this.pendingStates, v = a.get(state)
+            if (b) {
+                if (v && v.type === 'static') b.GlobalStates.defineState(o, state, () => {v.fn.apply(o), call.apply(o)}), a.delete(state)
+                else b.GlobalStates.defineState(o, state, call)
+            }
+            else a.set(state, {type: 'static', fn: call})
+            return (state: string, call: Handler = () => {}) => this.defineState.call(o, state, call)
+        },
+        defineComputedState(state: string, call: Handler = () => {}) {
+            const b = this.belongsTo, a = this.pendingStates, v = a.get(state)
+            if (b) {
+                if (v && v.type === 'computed') b.GlobalStates.defineState(o, state, () => {v.fn.apply(o), call.apply(o)}), a.delete(state)
+                else b.GlobalStates.defineState(o, state, call)
+            }
+            else a.set(state, {type: 'computed', fn: call})
+            return (state: string, call: Handler = () => {}) => this.defineState.call(o, state, call)
+        },
+        setState(state: string, opts = {schedule: false}) {
+            if (this.belongsTo) {
+                this.prevstate = o.$.currentstate as string
+                this.belongsTo.GlobalStates.setState(o, state, opts)
+                o.$.ofn?.call(o)
+            }
+            else o.$.pendingStates.set(state, state)
+        },
+        hasDefinedState(s) {
+            return this.belongsTo?.GlobalStates.hasState(o, s) as boolean
+        },
+    }
 }
 
-function r(n: HTMLElement, o: Fiber) {
+var jsx = (o: Fiber) => {
+    const node = document.createElement(o.tag); concat(node, o)
+    return node
+}
+
+function concat(n: HTMLElement, o: Fiber) {
     const p = new Set(['tag', 'type', 'uikey'])
     for (const [k, v] of Object.entries(o)) {
-        if (k === 'className') n.className = v
-        else if (k === 'append') {
-            v.forEach((a: UINode | string | nodefn<UINode>) => {
-                typeof a === 'function' ? n.append(a(n).node) : typeof a === 'string' ? n.append(a) : n.append(a.node)
-            })
+        if (k === 'className') {
+            n.className = v
+            continue;
         }
-        else if (k.startsWith('$')) n.$.prop[k.replace('$', '')] = v
-        else if (casiveAttrs.has(k)) n.setAttribute(k, v)
-        else if (!p.has(k)) n.setAttribute(toKebab(k), v)
+        if (k === 'append') {
+            v.forEach((a: Node | string | nodefn<Node>) => {
+                typeof a === 'function' ? n.appendChild(a(n)) : n.append(a)
+            })
+            continue;
+        }
+        if (k.startsWith('$')) {
+            n.$.prop[k.replace('$', '')] = v
+            continue;
+        }
+        if (casiveAttrs.has(k)) {
+            n.setAttribute(k, v)
+        }
+        else if (!p.has(k)) {
+            n.setAttribute(toKebab(k), v)
+        }
     }
 }
 
@@ -111,7 +222,7 @@ class UINode {
             id: '',
             isRuneRoot: false
         }
-        r(this.node, o)
+        concat(this.node, o)
         if (o.uikey) this.UIKey = o.uikey
     }
 
