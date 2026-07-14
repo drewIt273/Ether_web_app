@@ -10,6 +10,7 @@ export type ErrorCode = 'RUNTIME' | 'NODE_HIERARCHY' | 'DOM_INTERFACE_OBJECT' | 
 export {}
 
 interface ErrorLog {
+    readonly Runtime: ArrayLogLock<RuntimeError>
     readonly DOMInterface: ArrayLogLock<DOMInterfaceError>
     readonly NodeHierarchy: ArrayLogLock<NodeHierarchyError>
     readonly Cache: ArrayLogLock<CacheError>
@@ -17,6 +18,7 @@ interface ErrorLog {
 }
 
 export const ErrorLog: ErrorLog = {
+    Runtime: new ArrayLogLock,
     DOMInterface: new ArrayLogLock,
     NodeHierarchy: new ArrayLogLock,
     Cache: new ArrayLogLock,
@@ -35,6 +37,15 @@ class GlobalError extends Error {
 
     toJSON() {
         return {name: this.name, cause: this.cause, message: this.message, stack: this.stack};
+    }
+}
+
+export class RuntimeError extends GlobalError {
+    readonly code: ErrorCode
+    constructor(msg: string) {
+        super(msg)
+        this.code = 'RUNTIME'
+        ErrorLog.Runtime.log(this)
     }
 }
 
