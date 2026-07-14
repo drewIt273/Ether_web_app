@@ -9,9 +9,9 @@ import {storageapi} from "@assets/storageapi";
 import {stylesheet} from "@assets/stylesheet";
 
 interface NodeMessageResolver {
-    resolve(sender: CellOrBlock, receiver: CellOrBlock, data: any, ...args: any[]): void
-    subscribe(node: CellOrBlock, key: any, ...fn: HandlerList): void
-    unsubscribe(node: CellOrBlock, key: any, fn?: Handler|null): void
+    resolve(sender: Node, receiver: Node, data: any, ...args: any[]): void
+    subscribe(node: Node, key: any, ...fn: Handler[]): void
+    unsubscribe(node: Node, key: any, fn?: Handler|null): void
 }
 
 interface UiEventsInterface {
@@ -78,32 +78,32 @@ export class DOMInterface extends Module {
         })
         this.root = document.querySelector(`[${this.rune.config.approot}]`) ?? document.body
         this.nodeMsg = {
-            resolve: (sender: CellOrBlock, receiver: CellOrBlock, data: any, ...args: any[]) => {
-                let o = receiver.meta.belongsTo
+            resolve: (sender: Node, receiver: Node, data: any, ...args: any[]) => {
+                let o = receiver.$.belongsTo
                 if (o && o === this) {
-                    const hs = receiver.mappedData.get(data)
+                    const hs = receiver.$.mappedData.get(data)
                     if (hs) for (const fn of hs) fn.apply(receiver, args)
-                    sender.emittedData = data
+                    sender.$.emittedData = data
                 }
             },
-            subscribe: (node: CellOrBlock, key: any, ...fn: Handler[]) => {
-                if (node.meta?.belongsTo === this) {
-                    const existing = node.mappedData.get(key)
-                    if (!existing) node.mappedData.set(key, [...fn])
+            subscribe: (node: Node, key: any, ...fn: Handler[]) => {
+                if (node.$.belongsTo === this) {
+                    const existing = node.$.mappedData.get(key)
+                    if (!existing) node.$.mappedData.set(key, [...fn])
                     else existing.push(...fn)
                 }
-                else throw new DOMInterfaceError(`UINode ${node.ID} out of reach`)
+                else throw new DOMInterfaceError(`UINode ${node.$.ID} out of reach`)
             },
-            unsubscribe: (node: CellOrBlock, key: any, fn: Handler|null = null) => {
-                if (node.meta?.belongsTo === this) {
-                    const hs = node.mappedData.get(key)
+            unsubscribe: (node: Node, key: any, fn: Handler|null = null) => {
+                if (node.$.belongsTo === this) {
+                    const hs = node.$.mappedData.get(key)
                     if (hs)
                         if (fn) {
-                            node.mappedData.set(key, hs.filter(h => h !== fn))
+                            node.$.mappedData.set(key, hs.filter(h => h !== fn))
                         }
-                        else node.mappedData.delete(key)
+                        else node.$.mappedData.delete(key)
                 }
-                else throw new DOMInterfaceError(`UINode ${node.ID} is out of reach`)
+                else throw new DOMInterfaceError(`UINode ${node.$.ID} is out of reach`)
             },
         }
         this.root.rune = {
@@ -235,3 +235,5 @@ function h$(n: Node) {
     else if (t === 'uicomp') return 3
     else return 0
 }
+
+export type D = DOMInterface
