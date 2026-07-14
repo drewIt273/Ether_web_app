@@ -2,11 +2,8 @@
  * Instance by DrewIt
  */
 
-import {ranstring, toKebab} from "@assets/any";
-import {DOMInterfaceError} from "@core/error";
-import {RuneInstancesLog} from "@core/rune";
+import {ranstring, toKebab} from "@assets/any"; import {DOMInterfaceError} from "@core/error";
 
-export const UINodeMap = new WeakMap<Node, UINode>()
 export const NodeKeys = new Set<string>()
 export const EventMap = new WeakMap<Node, {ev: keyof GlobalEvents, fn: Handler}>()
 export const StatesMap = new WeakMap<Node, string>()
@@ -17,19 +14,6 @@ interface NodeMeta {
     unEventSet: Set<keyof GlobalEvents>
     backStates: Map<string, {type: 'static' | 'computed', fn: Handler}>
     readonly This: UINode
-}
-
-interface NodeJSX<K extends unknown> {
-    tag?: keyof HTMLElementTagNameMap
-    id?: string
-    attrs?: Record<string, unknown>
-    className?: string
-    textContent?: string
-    style?: Partial<Record<keyof CSSStyleProperties, any>>
-    append?: K[]
-    UIKey?: string
-    on?: [keyof DocumentEventMap, ...Handler[]]
-    innerHTML?: string
 }
 
 type nodefn<K extends unknown> = ($: HTMLElement) => K
@@ -348,184 +332,6 @@ class UINode {
     }
 }
 
-export class UICell extends UINode {
-
-    readonly ID: string
-    emittedData: any
-    receivedData: any
-    mappedData: Map<any, HandlerList>
-    constructor(o: Fiber) {
-        super(o)
-        this.ID = ranstring(4, 1)
-        this.attrs({'ui-cell': this.ID})
-        this.mappedData = new Map
-        UINodeMap.set(this.node, this)
-        jsx(o, this.node)
-    }
-
-    mount(n: Node|UIBlock|UIComponent) {
-        n instanceof Node ? n.appendChild(this.node) : n.node.append(this.node)
-    }
-    
-    emit(data: any) {
-        const k = this.meta.belongsTo
-        return {
-            to: (target: CellOrBlock, ...args: any[]) => {
-                if (k) k.nodeMsg.resolve(this, target, data, ...args)
-            },
-            map: (...fn: Handler[]) => {
-                if (k) k.nodeMsg.subscribe(this, data, ...fn)
-            },
-            unmap: (fn: Handler) => {
-                if (k) k.nodeMsg.unsubscribe(this, data, fn)
-            }
-        }
-    }
-}
-
-export class UIBlock extends UINode {
-
-    readonly ID: string
-    emittedData: any
-    receivedData: any
-    mappedData: Map<any, HandlerList>
-    constructor(o: Fiber) {
-        super(o)
-        this.ID = ranstring(3, 1)
-        this.attrs({'ui-block': this.ID})
-        this.mappedData = new Map
-        UINodeMap.set(this.node, this)
-        jsx(o, this.node)
-    }
-
-    get childCells() {
-        return childCells(this)
-    }
-
-    mount(n: UIComponent|Node) {
-        n instanceof Node ? n.appendChild(this.node) : n.node.append(this.node)
-    }
-
-    emit(data: any) {
-        const k = this.meta.belongsTo
-        return {
-            to: (target: CellOrBlock, ...args: any[]) => {
-                if (k) k.nodeMsg.resolve(this, target, data, ...args)
-            },
-            map: (...fn: Handler[]) => {
-                if (k) k.nodeMsg.subscribe(this, data, ...fn)
-            },
-            unmap: (fn: Handler) => {
-                if (k) k.nodeMsg.unsubscribe(this, data, fn)
-            }
-        }
-    }
-}
-
-export class UIComponent extends UINode {
-
-    readonly ID: string
-    constructor(o: Fiber) {
-        super(o)
-        this.ID = ranstring(4, 1)
-        this.attrs({'ui-comp': this.ID})
-        UINodeMap.set(this.node, this)
-        this.node.rune = {id: 'node', isRuneRoot: false}, console.log(this.node.rune)
-        this.#o = () => jsx(o, this.node)
-    }
-
-    #o;
-
-    get childBlocks() {
-        return childBlocks(this)
-    }
-
-    get childCells() {
-        return childCells(this)
-    }
-
-    mount(n: Node) {
-        n.appendChild(this.node)
-    }
-
-    init() {
-        this.#o()
-    }
-}
-
-function childCells(n: UINode) {
-    const k: UICell[] = []
-    n.childNodes.forEach(n => {
-        const o = UINodeMap.get(n)
-        if (o && o instanceof UICell) k.push(o)
-    })
-    return k
-}
-
-function childBlocks(n: UINode) {
-    const k: UIBlock[] = []
-    n.childNodes.forEach(n => {
-        const o = UINodeMap.get(n)
-        if (o && o instanceof UIBlock) k.push(o)
-    })
-    return k
-}
-
 const casiveAttrs = new Set(['viewBox'])
-
-function jsx(o: NodeJSX<unknown>, n: HTMLElement) {
-
-    const u = UINodeMap.get(n)
-    for (const [key, value] of Object.entries(o)) {
-        if (key === 'UIKey') {
-            if (u) u.UIKey = value
-            continue;
-        }
-        if (key === 'className') {
-            n.className = value
-            continue;
-        }
-        if (key === 'id') {
-            n.id = value
-            continue;
-        }
-        if (key === 'style') {
-            Object.assign(n.style, value)
-            continue;
-        }
-        if (key === 'textContent') {
-            n.textContent = value
-            continue;
-        }
-        if (key === 'innerHTML') {
-            n.innerHTML = value
-            continue;
-        }
-        if (key === 'attrs') {
-            for (const [k, v] of Object.entries(value)) {
-                if (casiveAttrs.has(k)) n.setAttribute(k, String(v))
-                else n.setAttribute(toKebab(k), String(v))
-            }
-            continue;
-        }
-        if (key === 'on' && Array.isArray(value)) {
-            const o = RuneInstancesLog.find(v => v.ID === n.rune.id)
-            if (o) o.dom.GlobalEvents.onEvent(value[0], n, value[1])
-            else EventMap.set(n, {ev: value[0], fn: value[1]})
-            continue;
-        }
-        if (key === 'append') {
-            value.forEach((v: Node | UINode | nodefn<Node | UINode>) => {
-                let a; v instanceof Node ? n.append(v) : v instanceof UINode ? n.append(v.node) : (a = v(n), a instanceof Node ? n.append(a) : n.append(a.node))
-            })
-            continue;
-        }
-    }
-    return n
-}
-
-export function newnode(n: keyof HTMLElementTagNameMap, o: NodeJSX<Node | UINode | nodefn<Node | UINode>> = {}) {
-    return jsx(o, document.createElement(n))
-}
 
 export type U = UINode
