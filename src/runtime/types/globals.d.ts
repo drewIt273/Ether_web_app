@@ -26,16 +26,38 @@ declare global {
         }
         $: NodeMetaData
     }
-    interface NodeMetaData {
+    interface NodeMetaData extends INC {
+        ID: string
         tag: NodeMetaTag
-        readonly mounted: boolean
-        uikey: string
-        belongsTo: DOMInterface
-        prevstate?: string
-        currentstate?: string
-        onevent: Map<keyof GlobalEvents, ((ev?: Event) => void)[]>
+        uikey?: string
+        belongsTo: DOMInterface | null
+        prevstate: string | null
+        currentstate: string | null
+        onevent: Map<keyof GlobalEvents, ((ev?: Event) => any)[]>
         prop: Record<string, any>
-        readonly uinode: UINode
+        pendingStates: Map<string, {type: 'static'|'computed', fn: Handler}> & Map<string, string>
+        readonly mounted: boolean
+        readonly uinode?: UINode
+        findAll(n: string): Element[]
+        find(n: string): Element | null
+        on(ev: keyof GlobalEvents, ...calls: ((ev?: Event | undefined) => void)[]): void
+        off(ev?: keyof DocumentEventMap | "append" | null): void
+        keycall(keys: string[], fn: (ev: Event) => void): void
+        unbindkeys(): void
+        defineState(state: string, call?: Handler): this['defineState']
+        defineComputedState(state: string, call?: Handler): this['defineComputedState']
+        setState(state: string, opts?: {schedule: boolean;}): void
+        hasDefinedState(s: string): boolean
+        onStateChange(fn: Handler): void
+        ofn: Handler | null
+    }
+    interface INC {
+        emittedData: null | any
+        receivedData: null | any
+        mappedData: Map<any, Handler[]>
+        emit(data: any, to: string | Node, ...args: any[]): void
+        map(data: any, ...fn: Handler[]): void
+        unmap(data: any, fn?: Handler | null): void
     }
     type NodeMetaTag = 'uicell' | 'uiblock' | 'uicomp' | 'node'
     type NodeUpdateType = 'textcontent' | 'state' | 'any'
