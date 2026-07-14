@@ -3,7 +3,7 @@
  */
 
 import {Module} from "@core/module";
-import {EventMap, NodeMetaDataInit} from "./ui-root";
+import {UINodeMap, UICell, UIBlock, UIComponent, EventMap, NodeMetaDataInit} from "./ui-root";
 import {DOMInterfaceError, NodeHierarchyError} from "@core/error";
 import {storageapi} from "@assets/storageapi";
 import {stylesheet} from "@assets/stylesheet";

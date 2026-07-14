@@ -2,8 +2,7 @@
  * Instance by DrewIt
  */
 
-import {ArrayLogLock} from "@assets/registry";
-import {RuntimeProxyError} from "./error";
+import {ArrayLogLock} from "@assets/registry"; import {RuntimeProxyError} from "./error";
 
 interface uiEventMsg {
     type: 'uiEvent'
@@ -23,9 +22,7 @@ interface requestMsg {
 }
 
 export type MessageHandler = (msg: ProxyMessage) => null | Promise<ProxyMessage>
-
 export type ProxyMessage = uiEventMsg | uiStateMsg | rejectedMsg | requestMsg
-
 export const RuneProxies: ArrayLogLock<RuntimeProxy> = new ArrayLogLock()
 
 export class RuntimeProxy {
