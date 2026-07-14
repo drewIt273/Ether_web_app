@@ -9,6 +9,7 @@ import {Scheduler} from "./scheduler";
 import {storageapi} from "@assets/storageapi";
 import {ArrayLogLock} from "@assets/registry";
 import {RuneProxies, ProxyMessage, MessageHandler, RuntimeProxy} from "./proxy";
+import {RuntimeError} from "./error";
 
 interface RuntimeConfig {
     approot: string
@@ -65,7 +66,7 @@ export class Rune {
         this.proxyInterface = {
             allowed: true,
             received: [],
-            mapped: new Map,
+            mapped: new Map(),
             async send(msg, to) {
                 const o = RuneProxies.find(o => o.targets.includes(to))
                 return o?.send(msg, to, this.This)
@@ -107,13 +108,12 @@ export class Rune {
     async #preboot() {
         const a = [this.dom, this.states, this.events]
         try {
-            for (const k of a) {
-                // @ts-expect-error
+            for (const k of a) { // @ts-expect-error
                 this.hooks.init.push(() => k.onInit.call(k))
                 this.hooks.ready.push(() => k.onReady.call(k))
             }
         }
-        catch(e) {return new Error(`${e}`)}
+        catch(e) {return new RuntimeError(`${e}`)}
     }
 
     async #runstartupHooks() {
