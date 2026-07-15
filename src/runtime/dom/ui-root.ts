@@ -7,6 +7,7 @@ import {ranstring, toKebab} from "@assets/any"; import {DOMInterfaceError} from 
 export const NodeKeys = new Set<string>()
 export const EventMap = new WeakMap<Node, {ev: keyof GlobalEvents, fn: Handler}>()
 export const StatesMap = new WeakMap<Node, string>()
+export const UiDependencyMap = new WeakMap<Node, Array<{node: Node, fn: (data: any) => any}>>()
 
 interface NodeMeta {
     belongsTo: DOMInterface
@@ -18,7 +19,11 @@ interface NodeMeta {
 
 type nodefn<K extends unknown> = ($: HTMLElement) => K
 
-interface Fiber {
+type FiberHandlers = {
+    [K in keyof GlobalEvents as `on${string & K}`]?: (event?: GlobalEvents[K]) => void
+}
+
+interface Fiber extends FiberHandlers {
     tag: keyof HTMLElementTagNameMap
     type?: NodeMetaTag
     id?: string
@@ -27,6 +32,29 @@ interface Fiber {
     className?: string
     append?: (nodefn<Node> | string | Node)[]
     [x: string]: any
+}
+
+const DepObject = {
+    notifyDependents(node: Node, data: any) {
+        UiDependencyMap.get(node)?.forEach(o => {
+            o.fn.call(node, data)
+        })
+    },
+    define(node: Node) {
+        UiDependencyMap.set(node, [])
+    },
+    has(node: Node) {
+        return UiDependencyMap.has(node)
+    },
+    get(node: Node) {
+        return UiDependencyMap.get(node)
+    },
+    add(target: Node, o: {node: Node, fn: (data: any) => any}) {
+        this.get(target)?.push(o)
+    },
+    remove(node: Node) {
+        UiDependencyMap.delete(node)
+    }
 }
 
 const META = Symbol('NodeMeta'), RUNE = Symbol('Rune')
@@ -61,6 +89,7 @@ function nm(o: HTMLElement): NodeMetaData {
     const SRC = Symbol('src'), c: NodeMetaData = {
         ID: ranstring(5, 1),
         tag: 'node',
+        node: o,
         prop: {},
         ofn: null,
         onevent: new Map(),
@@ -102,6 +131,10 @@ function nm(o: HTMLElement): NodeMetaData {
         findAll: (n: string) => {
             return Array.from(o.querySelectorAll(n))
         },
+        dependsOn(sourceNode, fn) {
+            if (!DepObject.has(sourceNode)) DepObject.define(sourceNode)
+            DepObject.add(sourceNode, {node: o, fn: fn})
+        },
         on(ev: keyof GlobalEvents, ...calls: ((ev?: Event) => any)[]) {
             if (this.belongsTo) this.belongsTo.GlobalEvents.onEvent(ev, o, ...calls)
             else this.onevent.set(ev, calls)
@@ -127,19 +160,19 @@ function nm(o: HTMLElement): NodeMetaData {
         defineComputedState(state: string, call: Handler = () => {}) {
             const b = this.belongsTo, a = this.pendingStates, v = a.get(state)
             if (b) {
-                if (v && v.type === 'computed') b.GlobalStates.defineState(o, state, () => {v.fn.apply(o), call.apply(o)}), a.delete(state)
-                else b.GlobalStates.defineState(o, state, call)
+                if (v && v.type === 'computed') b.GlobalStates.defineCompute(o, state, () => {v.fn.apply(o), call.apply(o)}), a.delete(state)
+                else b.GlobalStates.defineCompute(o, state, call)
             }
             else a.set(state, {type: 'computed', fn: call})
-            return (state: string, call: Handler = () => {}) => this.defineState.call(o, state, call)
+            return (state: string, call: Handler = () => {}) => this.defineComputedState.call(o, state, call)
         },
         setState(state: string, opts = {schedule: false}) {
             if (this.belongsTo) {
                 this.prevstate = o.$.currentstate as string
                 this.belongsTo.GlobalStates.setState(o, state, opts)
-                o.$.ofn?.call(o)
+                this.ofn?.call(o)
             }
-            else o.$.pendingStates.set(state, state)
+            else this.pendingStates.set(state, state)
         },
         hasDefinedState(s) {
             return this.belongsTo?.GlobalStates.hasState(o, s) as boolean
@@ -154,7 +187,7 @@ var jsx = (o: Fiber) => {
 }
 
 function concat(n: HTMLElement, o: Fiber) {
-    const p = new Set(['tag', 'type', 'uikey'])
+    const p = new Set(['tag', 'type', 'uikey']), j: Record<string, any> = {}
     for (const [k, v] of Object.entries(o)) {
         if (k === 'className') {
             n.className = v
@@ -166,8 +199,22 @@ function concat(n: HTMLElement, o: Fiber) {
             })
             continue;
         }
+        if (k.startsWith('on')) { // @ts-expect-error
+            n.$.on(k.slice(2), v)
+            continue;
+        }
         if (k.startsWith('$')) {
-            n.$.prop[k.replace('$', '')] = v
+            let s = k.replace('$', ''), j = o[k]
+            Object.defineProperty(n.$.prop, s, {
+                get() {
+                    return j
+                },
+                set(v) {
+                    j = v, DepObject.notifyDependents(n, v)
+                },
+                configurable: true,
+                enumerable: false
+            })
             continue;
         }
         if (casiveAttrs.has(k)) {
