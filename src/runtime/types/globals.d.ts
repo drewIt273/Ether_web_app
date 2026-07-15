@@ -18,18 +18,18 @@ declare global {
         }
         $: NodeMetaData
     }
-    interface NodeMetaData extends NodeMsgResolverUnit {
-        ID: string
+    interface NodeMetaData extends NodeMsgResolverUnit, UiNodeDependency {
         tag: NodeMetaTag
         uikey?: string
         belongsTo: DOMInterface | null
         prevstate: string | null
         currentstate: string | null
         onevent: Map<keyof GlobalEvents, ((ev?: Event) => any)[]>
-        prop: Record<string, any>
+        prop: FiberDepRecord
         pendingStates: Map<string, {type: 'static'|'computed', fn: Handler}> & Map<string, string>
+        readonly ID: NodeID
         readonly mounted: boolean
-        readonly uinode?: UINode
+        readonly node: Node
         findAll(n: string): Element[]
         find(n: string): Element | null
         on(ev: keyof GlobalEvents, ...calls: ((ev?: Event | undefined) => void)[]): void
@@ -51,7 +51,10 @@ declare global {
         map(data: any, ...fn: Handler[]): void
         unmap(data: any, fn?: Handler | null): void
     }
+    interface UiNodeDependency {
+        dependsOn(sourceNode: Node, fn: (changeData: any) => any): void
+    }
     type NodeMetaTag = 'uicell' | 'uiblock' | 'uicomp' | 'node'
-    type NodeUpdateType = 'textcontent' | 'state' | 'any'
-    type FiberDepRecord = Record<string, {type: NodeUpdateType, value: any}>
+    type FiberDepRecord = Record<string, any>
+    type NodeID = string
 }
