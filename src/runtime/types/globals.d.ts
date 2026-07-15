@@ -18,7 +18,7 @@ declare global {
         }
         $: NodeMetaData
     }
-    interface NodeMetaData extends INC {
+    interface NodeMetaData extends NodeMsgResolverUnit {
         ID: string
         tag: NodeMetaTag
         uikey?: string
@@ -43,7 +43,7 @@ declare global {
         onStateChange(fn: Handler): void
         ofn: Handler | null
     }
-    interface INC {
+    interface NodeMsgResolverUnit {
         emittedData: null | any
         receivedData: null | any
         mappedData: Map<any, Handler[]>

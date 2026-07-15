@@ -58,8 +58,7 @@ export function NodeMetaDataInit() {
 }
 
 function nm(o: HTMLElement): NodeMetaData {
-    const SRC = Symbol('src')
-    return {
+    const SRC = Symbol('src'), c: NodeMetaData = {
         ID: ranstring(5, 1),
         tag: 'node',
         prop: {},
@@ -145,7 +144,8 @@ function nm(o: HTMLElement): NodeMetaData {
         hasDefinedState(s) {
             return this.belongsTo?.GlobalStates.hasState(o, s) as boolean
         },
-    }
+    } // @ts-expect-error
+    c[SRC] = {}; return c
 }
 
 var jsx = (o: Fiber) => {

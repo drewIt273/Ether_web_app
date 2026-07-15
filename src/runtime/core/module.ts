@@ -35,8 +35,8 @@ const IMC: ModuleMessageResolver = {
 interface MsgResolverUnit {
     emittedData: any
     receivedData: any
-    mappedData: Map<any, HandlerList>
-    map: (data: any, ...fn: HandlerList) => MsgResolverUnit
+    mappedData: Map<any, Handler[]>
+    map: (data: any, ...fn: Handler[]) => MsgResolverUnit
     unmap: (data: any, fn?: Handler | null) => MsgResolverUnit
     emit<K extends keyof ModulesMappedData> (data: K, to: Module, args: ModulesMappedData[K]): any
 }
