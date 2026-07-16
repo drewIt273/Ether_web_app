@@ -9,7 +9,6 @@
     // See also https://aka.ms/tsconfig/module
     "module": "ES2022",
     "target": "ES2022",
-    "types": [],
     // For nodejs:
     // "lib": ["esnext"],
     "types": ["node"],
@@ -44,6 +43,7 @@
       "@core/*": ["./src/runtime/core/*"],
       "@dom/*": ["./src/runtime/dom/*"],
       "@assets/*": ["./src/assets/*"],
+      "@lifecycle/*": ["./src/runtime/lifecycle/*"]
     },
   }, 
   "include": ["src/**/*"],
