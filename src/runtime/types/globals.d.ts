@@ -55,6 +55,8 @@ declare global {
         dependsOn(sourceNode: Node, fn: (changeData: any) => any): void
     }
     type NodeMetaTag = 'uicell' | 'uiblock' | 'uicomp' | 'node'
+    type HTMLTagName = keyof HTMLElementTagNameMap
     type FiberDepRecord = Record<string, any>
     type NodeID = string
+    var jsx: <K extends HTMLTagName>(n: K, o: Fiber) => HTMLElementTagNameMap[K]
 }

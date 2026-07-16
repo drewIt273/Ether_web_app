@@ -20,16 +20,16 @@ interface NodeMeta {
 type nodefn<K extends unknown> = ($: HTMLElement) => K
 
 type FiberHandlers = {
-    [K in keyof GlobalEvents as `on${string & K}`]?: (event?: GlobalEvents[K]) => void
+    [K in keyof GlobalEvents as `on${string & K}`]?: (node: Node, event?: GlobalEvents[K]) => void
 }
 
 interface Fiber extends FiberHandlers {
-    tag: keyof HTMLElementTagNameMap
     type?: NodeMetaTag
     id?: string
     uikey?: string
     style?: Partial<Record<keyof CSSStyleProperties, any>>
     className?: string
+    innerHTML?: string
     append?: (nodefn<Node> | string | Node)[]
     [x: string]: any
 }
@@ -181,9 +181,9 @@ function nm(o: HTMLElement): NodeMetaData {
     c[SRC] = {}; return c
 }
 
-var jsx = (o: Fiber) => {
-    const node = document.createElement(o.tag); concat(node, o)
-    return node
+var jsx = <K extends HTMLTagName>(n: K, o: Fiber): HTMLElementTagNameMap[K] => {
+    const node = document.createElement(n); concat(node, o)
+    return node as HTMLElementTagNameMap[K]
 }
 
 function concat(n: HTMLElement, o: Fiber) {
@@ -200,7 +200,7 @@ function concat(n: HTMLElement, o: Fiber) {
             continue;
         }
         if (k.startsWith('on')) { // @ts-expect-error
-            n.$.on(k.slice(2), v)
+            n.$.on(k.slice(2), () => v.call(n, n))
             continue;
         }
         if (k.startsWith('$')) {
@@ -381,4 +381,4 @@ class UINode {
 
 const casiveAttrs = new Set(['viewBox'])
 
-export type U = UINode
+export type U = UINode; export type F = Fiber
