@@ -2,8 +2,12 @@
  * Instance by DrewIt
  */
 
-import {dom} from "./boot";
-import {sidebar$} from "./sidebar";
-import {main$} from "./main";
+import {Rune} from "@core/rune";
+import {Sidebar$} from "./SidebarLayout";
+import {main$} from "./MainLayout";
 
-if (dom.ready) dom.append(sidebar$())(main$())
+const rune = new Rune(), a = rune.boot()
+if (a instanceof Error) throw a;
+export const dom = rune.dom, scheduler = rune.scheduler
+
+if (dom.ready) dom.append(Sidebar$())(main$())
