@@ -110,11 +110,11 @@ function nm(o: HTMLElement): NodeMetaData {
         receivedData: null,
         mappedData: new Map(),
         get mounted() {
-            return (o.isConnected && o.parentNode && o.$.belongsTo) ? true : false
+            return (this.node.isConnected && this.node.parentNode && this.node.$.belongsTo) ? true : false
         },
         set belongsTo(o: DOMInterface) { // @ts-expect-error
             if (!this[SRC].dom) this[SRC].dom = o
-            else throw new DOMInterfaceError(`Node ${o} already belongs to a Rune instance and cannot be reset`)
+            else throw new DOMInterfaceError(`Node ${this.node} already belongs to a Rune instance and cannot be reset`)
         },
         get belongsTo() { // @ts-expect-error
             return this[SRC].dom
@@ -126,86 +126,85 @@ function nm(o: HTMLElement): NodeMetaData {
             return this[SRC].ofn
         },
         map(data, ...fns) {
-            this.belongsTo?.nodeMsg.subscribe(o, data, ...fns)
+            this.belongsTo?.nodeMsg.subscribe(this.node, data, ...fns)
         },
         unmap(data, fn: Handler | null = null) {
-            this.belongsTo?.nodeMsg.unsubscribe(o, data, fn)
+            this.belongsTo?.nodeMsg.unsubscribe(this.node, data, fn)
         },
         emit(data, to, ...args: any[]) {
             const n = typeof to === 'string' ? Array.from(document.body.childNodes).find(v => v.$.uikey === to) : to
-            if (n) this.belongsTo?.nodeMsg.resolve(o, n, data, ...args)
+            if (n) this.belongsTo?.nodeMsg.resolve(this.node, n, data, ...args)
         },
         find(n: string) {
-            return o.querySelector(n)
+            return (this.node as Element).querySelector(n)
         },
-        findAll: (n: string) => {
-            return Array.from(o.querySelectorAll(n))
+        findAll(n: string) {
+            return Array.from((this.node as Element).querySelectorAll(n))
         },
         dependsOn(sourceNode, fn) {
             if (!DepObject.has(sourceNode)) DepObject.define(sourceNode)
-            DepObject.add(sourceNode, {node: o, fn: fn})
+            DepObject.add(sourceNode, {node: this.node, fn: fn})
         },
         on(ev: keyof GlobalEvents, ...calls: ((ev?: Event) => any)[]) {
-            if (this.belongsTo) this.belongsTo.GlobalEvents.onEvent(ev, o, ...calls)
+            if (this.belongsTo) this.belongsTo.GlobalEvents.onEvent(ev, this.node, ...calls)
             else this.onevent.set(ev, calls)
         },
         off(ev: keyof GlobalEvents | null = null) {
-            this.belongsTo?.GlobalEvents.unEvent(o, ev)
+            this.belongsTo?.GlobalEvents.unEvent(this.node, ev)
         },
         keycall(keys: string[], fn: Handler) {
-            this.belongsTo?.GlobalEvents.keyEvent(o, keys, fn)
+            this.belongsTo?.GlobalEvents.keyEvent(this.node, keys, fn)
         },
         unbindkeys() {
-            this.belongsTo?.GlobalEvents.unKey(o)
+            this.belongsTo?.GlobalEvents.unKey(this.node)
         },
         defineState(state: string, call: Handler = () => {}) {
             const b = this.belongsTo, a = this.pendingStates, v = a.get(state)
             if (b) {
-                if (v && v.type === 'static') b.GlobalStates.defineState(o, state, () => {v.fn.apply(o), call.apply(o)}), a.delete(state)
-                else b.GlobalStates.defineState(o, state, call)
+                if (v && v.type === 'static') b.GlobalStates.defineState(this.node, state, () => {v.fn.apply(this.node), call.apply(this.node)}), a.delete(state)
+                else b.GlobalStates.defineState(this.node, state, call)
             }
             else a.set(state, {type: 'static', fn: call})
-            return (state: string, call: Handler = () => {}) => this.defineState.call(o, state, call)
+            return (state: string, call: Handler = () => {}) => this.defineState.call(this.node, state, call)
         },
         defineComputedState(state: string, call: Handler = () => {}) {
             const b = this.belongsTo, a = this.pendingStates, v = a.get(state)
             if (b) {
-                if (v && v.type === 'computed') b.GlobalStates.defineCompute(o, state, () => {v.fn.apply(o), call.apply(o)}), a.delete(state)
-                else b.GlobalStates.defineCompute(o, state, call)
+                if (v && v.type === 'computed') b.GlobalStates.defineCompute(this.node, state, () => {v.fn.apply(this.node), call.apply(this.node)}), a.delete(state)
+                else b.GlobalStates.defineCompute(this.node, state, call)
             }
             else a.set(state, {type: 'computed', fn: call})
-            return (state: string, call: Handler = () => {}) => this.defineComputedState.call(o, state, call)
+            return (state: string, call: Handler = () => {}) => this.defineComputedState.call(this.node, state, call)
         },
         setState(state: string, opts = {schedule: false}) {
             if (this.belongsTo) {
-                this.prevstate = o.$.currentstate as string
-                this.belongsTo.GlobalStates.setState(o, state, opts)
-                this.ofn?.call(o)
+                this.prevstate = this.node.$.currentstate as string
+                this.belongsTo.GlobalStates.setState(this.node, state, opts)
+                this.ofn?.call(this.node)
             }
             else this.pendingStates.set(state, state)
         },
         hasDefinedState(s) {
-            return this.belongsTo?.GlobalStates.hasState(o, s) as boolean
+            return this.belongsTo?.GlobalStates.hasState(this.node, s) as boolean
         },
     } // @ts-expect-error
     c[SRC] = {}; return c
 }
 
-var jsx = <K extends HTMLTagName>(n: K, o: Fiber): HTMLElementTagNameMap[K] => {
-    const node = document.createElement(n); concat(node, o)
-    return node as HTMLElementTagNameMap[K]
+const SVG_NAMESPACE = `http://www.w3.org/2000/svg`;
+const SVG_TAGS = new Set(["svg", "g", "rect", "path", "circle", "line", "polyline", "polygon", "ellipse", "text", "defs", "use", "mask", "clipPath", "linearGradient", "radialGradient", "stop"]);
+
+var jsx = <K extends HTMLTagName>(n: K, o: Fiber): UiElementInterfaceMap[K] => {
+    const node = SVG_TAGS.has(n) ? document.createElementNS(SVG_NAMESPACE, n) : document.createElement(n); concat(node, o)
+    return node as UiElementInterfaceMap[K]
 }
 
-function concat(n: HTMLElement, o: Fiber) {
+function concat(n: HTMLElement | SVGElement, o: Fiber) {
     const p = new Set(['tag', 'type', 'uikey']), j: Record<string, any> = {}
     for (const [k, v] of Object.entries(o)) {
-        if (k === 'className') {
-            n.className = v
-            continue;
-        }
         if (k === 'append') {
             v.forEach((a: Node | string | nodefn<Node>) => {
-                typeof a === 'function' ? n.appendChild(a(n)) : n.append(a)
+                typeof a === 'function' ? n.appendChild(a((n as HTMLElement))) : n.append(a)
             })
             continue;
         }
