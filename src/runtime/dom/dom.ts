@@ -40,10 +40,8 @@ export class DOMInterface extends Module {
         this.rune = r
         this.observer = new MutationObserver(muts => {
             const rn = (n: Node) => {
-                n.rune = {
-                    id: this.rune.ID,
-                    isRuneRoot: false
-                }
+                n.rune.id = this.rune.ID
+                n.rune.isRuneRoot = false
             }
             for (const mut of muts) {
                 if (mut.addedNodes) for (const added of mut.addedNodes) {
@@ -141,7 +139,7 @@ export class DOMInterface extends Module {
         if (this.root.contains(into)) {
             const e = NodeHierarchyCheck(node)
             if (e) throw e
-            if ((h$(into) > h$(node))) into.appendChild(node)
+            if ((h$(into) > h$(node)) || (h$(into) && h$(node)) === 0) into.appendChild(node)
             else throw new NodeHierarchyError(`${into.$.tag} cannot mount ${node.$.tag}`)
         }
         else throw new DOMInterfaceError(`Node ${into} is out of reach`)
