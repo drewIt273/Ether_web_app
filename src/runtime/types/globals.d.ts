@@ -2,7 +2,7 @@
  * Instance by DrewIt
  */
 
-import {U, F} from "@dom/ui-root"; import {Rune as R} from "@core/rune"; import {D} from "@dom/dom"; import {G} from "@core/events";
+import {U, F} from "@dom/ui-root"; import {Rune as R} from "@core/rune"; import {D} from "@dom/dom"; import {G} from "@core/events"; import {vector as v} from "@dom/vectors";
 
 declare global {
     type UINode = U;
@@ -33,7 +33,7 @@ declare global {
         findAll(n: string): Element[]
         find(n: string): Element | null
         on(ev: keyof GlobalEvents, ...calls: ((ev?: Event | undefined) => void)[]): void
-        off(ev?: keyof DocumentEventMap | "append" | null): void
+        off(ev?: keyof GlobalEvents | null): void
         keycall(keys: string[], fn: (ev: Event) => void): void
         unbindkeys(): void
         defineState(state: string, call?: Handler): this['defineState']
@@ -55,8 +55,10 @@ declare global {
         dependsOn(sourceNode: Node, fn: (changeData: any) => any): void
     }
     type NodeMetaTag = 'uicell' | 'uiblock' | 'uicomp' | 'node'
-    type HTMLTagName = keyof HTMLElementTagNameMap
+    type UiElementInterfaceMap = HTMLElementTagNameMap & SVGElementTagNameMap
+    type HTMLTagName = keyof HTMLElementTagNameMap | keyof SVGElementTagNameMap
     type FiberDepRecord = Record<string, any>
     type NodeID = string
-    var jsx: <K extends HTMLTagName>(n: K, o: Fiber) => HTMLElementTagNameMap[K]
+    var jsx: <K extends HTMLTagName>(n: K, o: Fiber) => UiElementInterfaceMap[K]
+    var vector = v
 }
