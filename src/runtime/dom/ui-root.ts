@@ -60,11 +60,13 @@ const DepObject = {
 
 const META = Symbol('NodeMeta'), RUNE = Symbol('Rune')
 
-export function NodeMetaDataInit() {
+export async function NodeMetaDataInit() {
     Object.defineProperty(Node.prototype, '$', {
         get() {
             if (!this[META]) {
-                this[META] = nm(this)
+                const o = nm.apply(this, this)
+                this[META] = o // @ts-expect-error
+                o.node = this
             }
             return this[META];
         },
@@ -83,6 +85,13 @@ export function NodeMetaDataInit() {
         },
         configurable: true,
         enumerable: false
+    }),
+    Object.defineProperty(window, 'jsx', {
+        get() {
+            return jsx
+        },
+        configurable: false,
+        enumerable: false,
     })
 }
 
@@ -403,4 +412,4 @@ class UINode {
 
 const casiveAttrs = new Set(['viewBox'])
 
-export type U = UINode; export type F = Fiber
+export type U = UINode; export type F = Fiber; export {jsx}
