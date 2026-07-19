@@ -28,9 +28,10 @@ interface Fiber extends FiberHandlers {
     id?: string
     uikey?: string
     style?: Partial<Record<keyof CSSStyleProperties, any>>
-    className?: string
+    class?: string
     innerHTML?: string
     append?: (nodefn<Node> | string | Node)[]
+    states?: Record<string, Handler>
     [x: string]: any
 }
 
@@ -201,6 +202,27 @@ function concat(n: HTMLElement, o: Fiber) {
         }
         if (k.startsWith('on')) { // @ts-expect-error
             n.$.on(k.slice(2), () => v.call(n, n))
+            continue;
+        }
+        if (k === 'uikey') {
+            if (!NodeKeys.has(v)) n.$.uikey = v, NodeKeys.add(v), n.setAttribute('node-key', v)
+            else throw new Error(`An existing node already has the uikey ${v}`)
+            continue;
+        }
+        if (k === 'states') {
+            for (const [k, fn] of Object.entries(v)) {
+                n.$.on('append', () => n.$.defineState(k, fn as Handler))
+            }
+            continue;
+        }
+        if (k === 'innerHTML') {
+            n.innerHTML = v
+            continue;
+        }
+        if (k === 'style') {
+            for (const [k, a] of Object.entries(v)) { // @ts-expect-error
+                n.style[k] = a
+            }
             continue;
         }
         if (k.startsWith('$')) {
