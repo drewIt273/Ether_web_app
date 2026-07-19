@@ -7,6 +7,7 @@ import {EventMap, NodeMetaDataInit} from "./ui-root";
 import {DOMInterfaceError, NodeHierarchyError} from "@core/error";
 import {storageapi} from "@assets/storageapi";
 import {stylesheet} from "@assets/stylesheet";
+import {vector} from "./vectors";
 
 interface NodeMessageResolver {
     resolve(sender: Node, receiver: Node, data: any, ...args: any[]): void
@@ -116,6 +117,13 @@ export class DOMInterface extends Module {
         if (typeof window === 'undefined') return new Error('[DOM] not running in browser environment')
         else {
             NodeMetaDataInit()
+            Object.defineProperty(window, 'vector', {
+                get() {
+                    return vector
+                },
+                enumerable: false,
+                configurable: false
+            })
             this.init = !0
         }
     }
