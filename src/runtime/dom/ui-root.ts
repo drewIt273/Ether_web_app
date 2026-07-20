@@ -147,7 +147,7 @@ function nm(o: HTMLElement): NodeMetaData {
         },
         on(ev: keyof GlobalEvents, ...calls: ((ev?: Event) => any)[]) {
             if (this.belongsTo) this.belongsTo.GlobalEvents.onEvent(ev, this.node, ...calls)
-            else this.onevent.set(ev, calls)
+            else this.onevent.has(ev) ? this.onevent.get(ev)?.push(...calls) : this.onevent.set(ev, [...calls])
         },
         off(ev: keyof GlobalEvents | null = null) {
             this.belongsTo?.GlobalEvents.unEvent(this.node, ev)
