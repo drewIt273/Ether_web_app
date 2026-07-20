@@ -114,7 +114,7 @@ export class DOMInterface extends Module {
     async onInit() {
         if (typeof window === 'undefined') return new Error('[DOM] not running in browser environment')
         else {
-            NodeMetaDataInit()
+            await NodeMetaDataInit(),
             Object.defineProperty(window, 'vector', {
                 get() {
                     return vector

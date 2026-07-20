@@ -90,7 +90,7 @@ export class UiStateManager extends Module {
 
     define(node: Node, state: string, fn: Handler) {
         const map = this.reg.get(node) ?? {}
-        map[state] = {t: 'static', fn: () => {if (node.$.mounted) (node as HTMLElement).setAttribute('data-state', state), fn.call(node)}}
+        map[state] = {t: 'static', fn: () => {(node as HTMLElement).setAttribute('data-state', state), fn.call(node)}}
         this.reg.set(node, map)
     }
 
@@ -112,7 +112,7 @@ export class UiStateManager extends Module {
                 if (entry.t === 'static') entry.fn.call(node)
             }
             else this.rune.scheduler.schedule(node, entry.fn)
-        if (node.$.uikey) persist(node.$.uikey, state)
+        node.$.currentstate = state; if (node.$.uikey) persist(node.$.uikey, state)
         // Computed states are not manually set
     }
 }
