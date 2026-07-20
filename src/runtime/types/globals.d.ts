@@ -17,6 +17,7 @@ declare global {
             isRuneRoot: boolean
         }
         $: NodeMetaData
+        jsx: (o: Fiber) => this
     }
     interface NodeMetaData extends NodeMsgResolverUnit, UiNodeDependency {
         tag: NodeMetaTag
