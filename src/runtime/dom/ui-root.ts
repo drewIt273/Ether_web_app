@@ -20,7 +20,7 @@ interface NodeMeta {
 type nodefn<K extends unknown> = ($: HTMLElement) => K
 
 type FiberHandlers = {
-    [K in keyof GlobalEvents as `on${string & K}`]?: (node: Node, event?: GlobalEvents[K]) => void
+    [K in keyof GlobalEvents as `on${string & K}`]?: (node: HTMLElement | SVGElement, event?: GlobalEvents[K]) => void
 }
 
 interface Fiber extends FiberHandlers {
@@ -31,7 +31,7 @@ interface Fiber extends FiberHandlers {
     class?: string
     innerHTML?: string
     append?: (nodefn<Node> | string | Node)[]
-    states?: Record<string, Handler>
+    states?: Record<string, (n: HTMLElement | SVGElement, ...args: any[]) => any>
     [x: string]: any
 }
 
@@ -75,17 +75,23 @@ export async function NodeMetaDataInit() {
     })
     Object.defineProperty(Node.prototype, 'rune', {
         get() {
-            if (!this[RUNE]) {
-                this[RUNE] = {
-                    id: '',
-                    isRuneRoot: false
-                }
-            }
+            if (!this[RUNE]) this[RUNE] = {id: '', isRuneRoot: false}
             return this[RUNE]
         },
         configurable: true,
         enumerable: false
-    }),
+    })
+    Object.defineProperty(Node.prototype, 'jsx', {
+        get() {
+            const n: HTMLElement = typeof this === 'function' ? this.call(this) : this
+            return function(o: Fiber) {
+                concat(n, o)
+                return n
+            }
+        },
+        configurable: false,
+        enumerable: false
+    })
     Object.defineProperty(window, 'jsx', {
         get() {
             return jsx
@@ -219,7 +225,7 @@ function concat(n: HTMLElement | SVGElement, o: Fiber) {
         }
         if (k === 'states') {
             for (const [k, fn] of Object.entries(v)) {
-                n.$.on('append', () => n.$.defineState(k, fn as Handler))
+                n.$.on('append', () => n.$.defineState(k, () => (fn as Handler).call(n, n)))
             }
             continue;
         }
