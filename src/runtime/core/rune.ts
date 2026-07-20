@@ -109,8 +109,8 @@ export class Rune {
         const a = [this.dom, this.states, this.events]
         try {
             for (const k of a) { // @ts-expect-error
-                this.hooks.init.push(() => k.onInit.call(k))
-                this.hooks.ready.push(() => k.onReady.call(k))
+                this.hooks.init.push(async () => k.onInit.call(k))
+                this.hooks.ready.push(async () => k.onReady.call(k))
             }
         }
         catch(e) {return new RuntimeError(`${e}`)}
