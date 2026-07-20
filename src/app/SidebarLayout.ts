@@ -5,6 +5,14 @@
 import {onResizeX, toggleNodeState} from "./ui";
 
 function sn() {
+    let o = jsx('div', {
+        style: {width: '35px', height: '35px', borderRadius: '14px', position: 'absolute', transition: '.3s ease-in-out'}
+    }), i = (s: string) => jsx('div', {
+        style: {
+            padding: '8px', display: 'flex', alignItems: 'center', borderRadius: '14px', transition: 'all.3s ease-in-out', zIndex: 1
+        },
+        icon: '', states: {open: (n) => {o.style.background = `var(--${s})`; o.style.transform = `translateX(${n.getBoundingClientRect().left - 32}px)`}, close: () => {}}, onclick(n) {let a = (n.parentElement as HTMLElement).querySelectorAll('[icon]'); a.forEach(i => {i.$.setState('close'), f(i as HTMLElement, 'currentColor')}); n.$.setState('open');}, onmouseenter(n) {f(n, `var(--${s})`)}, onmouseleave(n) {f(n, 'currentColor')}
+    }), c = (n: Node) => (n as Element).getAttribute('fill') !== 'none' ? 'fill' : 'stroke', f = (n: HTMLElement | SVGElement, s: string) => {let o = n.querySelector('svg'); if (n.$.currentstate !== 'open') o?.setAttribute(c(o), s)}
     return jsx('aside', {
         type: 'uicomp',
         expand: '',
@@ -58,19 +66,16 @@ function sn() {
                     jsx('div', {
                         append: [
                             jsx('div', {
+                                class: 'items-center w-full gap-md',
                                 append: [
-                                    jsx('div', {
-                                        class: 'relative',
-                                        append: [jsx('div', {class: 'items-center', style: {position: 'absolute', top: 0, left: 0},})]
-                                    }),
-                                    jsx('div', {
-                                        class: 'h-xxs',
-                                        style: {backgroundColor: 'var(--cr-blueviolet)'}
-                                    })
-                                ]
+                                    i('cr-lightslategrey').jsx({append: [vector.rect.group]}),
+                                    i('cr-blue').jsx({append: [vector.i.cube]}),
+                                    i('cr-cadetblue').jsx({append: [vector.i.cubetr]}), o
+                                ],
+                                style : {paddingInline: '15px'}
                             })
                         ],
-                        style: {paddingTop: '3em'}
+                        style: {paddingTop: '1em', paddingInline: '1em'}
                     }),
                 ]
             }),
