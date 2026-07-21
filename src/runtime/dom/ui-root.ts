@@ -5,7 +5,6 @@
 import {ranstring, toKebab} from "@assets/any"; import {DOMInterfaceError} from "@core/error";
 
 export const NodeKeys = new Set<string>()
-export const EventMap = new WeakMap<Node, {ev: keyof GlobalEvents, fn: Handler}>()
 export const StatesMap = new WeakMap<Node, string>()
 export const UiDependencyMap = new WeakMap<Node, Array<{node: Node, fn: (data: any) => any}>>()
 
@@ -119,7 +118,12 @@ function nm(o: HTMLElement): NodeMetaData {
             return (this.node.isConnected && this.node.parentNode && this.node.$.belongsTo) ? true : false
         },
         set belongsTo(o: DOMInterface) { // @ts-expect-error
-            if (!this[SRC].dom) this[SRC].dom = o
+            if (!this[SRC].dom) { this[SRC].dom = o
+                for (const [k, v] of this.pendingStates.entries()) {
+                    v.type === 'static' ? this.defineState(k, v.fn) : this.defineComputedState(k, v.fn)
+                }
+                this.pendingStates.clear()
+            }
             else throw new DOMInterfaceError(`Node ${this.node} already belongs to a Rune instance and cannot be reset`)
         },
         get belongsTo() { // @ts-expect-error
@@ -184,7 +188,7 @@ function nm(o: HTMLElement): NodeMetaData {
         },
         setState(state: string, opts = {schedule: false}) {
             if (this.belongsTo) {
-                this.prevstate = this.node.$.currentstate as string
+                this.prevstate = this.node.$.currentstate
                 this.belongsTo.GlobalStates.setState(this.node, state, opts)
                 this.ofn?.call(this.node)
             }
@@ -223,10 +227,12 @@ function concat(n: HTMLElement | SVGElement, o: Fiber) {
             else throw new Error(`An existing node already has the uikey ${v}`)
             continue;
         }
+        if (k === 'type') {
+            n.$.tag = v as NodeMetaTag
+            continue;
+        }
         if (k === 'states') {
-            for (const [k, fn] of Object.entries(v)) {
-                n.$.on('append', () => n.$.defineState(k, () => (fn as Handler).call(n, n)))
-            }
+            for (const [k, fn] of Object.entries(v)) n.$.defineState(k, () => (fn as Handler).call(n, n))
             continue;
         }
         if (k === 'innerHTML') {
