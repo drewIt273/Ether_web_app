@@ -225,7 +225,7 @@ function OutOfReachError(n: Node) {
 
 function NodeHierarchyCheck(n: Node) {
     const p = n.parentElement
-    if (p) if (h$(n) > h$(p)) return new NodeHierarchyError(`${n.$.tag} cannot mount ${p.$.tag}`)
+    if (p) if (h$(n) > h$(p) && h$(p) !== 0) return new NodeHierarchyError(`${n.$.tag} cannot mount ${p.$.tag}`)
     if (n.childNodes.length) {
         n.childNodes.forEach(k => {
             let e = NodeHierarchyCheck(k)
