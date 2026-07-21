@@ -5,14 +5,28 @@
 import {onResizeX, toggleNodeState} from "./ui";
 
 function sn() {
-    let o = jsx('div', {
-        style: {width: '35px', height: '35px', borderRadius: '14px', position: 'absolute', transition: '.3s ease-in-out'}
-    }), i = (s: string) => jsx('div', {
+    let v = () => {
+        return {
+            open: (n: HTMLElement | SVGElement) => {},
+            close: (n: HTMLElement | SVGElement) => {}
+        }
+    }, b = {states: v(), abcon: ''}, se = (n: Node, s: string) => n.$.setState(s)
+    const k = jsx('div', {
+        ...b
+    }), l = jsx('div', {
+        ...b
+    }), m = jsx('div', {
+        ...b
+    }), p = [k, l, m];
+    let o = jsx('div', {style: {width: '35px', height: '35px', borderRadius: '14px', position: 'absolute', transition: '.3s ease-in-out'}}),
+    i = (s: string, x: HTMLElement) => jsx('div', {
         style: {
             padding: '8px', display: 'flex', alignItems: 'center', borderRadius: '14px', transition: 'all.3s ease-in-out', zIndex: 1
-        },
-        icon: '', states: {open: (n) => {o.style.background = `var(--${s})`; o.style.transform = `translateX(${n.getBoundingClientRect().left - 32}px)`}, close: () => {}}, onclick(n) {let a = (n.parentElement as HTMLElement).querySelectorAll('[icon]'); a.forEach(i => {i.$.setState('close'), f(i as HTMLElement, 'currentColor')}); n.$.setState('open');}, onmouseenter(n) {f(n, `var(--${s})`)}, onmouseleave(n) {f(n, 'currentColor')}
-    }), c = (n: Node) => (n as Element).getAttribute('fill') !== 'none' ? 'fill' : 'stroke', f = (n: HTMLElement | SVGElement, s: string) => {let o = n.querySelector('svg'); if (n.$.currentstate !== 'open') o?.setAttribute(c(o), s)}
+        }, icon: '', states: {
+            open: (n) => {o.style.background = `var(--${s})`, o.style.transform = `translateX(${n.getBoundingClientRect().left - 10}px)`, p.forEach(e => {if (e !== x) se(e, 'close')}), se(x, 'open')},
+            close: () => {}
+        }, onclick(n) {let a = (n.parentElement as HTMLElement).querySelectorAll('[icon]'); a.forEach(i => {se(i, 'close'), f(i as HTMLElement, 'currentColor')}); se(n, 'open');}, onmouseenter(n) {f(n, `var(--${s})`)}, onmouseleave(n) {f(n, 'currentColor')}
+    }), c = (n: Node) => (n as Element).getAttribute('fill') !== 'none' ? 'fill' : 'stroke', f = (n: HTMLElement | SVGElement, s: string) => {let o = n.querySelector('svg'); if (n.$.currentstate !== 'open') o?.setAttribute(c(o), s)};
     return jsx('aside', {
         type: 'uicomp',
         expand: '',
@@ -29,31 +43,31 @@ function sn() {
                                 append: [
                                     jsx('div', {
                                         type: 'uicell',
-                                        id: 'ico',
-                                        append: [jsx('div', {class: 'ico-d center'})]
+                                        class: 'i-tab bg-hover',
+                                        append: [vector.rect.group]
                                     }),
-                                ]
-                            }),
-                            jsx('div', {
-                                class: 'd-flex gap-md',
-                                append: [
                                     jsx('div', {
                                         id: 'nav-controls',
                                         append: [
                                             jsx('div', {
                                                 type: 'uicell',
                                                 id: 'go-left',
-                                                class: 'i-tab bg-hover',
-                                                append: [vector.arrow.left]
+                                                class: 'i-tab bg-hover center',
+                                                append: [vector.chevron.left.jsx({width: 16, height: 16})]
                                             }),
                                             jsx('div', {
                                                 type: 'uicell',
                                                 id: 'go-right',
-                                                class: 'i-tab bg-hover',
-                                                append: [vector.arrow.right]
+                                                class: 'i-tab bg-hover center',
+                                                append: [vector.chevron.right.jsx({width: 16, height: 16})]
                                             }),
                                         ]
                                     }),
+                                ]
+                            }),
+                            jsx('div', {
+                                class: 'd-flex gap-md',
+                                append: [
                                     jsx('div', {
                                         id: 'tab-write-actions',
                                         class: 'i-tab bg-hover',
@@ -68,15 +82,20 @@ function sn() {
                             jsx('div', {
                                 class: 'items-center w-full gap-md',
                                 append: [
-                                    i('cr-lightslategrey').jsx({append: [vector.rect.group]}),
-                                    i('cr-blue').jsx({append: [vector.i.cube]}),
-                                    i('cr-cadetblue').jsx({append: [vector.i.cubetr]}), o
+                                    i('cr-lightslategrey', k).jsx({append: [vector.rect.group], uikey: 'a-workspace-b'}),
+                                    i('cr-blue', l).jsx({append: [vector.i.cube], uikey: 'a-projects-b'}),
+                                    i('cr-cadetblue', m).jsx({append: [vector.i.cubetr], uikey: 'a-spaces-b'}), o
                                 ],
-                                style : {paddingInline: '15px'}
                             })
                         ],
-                        style: {paddingTop: '1em', paddingInline: '1em'}
+                        style: {paddingBlock: '1em', paddingInline: 'var(--space-xs)'}
                     }),
+                    jsx('div', {
+                        type: 'uicomp',
+                        id: 'asideContent',
+                        class: 'pt-md pl-sm pr-sm pb-sm',
+                        append: p
+                    })
                 ]
             }),
             jsx('div', {class: 'col-resizer right-side'})
