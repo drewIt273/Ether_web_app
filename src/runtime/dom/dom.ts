@@ -3,7 +3,7 @@
  */
 
 import {Module} from "@core/module";
-import {EventMap, NodeMetaDataInit} from "./ui-root";
+import {NodeMetaDataInit} from "./ui-root";
 import {DOMInterfaceError, NodeHierarchyError} from "@core/error";
 import {storageapi} from "@assets/storageapi";
 import {stylesheet} from "@assets/stylesheet";
@@ -48,9 +48,6 @@ export class DOMInterface extends Module {
                     rn(added), added.childNodes.forEach(c => rn(c));
                     (added as Element).setAttribute('_hide_', '')
                     const call = (n: Node) => {
-                        if (EventMap.has(n)) { const k = EventMap.get(n)
-                            if (k) this.GlobalEvents.onEvent(k.ev, n, k.fn)
-                        }
                         n.$.belongsTo = this
                         n.$.onevent.forEach((v, k) => {
                             if (k === 'append') v.forEach(h => h())
@@ -58,7 +55,9 @@ export class DOMInterface extends Module {
                         }), n.$.onevent.clear()
                         if (n.$.uikey) {
                             const a = storageapi.o.get('uistates')?.[n.$.uikey]
-                            if (a) this.GlobalStates.setState(n, a)
+                            if (a) queueMicrotask(() => {
+                                if (n.$.hasDefinedState(a)) n.$.setState(a)
+                            })
                         }
                         n.childNodes.forEach(a => call(a));
                     }
