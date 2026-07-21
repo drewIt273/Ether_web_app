@@ -56,7 +56,7 @@ body, web-app {
     margin: 0;
 }
 [node-key="sidebar"] {
-    height: 100%;
+    height: 100dvh;
     max-width: 340px;
     min-width: 300px;
     transition: all .3s ease-in-out;
@@ -84,6 +84,30 @@ body, web-app {
     #nav-controls {
         display: flex;
         gap: 6px;
+    }
+    #asideContent {
+        position: relative;
+        height: calc(100dvh - 8em);
+        overflow: hidden;
+        overflow-y: auto;
+        [abcon] {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            overflow: hidden;
+            overflow-y: auto;
+            height: calc(100dvh - 8em);
+            padding: 10px;
+        }
+        [abcon][data-state="open"] {
+            opacity: 1;
+            z-index: 2;
+        }
+        [abcon][data-state="close"] {
+            opacity: 0;
+            z-index: -1;
+            pointer-events: none;
+        }
     }
 }
 [node-key="mainLayoutConstructive"] {
