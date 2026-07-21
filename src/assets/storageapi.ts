@@ -54,7 +54,7 @@ const memory = {
         else return (p: string, o: any) => {
             const n = cache[k]
             if (strictObject(n)) {
-                n[p] = o; cache[k] = o
+                n[p] = o; cache[k] = n
                 setItem(k, n)
             }
         }
