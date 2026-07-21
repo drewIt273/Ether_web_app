@@ -2,7 +2,7 @@
  * Instance by DrewIt
  */
 
-import {U, F} from "@dom/ui-root"; import {Rune as R} from "@core/rune"; import {D} from "@dom/dom"; import {G} from "@core/events"; import {vector as v} from "@dom/vectors";
+import {U, F} from "@dom/ui-root"; import {Rune as R} from "@core/rune"; import {D} from "@dom/dom"; import {G} from "@core/events"; import {vector as v} from "@dom/vectors"; import {storageapi as O} from "@assets/storageapi";
 
 declare global {
     type UINode = U;
@@ -60,6 +60,7 @@ declare global {
     type HTMLTagName = keyof HTMLElementTagNameMap | keyof SVGElementTagNameMap
     type FiberDepRecord = Record<string, any>
     type NodeID = string
-    var jsx: <K extends HTMLTagName>(n: K, o: Fiber) => UiElementInterfaceMap[K]
-    var vector = v
+    const jsx: <K extends HTMLTagName>(n: K, o: Fiber) => UiElementInterfaceMap[K]
+    const vector = v
+    const storageapi = O
 }

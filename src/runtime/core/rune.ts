@@ -54,7 +54,7 @@ export class Rune {
     constructor(o: RuntimeAPI = {proxyTargets: null, shared: false}) {
         this.scheduler = new Scheduler()
         this.hooks = {
-            init: [storageapi.setCache],
+            init: [ge, storageapi.setCache],
             ready: [() => this.#pn.call(this)]
         }
         this.init = !1
@@ -134,4 +134,13 @@ export class Rune {
             else this.init = !0
         }
     }
+}
+function ge() {
+    Object.defineProperty(window, 'storageapi', {
+        get() {
+            return storageapi
+        },
+        enumerable: false,
+        configurable: false
+    })    
 }
