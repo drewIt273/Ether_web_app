@@ -14,6 +14,9 @@
 *, :before, :after {
     box-sizing: border-box;
 }
+*:not(.no-trans) {
+    transition: all .3s ease-in-out;
+}
 html, body {
     user-select: none;
     cursor: default;
@@ -26,7 +29,7 @@ html, body, web-app * {
     border: 0;
     margin: 0;
     padding: 0;
-    font-weight: 400;
+    font-weight: 500;
 }
 web-app, div, section, .smooth-scroll {
     scroll-behavior: smooth;
@@ -50,6 +53,7 @@ html, body, web-app {
     overflow: hidden;
     background-color: var(--bg-base-color);
     font-size: 15px;
+    font-family: var(--font-display);
 }
 body, web-app {
     height: 100%;
@@ -57,7 +61,6 @@ body, web-app {
 }
 [node-key="sidebar"] {
     height: 100dvh;
-    max-width: 340px;
     min-width: 300px;
     transition: all .3s ease-in-out;
     background-color: var(--bg-aside-color);
@@ -69,7 +72,7 @@ body, web-app {
     border-right-color: var(--bg-border-color);
 }
 [node-key="sidebar"][data-state="relative"][expand] {
-    width: 340px;
+    width: 300px;
     top: 0;
 }
 [node-key="sidebar"][data-state="absolute"] {
@@ -97,7 +100,7 @@ body, web-app {
             overflow: hidden;
             overflow-y: auto;
             height: calc(100dvh - 8em);
-            padding: 10px;
+            padding: 10px 0;
         }
         [abcon][data-state="open"] {
             opacity: 1;
@@ -108,6 +111,10 @@ body, web-app {
             z-index: -1;
             pointer-events: none;
         }
+        .htab [has-icon] span[i] {
+            height: 19px;
+        }
+        .htab:hover {background-color: var(--cr-transparent);}
     }
 }
 [node-key="mainLayoutConstructive"] {

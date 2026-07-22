@@ -147,6 +147,49 @@
     pointer-events: none;
     opacity: .3;
 }
+.htab {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 10px;
+    border-radius: 10px;
+    opacity: .7;
+    span {
+        font-weight: 500;
+    }
+    .opts {opacity: 0;}
+    .opts:hover > [data-slot="icon"] {stroke: var(--cr-blue);}
+}
+.htab:hover {
+    background: var(--bg-hover-color);
+    opacity: 1;
+    .opts {opacity: 1;}
+}
+.expander #eobj > div {
+    height: fit-content;
+}
+.expander[data-state="expanded"] {
+    #eobj {
+        opacity: 1;
+        height: fit-content;
+    }
+    [data-slot="icon"] {transform: rotate(45deg);}
+} 
+.expander[data-state="close"] {
+    #eobj {
+        opacity: 0;
+        height: 0;
+    }
+    [data-slot] {transform: rotate(0deg);}
+}
+.expander [data-slot="icon"] {
+    height: 16px;
+}
+[has-icon] {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
 .flex-wrapper {
     display: flex;
     flex-direction: row;
