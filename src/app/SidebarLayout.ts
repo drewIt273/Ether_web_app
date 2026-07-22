@@ -2,7 +2,7 @@
  * Instance by DrewIt
  */
 
-import {onResizeX, toggleNodeState} from "./ui";
+import {onResizeX, toggleStateOf} from "./ui";
 
 function sn() {
     let v = () => {
@@ -12,6 +12,67 @@ function sn() {
         }
     }, b = {states: v(), abcon: ''}, se = (n: Node, s: string) => n.$.setState(s)
     const k = jsx('div', {
+        append: [
+            jsx('div', {
+                style: {display: 'flex', flexDirection: 'column', gap: '5px', paddingInline: '5px'},
+                append: [
+                    jsx('div', {
+                        class: 'htab',
+                        append: [
+                            jsx('div', {
+                                append: [jsx('span', {append: [vector.viewfinder.jsx({width: 16, height: 16, strokeWidth: 3})], i: true}), jsx('span', {append: ["Issues"]})],
+                                hasIcon: true
+                            }),
+                            jsx('div', {
+                                append: [jsx('span', {append: [vector.ellipsis.horizontal], class: 'center opts no-trans'})]
+                            })
+                        ]
+                    }),
+                    jsx('div', {
+                        class: 'htab',
+                        append: [
+                            jsx('div', {
+                                append: [jsx('span', {append: [vector.i.cube.jsx({width: 16, height: 16})], i: true}), jsx('span', {append: ["Projects"]})],
+                                hasIcon: true
+                            }),
+                            jsx('div', {
+                                append: [jsx('span', {append: [vector.ellipsis.horizontal], class: 'center opts no-trans'})]
+                            })
+                        ]
+                    }),
+                    jsx('div', {
+                        class: 'htab',
+                        append: [
+                            jsx('div', {
+                                append: [jsx('span', {append: [vector.calender.jsx({wdith: 16, height: 16})], i: true}), jsx('span', {append: ["Schedule"]})],
+                                hasIcon: true
+                            }),
+                            jsx('div', {
+                                append: [jsx('span', {append: [vector.ellipsis.horizontal], class: 'center opts no-trans'})]
+                            })
+                        ]
+                    }),
+                ]
+            }),
+            jsx('div', {style: {paddingBlock: '2em'}}),
+            jsx('div', {
+                append: [
+                    jsx('div', {
+                        uikey: 'a-workspace-expander--1', class: 'expander items-center justify-between',
+                        states: {
+                            expanded: () => {},
+                            close: () => {}
+                        },
+                        onclick: (n) => toggleStateOf(n, 'expanded', 'close'),
+                        append: ["documents", jsx('span', {append: [vector.chevron.right.jsx({width: 16, height: 16})], dataSlot: 'icon'})]
+                    }),
+                    jsx('div', {
+                        id: 'eobj',
+                    })
+                ],
+                style: {paddingInline: '20px', opacity: .7}
+            })
+        ],
         ...b
     }), l = jsx('div', {
         ...b
