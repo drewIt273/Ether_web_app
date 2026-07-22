@@ -38,7 +38,7 @@ export function onResizeY(on: Node, target: Node = on.parentNode as ParentNode, 
         try {resizer.setPointerCapture(e.pointerId)} catch {}
         const onMove = (ev: PointerEvent) => {
             let y = ev.clientY
-            if (o.max) parent.style.width = `${(y < o.max && y > o.min) ? p + (y - i) : o.max}px`
+            if (o.max) parent.style.height = `${(y < o.max && y > o.min) ? p + (y - i) : o.max}px`
         }
         const onUp = (ev: PointerEvent) => {
             try {resizer.releasePointerCapture(e.pointerId)} catch {}
@@ -53,16 +53,9 @@ export function onResizeY(on: Node, target: Node = on.parentNode as ParentNode, 
 /**
  * Toggles between two states s1 and s2. If a different state was set initially, sets s1 as n's state.
  */
-export function toggleUINodeState(n: UINode, s1: string, s2: string) {
-    let s = n.currentstate; console.log(s);
-    if (s === s1) n.setState(s2)
-    else if (s === s2) n.setState(s1)
-    else n.setState(s1)
-}
-
-export function toggleElementState(n: HTMLElement, s1: string, s2: string) {
-    let s = 'data-state', g = n.getAttribute(s)
-    if (g === s1) n.setAttribute(s, s2)
-    else if (g === s2) n.setAttribute(s, s1)
-    else n.setAttribute(s, s1)
+export function toggleStateOf(n: HTMLElement | SVGElement, s1: string, s2: string) {
+    let s = n.$.currentstate
+    if (s === s1) n.$.setState(s2)
+    else if (s === s2) n.$.setState(s1)
+    else n.$.setState(s1)
 }
