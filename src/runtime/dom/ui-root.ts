@@ -31,6 +31,7 @@ interface Fiber extends FiberHandlers {
     innerHTML?: string
     append?: (nodefn<Node> | string | Node)[]
     states?: Record<string, (n: HTMLElement | SVGElement, ...args: any[]) => any>
+    readonly node?: HTMLElement | SVGElement
     [x: string]: any
 }
 
@@ -210,7 +211,8 @@ var jsx = <K extends HTMLTagName>(n: K, o: Fiber): UiElementInterfaceMap[K] => {
 }
 
 function concat(n: HTMLElement | SVGElement, o: Fiber) {
-    const p = new Set(['tag', 'type', 'uikey']), j: Record<string, any> = {}
+    const p = new Set(['tag', 'type', 'uikey', 'node'])
+    Object.defineProperty(o, 'node', {get() {return n}, configurable: false, enumerable: false})
     for (const [k, v] of Object.entries(o)) {
         if (k === 'append') {
             v.forEach((a: Node | string | nodefn<Node>) => {
@@ -259,11 +261,16 @@ function concat(n: HTMLElement | SVGElement, o: Fiber) {
             })
             continue;
         }
+        if (k === 'node') continue;
         if (casiveAttrs.has(k)) {
             n.setAttribute(k, v)
+            continue;
         }
         else if (!p.has(k)) {
-            n.setAttribute(toKebab(k), v)
+            if (typeof v !== 'boolean') n.setAttribute(toKebab(k), v)
+            else if (v) n.setAttribute(toKebab(k), '')
+                else n.removeAttribute(k)
+            continue;
         }
     }
 }
