@@ -153,7 +153,6 @@
     align-items: center;
     padding: 7px 10px;
     border-radius: 10px;
-    opacity: .7;
     span {
         font-weight: 500;
     }
@@ -165,25 +164,41 @@
     opacity: 1;
     .opts {opacity: 1;}
 }
-.expander #eobj > div {
+.btab {
+    color: var(--cr-white);
+    opacity: .9;
+    padding: 4px 15px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition-duration: .2s;
+}
+.btab:hover {background-color: #4363a7;} .btab, .btab:active {background-color: var(--cr-blue);}
+.expander #eobj {
     height: fit-content;
 }
 .expander[data-state="expanded"] {
-    #eobj {
-        opacity: 1;
-        height: fit-content;
-    }
     [data-slot="icon"] {transform: rotate(45deg);}
 } 
 .expander[data-state="close"] {
-    #eobj {
-        opacity: 0;
-        height: 0;
-    }
     [data-slot] {transform: rotate(0deg);}
 }
 .expander [data-slot="icon"] {
     height: 16px;
+}
+@keyframes gi {
+    0% {opacity: 0;}
+    100% {height: 0; opacity: 0;}
+}
+@keyframes gx {
+    0% {opacity: 1;}
+    100% {height: fit-content; opacity: 1;}
+}
+[open="true"] {
+    animation: gx .4s ease-in-out forwards;
+}
+[open="false"] {
+    animation: gi .4s ease-in-out forwards;
 }
 [has-icon] {
     display: flex;

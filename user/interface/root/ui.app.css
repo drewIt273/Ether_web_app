@@ -64,7 +64,11 @@ body, web-app {
     min-width: 300px;
     transition: all .3s ease-in-out;
     background-color: var(--bg-aside-color);
+    color: #adadad;
     border: 2px solid var(--cr-transparent);
+    .i-tab, [icon] {
+        color: var(--fg-base-color);
+    }
 }
 [node-key="sidebar"][data-state="relative"] {
     position: relative;
