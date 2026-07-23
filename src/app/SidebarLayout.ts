@@ -10,6 +10,11 @@ function sn() {
             open: (n: HTMLElement | SVGElement) => {},
             close: (n: HTMLElement | SVGElement) => {}
         }
+    }, e = () => {
+        return {
+            expanded: (n: HNode) => n.parentElement?.querySelector('#eobj')?.setAttribute('open', 'true'),
+            close: (n: HNode) => n.parentElement?.querySelector('#eobj')?.setAttribute('open', 'false')
+        }
     }, b = {states: v(), abcon: ''}, se = (n: Node, s: string) => n.$.setState(s)
     const k = jsx('div', {
         append: [
@@ -54,23 +59,44 @@ function sn() {
                     }),
                 ]
             }),
-            jsx('div', {style: {paddingBlock: '2em'}}),
+            jsx('div', {style: {paddingBlock: '1em'}}),
             jsx('div', {
                 append: [
                     jsx('div', {
-                        uikey: 'a-workspace-expander--1', class: 'expander items-center justify-between',
-                        states: {
-                            expanded: () => {},
-                            close: () => {}
-                        },
+                        uikey: 'a-workspace-expander--1', class: 'expander items-center justify-between pt-md',
+                        states: e(),
                         onclick: (n) => toggleStateOf(n, 'expanded', 'close'),
                         append: ["documents", jsx('span', {append: [vector.chevron.right.jsx({width: 16, height: 16})], dataSlot: 'icon'})]
                     }),
                     jsx('div', {
                         id: 'eobj',
+                        append: [function() {
+                            const o = storageapi.o.get('userdocs'), n = jsx('div', {})
+                            if (o && Object.entries(o).length) {
+                                for (const k of Object.entries(o)) {
+                                    n.jsx({append: [jsx('div', {append: [k[0]]})]})
+                                }
+                            }
+                            else n.jsx({class: 'center pb-xl pt-xl flex-column gap-sm', append: [jsx('span', {append: [vector.document.text]}), "no documents", jsx('div', {class: 'btab', append: ["Create"]})]})
+                            return n
+                        }]
                     })
                 ],
-                style: {paddingInline: '20px', opacity: .7}
+                style: {paddingInline: '20px'}
+            }),
+            jsx('div', {
+                append: [
+                    jsx('div', {
+                        uikey: 'a-tasks-expander--1', class: 'expander items-center justify-between pt-md',
+                        states: e(),
+                        onclick: (n) => toggleStateOf(n, 'expanded', 'close'),
+                        append: ["tasks", jsx('span', {append: [vector.chevron.right.jsx({width: 16, height: 16})], dataSlot: 'icon'})]
+                    }),
+                    jsx('div', {
+                        id: 'eobj',
+                    })
+                ],
+                style: {paddingInline: '20px'}
             })
         ],
         ...b
@@ -83,11 +109,12 @@ function sn() {
     i = (s: string, x: HTMLElement) => jsx('div', {
         style: {
             padding: '8px', display: 'flex', alignItems: 'center', borderRadius: '14px', transition: 'all.3s ease-in-out', zIndex: 1
-        }, icon: '', states: {
+        }, icon: true, states: {
             open: (n) => {o.style.background = `var(--${s})`, o.style.transform = `translateX(${n.getBoundingClientRect().left - 10}px)`, p.forEach(e => {if (e !== x) se(e, 'close')}), se(x, 'open')},
             close: () => {}
         }, onclick(n) {let a = (n.parentElement as HTMLElement).querySelectorAll('[icon]'); a.forEach(i => {se(i, 'close'), f(i as HTMLElement, 'currentColor')}); se(n, 'open');}, onmouseenter(n) {f(n, `var(--${s})`)}, onmouseleave(n) {f(n, 'currentColor')}
     }), c = (n: Node) => (n as Element).getAttribute('fill') !== 'none' ? 'fill' : 'stroke', f = (n: HTMLElement | SVGElement, s: string) => {let o = n.querySelector('svg'); if (n.$.currentstate !== 'open') o?.setAttribute(c(o), s)};
+
     return jsx('aside', {
         type: 'uicomp',
         expand: '',
