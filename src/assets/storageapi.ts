@@ -22,6 +22,8 @@ type nodekey = string
 
 interface CacheObject {
     uistates?: Record<nodekey, string>
+    userdocs?: Record<string, string>
+    [x: string]: any
 }
 
 const cache: CacheObject = {}
@@ -35,7 +37,6 @@ function setCache() {
     try {
         for (let i = 0; i < localStorage.length; i++) {
             const k = localStorage.key(i)
-            // @ts-expect-error
             if (k) cache[k] = safeParse(localStorage.getItem(k));
         }
     }

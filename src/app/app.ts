@@ -17,4 +17,8 @@ Object.defineProperty(window, 'runtime', {
     value: rune,
     enumerable: false,
     configurable: false
-})
+}),
+
+(function() {
+    storageapi.o.set('userdocs', {})
+})()
