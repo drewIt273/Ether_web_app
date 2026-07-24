@@ -77,7 +77,7 @@ function sn() {
                                     n.jsx({append: [jsx('div', {append: [k[0]]})]})
                                 }
                             }
-                            else n.jsx({class: 'center pb-xl pt-xl flex-column gap-sm', append: [jsx('span', {append: [vector.document.text]}), "no documents", jsx('div', {class: 'btab', append: ["Create"]})]})
+                            else n.jsx({class: 'center pb-xl pt-xl flex-column gap-sm', append: [jsx('span', {append: [vector.document.text]}), "no documents available", jsx('div', {class: 'primary-tab', append: ["Create"]})]})
                             return n
                         }]
                     })
@@ -94,6 +94,13 @@ function sn() {
                     }),
                     jsx('div', {
                         id: 'eobj',
+                        append: [jsx('div', {
+                            class: 'd-flex flex-column gap-md px-sm py-md',
+                            append: [
+                                jsx('div', {class: 'd-flex gap-xs', append: [jsx('span', {class: 'items-center gap-xs', append: [vector.bell, "Current"]})]}),
+                                jsx('div', {class: 'd-flex gap-xs', append: [jsx('span', {class: 'items-center gap-xs', append: [vector.clock, "Upcoming"]})]})
+                            ]
+                        })]
                     })
                 ],
                 style: {paddingInline: '20px'}
