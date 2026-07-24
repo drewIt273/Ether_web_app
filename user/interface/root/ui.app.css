@@ -45,7 +45,7 @@ body [default-scrollbar] {
 }
 web-app {
     font-family: var(--font-display);
-    color: var(--fg-base-color);
+    color: var(--fg-secondrary-color);
     display: block;
     display: flex;
 }
@@ -118,7 +118,7 @@ body, web-app {
         .htab [has-icon] span[i] {
             height: 19px;
         }
-        .htab:hover {background-color: var(--cr-transparent);}
+        .htab:hover {background-color: var(--cr-transparent); color: #dbdbdb}
     }
 }
 [node-key="mainLayoutConstructive"] {

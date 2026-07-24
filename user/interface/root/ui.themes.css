@@ -19,6 +19,7 @@ html[data-theme="dark"] {
     --bg-hover-color: #2C2C2C;
     --bg-selected: #1B2734;
     --fg-base-color: #D5D5D5;
+    --fg-secondrary-color: #adadad;
     --selection-color: #1A334E;
     --svg-color: #d7d7d7;
     --accent-color: var(--cr-cornflowerblue);

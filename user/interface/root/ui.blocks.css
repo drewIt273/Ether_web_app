@@ -164,7 +164,7 @@
     opacity: 1;
     .opts {opacity: 1;}
 }
-.btab {
+.primary-tab {
     color: var(--cr-white);
     opacity: .9;
     padding: 4px 15px;
@@ -172,8 +172,9 @@
     font-weight: 500;
     cursor: pointer;
     transition-duration: .2s;
+    width: fit-content;
 }
-.btab:hover {background-color: #4363a7;} .btab, .btab:active {background-color: var(--cr-blue);}
+.primary-tab:hover {background-color: #4363a7;} .primary-tab, .primary-tab:active {background-color: var(--cr-blue);}
 .expander #eobj {
     height: fit-content;
 }
@@ -185,6 +186,10 @@
 }
 .expander [data-slot="icon"] {
     height: 16px;
+}
+.app-vector {
+    width: 8em;
+    margin-bottom: 1em;
 }
 @keyframes gi {
     0% {opacity: 0;}
