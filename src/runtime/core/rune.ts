@@ -142,5 +142,5 @@ function ge() {
         },
         enumerable: false,
         configurable: false
-    })    
+    })
 }

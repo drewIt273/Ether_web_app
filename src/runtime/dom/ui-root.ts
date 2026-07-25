@@ -84,7 +84,7 @@ export async function NodeMetaDataInit() {
     Object.defineProperty(Node.prototype, 'jsx', {
         get() {
             const n: HTMLElement = typeof this === 'function' ? this.call(this) : this
-            return function(o: Fiber) {
+            return (o: Fiber) => {
                 concat(n, o)
                 return n
             }
