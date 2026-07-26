@@ -41,6 +41,7 @@
     "skipLibCheck": true,
     "paths": {
       "@core/*": ["./src/runtime/core/*"],
+      "@app/*": ["./src/app/*"],
       "@dom/*": ["./src/runtime/dom/*"],
       "@assets/*": ["./src/assets/*"],
     },
