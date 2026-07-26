@@ -4,13 +4,21 @@
 
 import {strictObject, toKebab} from "./any"
 
+type CSSObject = {
+    [K in keyof CSSStyleProperties]?: any
+}
+
+interface CSSDeclaration {
+    [x: string]: CSSObject | CSSDeclaration
+}
+
 class StylesheetConstructor {
 
     sheet: HTMLStyleElement
     /**
      * @example
      * const o = new stylesheet
-     * o.CSS = {
+     * o.css({
      *     ".lepopup-container": {
      *          display: "block",
      *          padding: "2em",
@@ -22,15 +30,17 @@ class StylesheetConstructor {
      *              display: "flex",
      *          },
      *      },
-     * }
+     * })
      */
-    constructor() {
+    constructor(o: {id?: string, base?: string} = {id: '', base: ''}) {
         this.sheet = document.createElement('style')
+        this.#base = o.base
+        this.sheet.id = o.id ? o.id : ""
     }
 
-    #base = ''
+    #base;
     #decls: string[] = []
-    #processBlock(s: string, block: Record<string, any>) {
+    #processBlock(s: string, block: CSSDeclaration) {
         const decls = []
         for (const prop in block) {
             const value = block[prop]
@@ -48,31 +58,17 @@ class StylesheetConstructor {
     }
 
     /**
-     * Optional: Sets the string selector that prefixes all rules
-     */
-    set base(s: string) {
-        this.#base = s
-    }
-
-    /**
-     * Optional. Sets the style tag id property
-     */
-    set id(s: string) {
-        this.sheet.id = s
-    }
-
-    /**
      * Generates CSS text from an object and writes it into the style tag.
      * 
      * The object o can have nested objects.
      */
-    set CSS(o: Record<string, any>) {
+    css(o: CSSDeclaration) {
         this.#decls = []
         for (const [selector, block] of Object.entries(o)) {
             const fs = this.#base ? (selector === '&' ? `${this.#base}` : selector.startsWith('&') ? `${this.#base}${selector.replace('&', '')}` : `${this.#base} ${selector}`) : selector
             this.#processBlock(fs, block)
         }
-        this.sheet.innerHTML += this.#decls.join('\n');
+        this.sheet.textContent += this.#decls.join('\n');
     }
 
     /**
@@ -92,9 +88,9 @@ class StylesheetConstructor {
     /**
      * Overwrites the stylesheet with object o
      */
-    overwrite(o: {}) {
+    overwrite(o: CSSDeclaration) {
         this.sheet.innerHTML = ''
-        this.CSS = o
+        this.css(o)
     }
 }
 
