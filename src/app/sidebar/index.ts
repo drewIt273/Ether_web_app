@@ -2,7 +2,8 @@
  * Instance by DrewIt
  */
 
-import {onResizeX, toggleStateOf} from "./ui";
+import {onResizeX, toggleStateOf} from "../ui";
+import {ui} from "../module";
 
 function sn() {
     let v = () => {
@@ -204,9 +205,10 @@ function sn() {
 }
 
 function Sidebar$() {
+    const o = ui.expose('sidebar', sn())
     return jsx('div', {
         class: 'sidebar-con',
-        append: [sn()]
+        append: [o.node]
     })
 }
 
