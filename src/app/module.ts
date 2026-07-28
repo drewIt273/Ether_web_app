@@ -10,11 +10,12 @@ interface UiModule {
 }
 
 interface UiModulesInterfaceMap {
-    "sidebar"?: UiModule
-    "issues"?: UiModule
-    "projects"?: UiModule
+    "sidebar": UiModule
+    "issues": UiModule
+    "projects": UiModule
 }
 
+// @ts-expect-error
 const modules: UiModulesInterfaceMap = {}
 
 const Imports = {
@@ -74,6 +75,15 @@ interface ModuleDefinitionObject {
     onImport?: Handler
 }
 
+interface UiComponentDefinitionObject {
+    name: string
+    node: HTMLElement
+    module?: keyof UiModulesInterfaceMap | null
+    deps?: string[]
+    onmount?: Handler
+    unmount?: Handler
+}
+
 class UiModule {
 
     root: UiComponent | null
@@ -98,28 +108,36 @@ class UiConstructor {
     static define<K extends keyof UiModulesInterfaceMap>(name: K, props: ModuleDefinitionObject): UiModulesInterfaceMap[K] {
         const u = props.root ? new UiComponent(() => props.root as HTMLElement) : null, o = new UiModule(name, u)
         o.onImport = props.onImport ?? null
-        if (o.root?.o) o.root.o = {mount: props.onMount, unmount: props.onUnmount}
+        if (o.root && o.root.o) o.root.o = {mount: props.onMount, unmount: props.onUnmount}
         this.modules[name] = o
         return o
     }
 
-    static async require<K extends keyof UiModulesInterfaceMap, L extends string>(key: K | `${K}:${L}`): Promise<UiModulesInterfaceMap[K]> {
-        let o = this.modules[key as K]
+    static export(props: UiComponentDefinitionObject) {
+        const o = new UiComponent(() => props.node) // @ts-expect-error
+        o.name = props.name, o.module = props.module ?? null
+        o.deps = props.deps ?? []
+        o.o = {mount: props.onmount, unmount: props.unmount}
+        return o
+    }
+
+    static async require<K extends keyof UiModulesInterfaceMap, L extends string>(key: K | `${K}:${L}`): Promise<UiModulesInterfaceMap[K] | UiComponent> {
         if (key.match(/^[a-z][a-z0-9_-]*:[a-z][a-z0-9_-]*$/i)) {
-            const s = key.split(':'), a = await import(`@app/${s[0]}/${s[1]}`)
+            const s = key.split(':'), a: {uicomp: UiComponent} = await import(`@app/${s[0]}/${s[1]}`)
+            return a.uicomp
         }
         else {
             // @ts-expect-error
             const a: {module: UiModule} = await Imports[key]()
             a.module.onImport?.()
+            return a.module
         }
-        return o
     }
 
     static readonly modules: UiModulesInterfaceMap = modules
 
-    static defineProperty<K extends keyof UiModulesInterfaceMap>(key: K, property: string, value: any) {
-        const u = this.modules[key]
+    static defineProperty<K extends keyof UiModulesInterfaceMap>(key: K | UiModule, property: string, value: any) {
+        const u = key instanceof UiModule ? key : this.modules[key]
         if (u) {
             if (u[property as keyof UiModule] === undefined) {
                 Object.defineProperty(u, property, {
@@ -139,7 +157,10 @@ export const ui: UiConstructor = UiConstructor
 interface UiConstructor {
     require<K extends keyof UiModulesInterfaceMap>(key: K): Promise<UiModulesInterfaceMap[K] | undefined>
     require<K extends keyof UiModulesInterfaceMap, L extends string>(key: `${K}:${L}`): Promise<UiComponent | undefined>
-    defineProperty<K extends keyof UiModulesInterfaceMap>(key: K, property: string, value: any): void
+    defineProperty<K extends keyof UiModulesInterfaceMap>(key: K | UiModule, property: string, value: any): void
     define<K extends keyof UiModulesInterfaceMap>(name: K, props: ModuleDefinitionObject): UiModulesInterfaceMap[K]
+    export(props: UiComponentDefinitionObject): UiComponent
     readonly modules: UiModulesInterfaceMap
 }
+
+export type {ModuleDefinitionObject, UiComponentDefinitionObject, UiModulesInterfaceMap}
