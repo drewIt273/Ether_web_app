@@ -2,6 +2,8 @@
  * Instance by DrewIt
  */
 
+import {ui} from "@app/module"
+
 function fb() {
     let s = 'An issue is a bug, task, question, or enhancement tracked with a title, description, priority, assignee, status, and comments so teams can capture context, coordinate fixes or work, and measure progress toward resolution.'
     return jsx('div', {
@@ -31,4 +33,4 @@ function Issues$() {
     })
 }
 
-export {Issues$}
+export const module: UiModulesInterfaceMap['issues'] = ui.define('issues', {root: Issues$()})

@@ -3,7 +3,7 @@
  */
 
 import {onResizeX, toggleStateOf} from "../ui";
-import {ui} from "../module";
+import {ui} from "@app/module";
 
 function sn() {
     let v = () => {
@@ -205,10 +205,9 @@ function sn() {
 }
 
 function Sidebar$() {
-    const o = ui.expose('sidebar', sn())
     return jsx('div', {
         class: 'sidebar-con',
-        append: [o.node]
+        append: [sn()]
     })
 }
 
@@ -223,4 +222,4 @@ o.on('append', () => {
 })
 */
 
-export {Sidebar$}
+export const module: UiModulesInterfaceMap['sidebar'] = ui.define('sidebar', {root: Sidebar$()})

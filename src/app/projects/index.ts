@@ -2,6 +2,8 @@
  * Instance by DrewIt
  */
 
+import {ui} from "@app/module"
+
 function fb() {
     let s = 'A project is a container for related tasks, deadlines, files, and collaborators that organizes work toward a specific goal, using milestones, priorities, and progress tracking to coordinate effort and measure completion.'
     return jsx('div', {
@@ -31,4 +33,4 @@ function Projects$() {
     })
 }
 
-export {Projects$}
+export const module: UiModulesInterfaceMap['projects'] = ui.define('projects', {root: Projects$()})
