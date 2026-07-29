@@ -3,7 +3,6 @@
  */
 
 interface UiModule {
-    readonly name: keyof UiModulesInterfaceMap
     root: UiComponent | null
     readonly imports: string[]
     onImport: Handler | null
@@ -19,9 +18,9 @@ interface UiModulesInterfaceMap {
 const modules: UiModulesInterfaceMap = {}
 
 const Imports = {
-    sidebar: () => import('@app/sidebar/index'),
-    isses: () => import('@app/issues/index'),
-    projects: () => import('@app/projects/index')
+    sidebar: () => import('./sidebar/index'),
+    isses: () => import('./issues/index'),
+    projects: () => import('./projects/index')
 }
 
 class UiComponent {
@@ -68,7 +67,7 @@ class UiComponent {
 }
 
 interface ModuleDefinitionObject {
-    root?: HTMLElement | null
+    root?: HTMLElement | UiComponent | null
     imports?: string[]
     onMount?: Handler
     onUnmount?: Handler
@@ -90,13 +89,14 @@ class UiModule {
     constructor(name: keyof UiModulesInterfaceMap, root: UiComponent | null = null) {
         this.#n = name
         this.root = root // @ts-expect-error
-        this.root?.module = name
+        if (this.root?.module) this.root.module = name
     }
 
     #n: keyof UiModulesInterfaceMap
 
-    // @ts-expect-error
-    readonly name = this.#n
+    get name() {
+        return this.#n
+    }
 
     readonly imports: string[] = []
 
@@ -106,14 +106,14 @@ class UiModule {
 class UiConstructor {
 
     static define<K extends keyof UiModulesInterfaceMap>(name: K, props: ModuleDefinitionObject): UiModulesInterfaceMap[K] {
-        const u = props.root ? new UiComponent(() => props.root as HTMLElement) : null, o = new UiModule(name, u)
+        const u = props.root instanceof UiComponent ? props.root : props.root instanceof HTMLElement ? this.expose({node: props.root as HTMLElement, name: `${name}:root`, module: name}) : null, o = new UiModule(name, u)
         o.onImport = props.onImport ?? null
         if (o.root && o.root.o) o.root.o = {mount: props.onMount, unmount: props.onUnmount}
         this.modules[name] = o
         return o
     }
 
-    static export(props: UiComponentDefinitionObject) {
+    static expose(props: UiComponentDefinitionObject) {
         const o = new UiComponent(() => props.node) // @ts-expect-error
         o.name = props.name, o.module = props.module ?? null
         o.deps = props.deps ?? []
@@ -123,13 +123,13 @@ class UiConstructor {
 
     static async require<K extends keyof UiModulesInterfaceMap, L extends string>(key: K | `${K}:${L}`): Promise<UiModulesInterfaceMap[K] | UiComponent> {
         if (key.match(/^[a-z][a-z0-9_-]*:[a-z][a-z0-9_-]*$/i)) {
-            const s = key.split(':'), a: {uicomp: UiComponent} = await import(`@app/${s[0]}/${s[1]}`)
-            return a.uicomp
+            const s = key.split(':'), a: {uicomp: UiComponent} = await import(`./${s[0]}/${s[1]}`)
+            return a?.uicomp
         }
         else {
             // @ts-expect-error
             const a: {module: UiModule} = await Imports[key]()
-            a.module.onImport?.()
+            a.module.onImport?.(), a.module.imports.forEach(i => this.require(`${key}:${i}`))
             return a.module
         }
     }
@@ -155,11 +155,12 @@ class UiConstructor {
 export const ui: UiConstructor = UiConstructor
 
 interface UiConstructor {
+    new (): UiConstructor
     require<K extends keyof UiModulesInterfaceMap>(key: K): Promise<UiModulesInterfaceMap[K] | undefined>
     require<K extends keyof UiModulesInterfaceMap, L extends string>(key: `${K}:${L}`): Promise<UiComponent | undefined>
     defineProperty<K extends keyof UiModulesInterfaceMap>(key: K | UiModule, property: string, value: any): void
     define<K extends keyof UiModulesInterfaceMap>(name: K, props: ModuleDefinitionObject): UiModulesInterfaceMap[K]
-    export(props: UiComponentDefinitionObject): UiComponent
+    expose(props: UiComponentDefinitionObject): UiComponent
     readonly modules: UiModulesInterfaceMap
 }
 
