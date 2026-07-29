@@ -126,10 +126,10 @@ export class DOMInterface extends Module {
     }
 
     async onReady() {
-        const s = new stylesheet(); s.id = '_rune-injected-styles_'; s.append()
-        s.CSS = {
+        const s = new stylesheet({id: '_rune-injected-styles_'}); s.append()
+        s.css({
             '*[_hide_]': {display: 'none'}
-        }
+        })
         this.observer.observe(this.root, {childList: true, subtree: true})
         this.ready = !0
     }
