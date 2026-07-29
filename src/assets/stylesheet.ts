@@ -94,4 +94,4 @@ class StylesheetConstructor {
     }
 }
 
-export {StylesheetConstructor as stylesheet}
+export const stylesheet = StylesheetConstructor
