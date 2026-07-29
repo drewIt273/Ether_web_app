@@ -3,7 +3,7 @@
  */
 
 import {onResizeX, toggleStateOf} from "../ui";
-import {ui} from "@app/module";
+import {ui} from "../module";
 
 function sn() {
     let v = () => {

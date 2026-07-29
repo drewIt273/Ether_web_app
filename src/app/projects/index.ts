@@ -2,7 +2,7 @@
  * Instance by DrewIt
  */
 
-import {ui} from "@app/module"
+import {ui} from "../module"
 
 function fb() {
     let s = 'A project is a container for related tasks, deadlines, files, and collaborators that organizes work toward a specific goal, using milestones, priorities, and progress tracking to coordinate effort and measure completion.'
