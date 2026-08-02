@@ -3,6 +3,7 @@
  */
 
 import {ranstring, toKebab} from "@assets/any"; import {DOMInterfaceError} from "@core/error";
+import { Props } from "tippy.js";
 
 export const NodeKeys = new Set<string>()
 export const StatesMap = new WeakMap<Node, string>()
@@ -115,6 +116,7 @@ function nm(o: HTMLElement): NodeMetaData {
         emittedData: null,
         receivedData: null,
         mappedData: new Map(),
+        motion: {state: 'null', current: null},
         get mounted() {
             return (this.node.isConnected && this.node.parentNode && this.node.$.belongsTo) ? true : false
         },
@@ -135,6 +137,10 @@ function nm(o: HTMLElement): NodeMetaData {
         },
         get onStateChange() { // @ts-expect-error
             return this[SRC].ofn
+        },
+        createTooltip(props: Partial<Props> = {}) {
+            const o = this.belongsTo?.Tippy?.createTooltip(this.node as HTMLElement, props)
+            this.on('mouseenter', () => o?.show()), this.on('mouseleave', () => o?.hide())
         },
         map(data, ...fns) {
             this.belongsTo?.nodeMsg.subscribe(this.node, data, ...fns)
