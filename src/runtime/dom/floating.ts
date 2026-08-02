@@ -18,8 +18,6 @@ export interface TooltipConfig {
     animation?: 'fade' | 'scale' | 'perspective'
     maxWidth?: number
     appendTo?: Element | 'parent'
-    onShow?: (instance: TooltipInstance) => void
-    onHide?: (instance: TooltipInstance) => void
     [key: string]: any // Allow custom Tippy props
 }
 
@@ -30,22 +28,6 @@ export interface PopupConfig extends TooltipConfig {
 }
 
 /**
- * Public instance handle (users never touch internal Tippy instance)
- */
-export interface TooltipInstance {
-    id: string
-    reference: Element
-    getContent(): string | HTMLElement
-    setContent(content: string | HTMLElement): void
-    show(): void
-    hide(): void
-    disable(): void
-    enable(): void
-    update(config: Partial<TooltipConfig>): void
-    destroy(): void
-}
-
-/**
  * Metadata stored in WeakMap
  */
 export interface InstanceMetadata {
@@ -53,10 +35,7 @@ export interface InstanceMetadata {
     type: 'tooltip' | 'popup'
     config: TooltipConfig
     isActive: boolean
-    createdAt: number
 }
-
-// src/runtime/floating/adapter/instance-manager.ts
 
 export interface InstanceRegistry {
     // WeakMap: reference element → internal Tippy instance
@@ -77,22 +56,64 @@ const reg: InstanceRegistry = {
 
 export class Tooltip {
 
-    readonly instance: Instance<Props>
+    readonly props: Instance<Props>
     readonly node: HTMLElement
-    constructor(node: HTMLElement) {
+    constructor(node: HTMLElement, props: Partial<Props> = {}) {
         this.node = node
-        this.instance = tippy(node)
-        reg.instances.set(node, this.instance)
+        this.props = tippy(node, props)
+        reg.instances.set(node, this.props)
     }
 
-    private con: string | HTMLElement = ''
-
     setContent(o: string | HTMLElement) {
-        this.instance.setContent(o)
-        this.con = o
+        this.props.setContent(o)
     }
 
     get getContent() {
-        return this.con
+        return this.props.props.content
+    }
+
+    show() {
+        if (this.props.state.isEnabled === !1) this.enable()
+        this.props.show()
+    }
+
+    hide() {
+        this.props.hide()
+    }
+
+    disable() {
+        this.props.disable()
+    }
+
+    enable() {
+        this.props.enable()
+    }
+}
+
+interface InteractiveMenuInterface extends Instance<Props> {
+    node: HTMLDivElement
+}
+
+export class TippyModule {
+
+    readonly imenu: InteractiveMenu
+    constructor() {
+        this.imenu = new InteractiveMenu()
+    }
+
+    createTooltip(node: HTMLElement, props: Partial<Props> = {}) {
+        if (!reg.instances.has(node)) return new Tooltip(node, props)
+    }
+
+    getTooltip(node: HTMLElement) {
+        return reg.instances.get(node)
+    }
+}
+
+class InteractiveMenu {
+
+    readonly node: HTMLDivElement
+    constructor() {
+        this.node = jsx('div', {})
     }
 }
