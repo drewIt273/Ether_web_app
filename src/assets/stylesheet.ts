@@ -74,14 +74,14 @@ class StylesheetConstructor {
     /**
      * Appends the stylesheet into the document head
      */
-    append() {
+    mount() {
         !this.sheet.isConnected ? document.head.append(this.sheet) : null
     }
 
     /**
      * Removes the stylesheet from the document
      */
-    remove() {
+    unmount() {
         if (this.sheet.isConnected) this.sheet.remove()
     }
 
@@ -95,3 +95,4 @@ class StylesheetConstructor {
 }
 
 export const stylesheet = StylesheetConstructor
+export type stylesheet = StylesheetConstructor
