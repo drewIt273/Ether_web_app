@@ -2,10 +2,11 @@
  * Instance by DrewIt
  */
 
-import {U, F} from "@dom/ui-root"; import {Rune as R} from "@core/rune"; import {D} from "@dom/dom"; import {G} from "@core/events"; import {vector as v} from "@dom/vectors"; import {storageapi as O} from "@assets/storageapi";
+import {U, F} from "@dom/ui-root"; import {Rune as R} from "@core/rune"; import {D} from "@dom/dom"; import {G} from "@core/events"; import {vector as v} from "@dom/vectors"; import {storageapi as O} from "@assets/storageapi"; import {ui as I} from "../../app/module"; import {ModuleDefinitionObject as MO, UiModulesInterfaceMap as UM} from "../../app/module"; import {Tooltip} from "@dom/floating"; import {Props} from "tippy.js";
 
 declare global {
     type UINode = U;
+    type HNode = HTMLElement | SVGElement
     type Handler = (...args: any[]) => any;
     type Rune = R
     type DOMInterface = D
@@ -28,9 +29,11 @@ declare global {
         onevent: Map<keyof GlobalEvents, ((ev?: Event) => any)[]>
         prop: FiberDepRecord
         pendingStates: Map<string, {type: 'static'|'computed', fn: Handler}> & Map<string, string>
+        motion: UiNodeMotionObject
         readonly ID: NodeID
         readonly mounted: boolean
         readonly node: Node
+        createTooltip(props?: Partial<Props>): void
         findAll(n: string): Element[]
         find(n: string): Element | null
         on(ev: keyof GlobalEvents, ...calls: ((ev?: Event | undefined) => void)[]): void
@@ -55,12 +58,19 @@ declare global {
     interface UiNodeDependency {
         dependsOn(sourceNode: Node, fn: (changeData: any) => any): void
     }
+    interface UiNodeMotionObject {
+        state: 'running' | 'pending' | 'paused' | 'null'
+        current: Animation | null
+    }
     type NodeMetaTag = 'uicell' | 'uiblock' | 'uicomp' | 'node'
     type UiElementInterfaceMap = HTMLElementTagNameMap & SVGElementTagNameMap
     type HTMLTagName = keyof HTMLElementTagNameMap | keyof SVGElementTagNameMap
     type FiberDepRecord = Record<string, any>
     type NodeID = string
+    type ModuleDefinitionObject = MO
+    type UiModulesInterfaceMap = UM
     const jsx: <K extends HTMLTagName>(n: K, o: Fiber) => UiElementInterfaceMap[K]
     const vector = v
     const storageapi = O
+    var ui = I
 }
