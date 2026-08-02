@@ -2,6 +2,8 @@
  * Instance by DrewIt
  */
 
+import {stylesheet} from '@assets/stylesheet'
+
 interface UiModule {
     root: UiComponent | null
     readonly imports: string[]
@@ -121,10 +123,10 @@ class UiConstructor {
         return o
     }
 
-    static async require<K extends keyof UiModulesInterfaceMap, L extends string>(key: K | `${K}:${L}`): Promise<UiModulesInterfaceMap[K] | UiComponent> {
+    static async require<K extends keyof UiModulesInterfaceMap, L extends string>(key: K | `${K}:${L}`): Promise<UiModulesInterfaceMap[K] | UiComponent | stylesheet> {
         if (key.match(/^[a-z][a-z0-9_-]*:[a-z][a-z0-9_-]*$/i)) {
-            const s = key.split(':'), a: {uicomp: UiComponent} = await import(`./${s[0]}/${s[1]}`)
-            return a?.uicomp
+            const s = key.split(':'), a: {uicomp: UiComponent} | stylesheet = await import(`./${s[0]}/${s[1]}`)
+            return a instanceof stylesheet ? a : a?.uicomp
         }
         else {
             // @ts-expect-error
@@ -157,7 +159,7 @@ export const ui: UiConstructor = UiConstructor
 interface UiConstructor {
     new (): UiConstructor
     require<K extends keyof UiModulesInterfaceMap>(key: K): Promise<UiModulesInterfaceMap[K] | undefined>
-    require<K extends keyof UiModulesInterfaceMap, L extends string>(key: `${K}:${L}`): Promise<UiComponent | undefined>
+    require<K extends keyof UiModulesInterfaceMap, L extends string>(key: `${K}:${L}`): Promise<UiComponent | stylesheet | undefined>
     defineProperty<K extends keyof UiModulesInterfaceMap>(key: K | UiModule, property: string, value: any): void
     define<K extends keyof UiModulesInterfaceMap>(name: K, props: ModuleDefinitionObject): UiModulesInterfaceMap[K]
     expose(props: UiComponentDefinitionObject): UiComponent
