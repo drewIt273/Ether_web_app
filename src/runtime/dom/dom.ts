@@ -8,6 +8,7 @@ import {DOMInterfaceError, NodeHierarchyError} from "@core/error";
 import {storageapi} from "@assets/storageapi";
 import {stylesheet} from "@assets/stylesheet";
 import {vector} from "./vectors";
+import {TippyModule} from "./floating";
 
 interface NodeMessageResolver {
     resolve(sender: Node, receiver: Node, data: any, ...args: any[]): void
@@ -35,6 +36,7 @@ export class DOMInterface extends Module {
     nodeMsg: NodeMessageResolver
     root: HTMLElement
     rune: Rune
+    Tippy: TippyModule | null
     constructor(r: Rune) {
         super(r)
         this.rune = r
@@ -107,7 +109,7 @@ export class DOMInterface extends Module {
         this.root.rune = {
             id: this.rune.ID,
             isRuneRoot: true
-        }
+        }, this.Tippy = null
     }
 
     async onInit() {
@@ -126,10 +128,11 @@ export class DOMInterface extends Module {
     }
 
     async onReady() {
-        const s = new stylesheet({id: '_rune-injected-styles_'}); s.append()
+        const s = new stylesheet({id: '_rune-injected-styles_'}); s.mount()
         s.css({
             '*[_hide_]': {display: 'none'}
-        })
+        }),
+        this.Tippy = new TippyModule()
         this.observer.observe(this.root, {childList: true, subtree: true})
         this.ready = !0
     }
