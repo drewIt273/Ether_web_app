@@ -14,6 +14,7 @@ interface UiModulesInterfaceMap {
     "sidebar": UiModule
     "issues": UiModule
     "projects": UiModule
+    "UxNotificationModule": UxNotify & UiModule
 }
 
 // @ts-expect-error
@@ -22,7 +23,8 @@ const modules: UiModulesInterfaceMap = {}
 const Imports = {
     sidebar: () => import('./sidebar/index'),
     isses: () => import('./issues/index'),
-    projects: () => import('./projects/index')
+    projects: () => import('./projects/index'),
+    UxNotificationModule: () => import('./uix/notix')
 }
 
 class UiComponent {
@@ -32,8 +34,8 @@ class UiComponent {
     }
 
     get node() {
-        if (!this.#n) this.#n = this.#fn()
-        return this.#n
+        if (!this.n) this.n = this.#fn()
+        return this.n
     }
 
     readonly name: string = ''
@@ -108,8 +110,8 @@ class UiModule {
 
 class UiConstructor {
 
-    static define<K extends keyof UiModulesInterfaceMap>(name: K, props: ModuleDefinitionObject): UiModulesInterfaceMap[K] {
-        const u = props.root instanceof UiComponent ? props.root : props.root instanceof HTMLElement ? this.expose({node: props.root as HTMLElement, name: `${name}:root`, module: name}) : null, o = new UiModule(name, u)
+    static define<K extends keyof UiModulesInterfaceMap>(name: K, props: ModuleDefinitionObject): UiModulesInterfaceMap[K] { // @ts-expect-error
+        const u = props.root instanceof UiComponent ? props.root : props.root instanceof HTMLElement ? this.expose({node: props.root as HTMLElement, name: `${name}:root`, module: name}) : null, o: UiModulesInterfaceMap[K] = new UiModule(name, u)
         o.onImport = props.onImport ?? null
         if (o.root && o.root.o) o.root.o = {mount: props.onMount, unmount: props.onUnmount}
         this.modules[name] = o, o.imports.push(...props.imports ?? [])
@@ -142,7 +144,7 @@ class UiConstructor {
 
     static readonly modules: UiModulesInterfaceMap = modules
 
-    static defineProperty<K extends keyof UiModulesInterfaceMap>(key: K | UiModule, property: string, value: any) {
+    static defineProperty<K extends keyof UiModulesInterfaceMap>(key: K | UiModule, property: string, value: any): returnedCall | undefined {
         const u = key instanceof UiModule ? key : this.modules[key]
         if (u) {
             if (u[property as keyof UiModule] === undefined) {
@@ -154,7 +156,7 @@ class UiConstructor {
             }
             else throw new Error(`Cannot overwrite already defined property of UiModule ${u.name}`)
         }
-        else return;
+        else return (prop: string, value: any) => this.defineProperty(key, prop, value) as returnedCall
     }
 }
 
@@ -164,10 +166,12 @@ interface UiConstructor {
     new (): UiConstructor
     require<K extends keyof UiModulesInterfaceMap>(key: K): Promise<UiModulesInterfaceMap[K] | undefined>
     require<K extends keyof UiModulesInterfaceMap, L extends string>(key: `${K}:${L}`): Promise<UiComponent | stylesheet | undefined>
-    defineProperty<K extends keyof UiModulesInterfaceMap>(key: K | UiModule, property: string, value: any): void
+    defineProperty<K extends keyof UiModulesInterfaceMap>(key: K | UiModule, property: string, value: any): ((prop: string, value: any) => returnedCall | undefined) | undefined
     define<K extends keyof UiModulesInterfaceMap>(name: K, props: ModuleDefinitionObject): UiModulesInterfaceMap[K]
     expose(props: UiComponentDefinitionObject): UiComponent
     readonly modules: UiModulesInterfaceMap
 }
+
+type returnedCall = (props: string, value: any) => returnedCall
 
 export type {ModuleDefinitionObject, UiComponentDefinitionObject, UiModulesInterfaceMap}
