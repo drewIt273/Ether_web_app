@@ -50,7 +50,19 @@ function sn() {
                         class: 'htab',
                         append: [
                             jsx('div', {
-                                append: [jsx('span', {append: [vector.calender.jsx({wdith: 16, height: 16})], i: true}), jsx('span', {append: ["Schedule"]})],
+                                append: [jsx('span', {append: [vector.i.sq2x2.jsx({wdith: 16, height: 16})], i: true}), jsx('span', {append: ["Dashboard"]})],
+                                hasIcon: true
+                            }),
+                            jsx('div', {
+                                append: [jsx('span', {append: [vector.ellipsis.horizontal], class: 'center opts no-trans'})]
+                            })
+                        ]
+                    }),
+                    jsx('div', {
+                        class: 'htab',
+                        append: [
+                            jsx('div', {
+                                append: [jsx('span', {append: [vector.calenderDays.jsx({wdith: 16, height: 16})], i: true}), jsx('span', {append: ["Schedule"]})],
                                 hasIcon: true
                             }),
                             jsx('div', {
@@ -222,4 +234,4 @@ o.on('append', () => {
 })
 */
 
-export const module: UiModulesInterfaceMap['sidebar'] = ui.define('sidebar', {root: Sidebar$()})
+export const module: UiModulesInterfaceMap['sidebar'] = ui.define('sidebar', {root: Sidebar$(), imports: ['sheet']})
