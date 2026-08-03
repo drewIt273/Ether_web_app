@@ -61,6 +61,34 @@ function deepEqual(a: any, b: any): boolean {
     return true
 }
 
+function parentPropertyOf(value: any, obj: Record<string, any>): string | undefined {
+    for (const [key, val] of Object.entries(obj)) {
+        // Direct reference match (for object references)
+        if (val === value) {
+            return key
+        }
+        
+        // Deep equality match (for objects with same content)
+        if (strictObject(val) && strictObject(value)) {
+            if (deepEqual(val, value)) {
+                return key
+            }
+            // Recursively search in nested objects
+            const result = parentPropertyOf(value, val)
+            if (result !== undefined) {
+                return result
+            }
+        }
+        
+        // String key matching (if a key name is passed as the value argument)
+        if (typeof value === 'string' && key === value) {
+            return key
+        }
+    }
+    
+    return undefined
+}
+
 const ranstring = (length: number, count: number, end = '') => {
     const chars = 'abcdefd', vchars = chars + '1234567890';
     let f = (s: string, c: number) => Array.from({length: c}, () => s[Math.floor(Math.random() * s.length)]).join(''), key = f(chars, 1);
