@@ -2,7 +2,7 @@
  * Instance by DrewIt
  */
 
-import {strictObject, toKebab} from "./any"
+import {strictObject, toKebab, parentPropertyOf} from "./any"
 
 type CSSObject = {
     [K in keyof CSSStyleProperties]?: any
@@ -34,27 +34,28 @@ class StylesheetConstructor {
      */
     constructor(o: {id?: string, base?: string} = {id: '', base: ''}) {
         this.sheet = document.createElement('style')
-        this.#base = o.base
+        this.#base = o.base ?? null
         this.sheet.id = o.id ? o.id : ""
     }
 
-    #base;
+    #base: string | null = null;
+    #odecl: CSSDeclaration = {};
     #decls: string[] = []
-    #processBlock(s: string, block: CSSDeclaration) {
+    #processBlock(s: string, block: CSSDeclaration, push: boolean = true) {
         const decls = []
         for (const prop in block) {
             const value = block[prop]
             // Nested selector (like ".parent": { ".child": {...} })
                 if (strictObject(value)) {
-                    let ch = prop.startsWith('&') ? prop.replace('&', s) : `${s} ${prop}`.trim()
-                    this.#processBlock(ch, value)
+                    let ch = prop.startsWith('&') ? prop.replace('&', s) : prop.startsWith('$') ? prop.replace('$', parentPropertyOf(block, this.#odecl) ?? '') : `${s} ${prop}`.trim()
+                    this.#processBlock(ch, value, false), this.#decls.push(`${parentPropertyOf('prop', this.#odecl)} ${ch} {${decls.join('; ')};}`);
                     continue
                 }
             // Convert property names to kebab-case
                 if (typeof value === 'string' || typeof value === 'number') decls.push(`${toKebab(prop)}: ${value}`)
         }
         // Only push if the block has at least one property
-            if (decls.length) this.#decls.push(`${s} {${decls.join('; ')};}`);
+            if (push && decls.length) this.#decls.push(`${s} {${decls.join('; ')};}`);
     }
 
     /**
@@ -63,7 +64,7 @@ class StylesheetConstructor {
      * The object o can have nested objects.
      */
     css(o: CSSDeclaration) {
-        this.#decls = []
+        this.#odecl = o
         for (const [selector, block] of Object.entries(o)) {
             const fs = this.#base ? (selector === '&' ? `${this.#base}` : selector.startsWith('&') ? `${this.#base}${selector.replace('&', '')}` : `${this.#base} ${selector}`) : selector
             this.#processBlock(fs, block)
