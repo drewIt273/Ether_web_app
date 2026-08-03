@@ -64,7 +64,8 @@ class UiComponent {
         unmount: () => {}
     }
 
-    #n?: HTMLElement
+    // @ts-expect-error
+    private n: HTMLElement
     #fn: () => HTMLElement
 }
 
@@ -111,7 +112,7 @@ class UiConstructor {
         const u = props.root instanceof UiComponent ? props.root : props.root instanceof HTMLElement ? this.expose({node: props.root as HTMLElement, name: `${name}:root`, module: name}) : null, o = new UiModule(name, u)
         o.onImport = props.onImport ?? null
         if (o.root && o.root.o) o.root.o = {mount: props.onMount, unmount: props.onUnmount}
-        this.modules[name] = o
+        this.modules[name] = o, o.imports.push(...props.imports ?? [])
         return o
     }
 
@@ -123,15 +124,18 @@ class UiConstructor {
         return o
     }
 
-    static async require<K extends keyof UiModulesInterfaceMap, L extends string>(key: K | `${K}:${L}`): Promise<UiModulesInterfaceMap[K] | UiComponent | stylesheet> {
+    static async require<K extends keyof UiModulesInterfaceMap, L extends string>(key: K | `${K}:${L}`): Promise<UiModulesInterfaceMap[K] | UiComponent | stylesheet | undefined> {
         if (key.match(/^[a-z][a-z0-9_-]*:[a-z][a-z0-9_-]*$/i)) {
-            const s = key.split(':'), a: {uicomp: UiComponent} | stylesheet = await import(`./${s[0]}/${s[1]}`)
-            return a instanceof stylesheet ? a : a?.uicomp
+            const s = key.split(':'), a: {uicomp?: UiComponent, sheet?: stylesheet} = await import(`./${s[0]}/${s[1]}`)
+            return a.uicomp ? a.uicomp : a.sheet ? a.sheet : undefined
         }
         else {
             // @ts-expect-error
             const a: {module: UiModule} = await Imports[key]()
-            a.module.onImport?.(), a.module.imports.forEach(i => this.require(`${key}:${i}`))
+            a.module.onImport?.(), a.module.imports.forEach(async i => {
+                const o = await this.require(`${key}:${i}`);
+                o instanceof stylesheet ? o.mount() : null
+            }) // @ts-expect-error
             return a.module
         }
     }
