@@ -12,7 +12,8 @@ interface CacheAPI {
     log: () => void
     o: {
         get<K extends keyof CacheObject>(k: K): CacheObject[K];
-        set<K extends keyof CacheObject>(k: K, v?: CacheObject[K]): ((p: string, o: any) => void) | undefined;
+        set<K extends keyof CacheObject>(k: K): ((p: string, o: any) => void);
+        set<K extends keyof CacheObject>(k: K, v: CacheObject[K]): void;
         has(k: keyof CacheObject): boolean;
         remove(k: keyof CacheObject): void;
     }
@@ -47,10 +48,11 @@ const memory = {
     get<K extends keyof CacheObject>(k: K) {
         return cache[k]
     },
-    set<K extends keyof CacheObject>(k: K, v: CacheObject[K] | undefined = undefined) {
+    set<K extends keyof CacheObject>(k: K, v: CacheObject[K] | undefined = undefined): ((p: string, o: any) => void) | void {
         if (v !== undefined) {
             cache[k] = v
             setItem(k, v)
+            return;
         }
         else return (p: string, o: any) => {
             const n = cache[k]
@@ -92,4 +94,5 @@ function syncCache() {
     catch(e) {return new CacheError(`${e}`)}
 }
 
+// @ts-expect-error
 export const storageapi: CacheAPI = {syncCache, setCache, isValidBackend, log: () => console.log(cache), o: memory}
