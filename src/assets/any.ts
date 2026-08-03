@@ -35,6 +35,32 @@ function safeParse(v: any) {
     }
 }
 
+/**
+ * Javascript compare objects by reference using '===' or '=='. This function can be used to compare 2 objects which have exact the same keys and exact the same values, returning false otherwise.
+ */
+function deepEqual(a: any, b: any): boolean {
+    // Handle primitives and nulls
+    if (a === b) return true
+    if (a === null || b === null) return false
+    if (typeof a !== 'object' || typeof b !== 'object') return false
+    
+    // Check if both are strict objects
+    if (!strictObject(a) || !strictObject(b)) return false
+    
+    // Check same keys
+    const keysA = Object.keys(a)
+    const keysB = Object.keys(b)
+    if (keysA.length !== keysB.length) return false
+    
+    // Recursively compare values
+    for (const key of keysA) {
+        if (!keysB.includes(key)) return false
+        if (!deepEqual(a[key], b[key])) return false
+    }
+    
+    return true
+}
+
 const ranstring = (length: number, count: number, end = '') => {
     const chars = 'abcdefd', vchars = chars + '1234567890';
     let f = (s: string, c: number) => Array.from({length: c}, () => s[Math.floor(Math.random() * s.length)]).join(''), key = f(chars, 1);
