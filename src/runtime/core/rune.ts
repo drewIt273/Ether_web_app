@@ -5,6 +5,7 @@
 import {DOMInterface} from "@dom/dom";
 import {UiEventsModule} from "./events";
 import {UiStateManager} from "@core/state";
+import {UiMotionEngine} from "./motion";
 import {Scheduler} from "./scheduler";
 import {storageapi} from "@assets/storageapi";
 import {ArrayLogLock} from "@assets/registry";
@@ -45,6 +46,7 @@ export class Rune {
     dom: DOMInterface
     events: UiEventsModule
     states: UiStateManager
+    motion: UiMotionEngine
     scheduler: Scheduler
     init: boolean
     ready: boolean
@@ -84,6 +86,7 @@ export class Rune {
         this.dom = new DOMInterface(this)
         this.events = new UiEventsModule(this)
         this.states = new UiStateManager(this)
+        this.motion = new UiMotionEngine(this)
     }
 
     #o: RuntimeAPI | null = null
@@ -106,7 +109,7 @@ export class Rune {
     }
 
     async #preboot() {
-        const a = [this.dom, this.states, this.events]
+        const a = [this.dom, this.states, this.events, this.motion]
         try {
             for (const k of a) { // @ts-expect-error
                 this.hooks.init.push(async () => k.onInit.call(k))
