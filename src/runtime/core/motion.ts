@@ -4,7 +4,17 @@
 
 import {Module} from "./module";
 
-export class Motion extends Module {
+interface AnimatableCSSProperties {
+    width?: `${number}` | `${number}px` | 'auto'
+    height?: `${number}` | `${number}px` | 'auto'
+    transformX?: `${number}px`
+    transformY?: `${number}px`
+    opacity?: number
+    color?: `#${string}`
+    backgroundColor?: `#${string}`
+}
+
+export class UiMotionEngine extends Module {
 
     constructor(r: Rune) {
         super(r)
@@ -18,7 +28,16 @@ export class Motion extends Module {
         this.ready = !0
     }
 
-    async animate(node: HTMLElement, keyframes: Keyframe[] | PropertyIndexedKeyframes | null, options: number | KeyframeAnimationOptions | undefined = undefined) {
+    async animate(node: HTMLElement, keyframes: MotionFrame[] | null, options: number | KeyframeAnimationOptions | undefined = undefined) {
         return node.$.motion.current = (() => node.animate(keyframes, options))()
+    }
+}
+
+declare global {
+    interface MotionFrame extends AnimatableCSSProperties, Keyframe {
+        duration?: number
+        easing?: string
+        composite?: CompositeOperationOrAuto
+        offset?: number | null
     }
 }
