@@ -61,6 +61,10 @@ declare global {
     interface UiNodeMotionObject {
         state: 'running' | 'pending' | 'paused' | 'null'
         current: Animation | null
+        buffer: Record<string, MotionFrame[]>
+        define<K extends string>(key: K, frames: MotionFrame[]): void
+        onanime(ev: keyof GlobalEvents, motion: string, target: Node | null): void
+        animate(key: string)
     }
     type NodeMetaTag = 'uicell' | 'uiblock' | 'uicomp' | 'node'
     type UiElementInterfaceMap = HTMLElementTagNameMap & SVGElementTagNameMap
