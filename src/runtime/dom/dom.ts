@@ -27,7 +27,12 @@ interface UiStatesInterface {
     setState(node: Node, state: string, opts?: {schedule: boolean}): void
     defineState(node: Node, state: string, call: Handler): void
     defineCompute(node: Node, state: string, call: Handler): void
-    hasState(node: Node, state: string): boolean
+    hasState(node: Node, state: string): boolean | undefined
+}
+
+interface UiAnimationInterface {
+    animate(node: Node, frames: MotionFrame[], opts: UiMotionOptions): Animation
+    play(node: Node, motion: string | Animation): void
 }
 
 export class DOMInterface extends Module {
@@ -68,6 +73,7 @@ export class DOMInterface extends Module {
                 }
                 if (mut.removedNodes) for (const removed of mut.removedNodes) {
                     const call = (n: Node) => {
+                        n.$.belongsTo = null
                         this.GlobalEvents.unEvent(n)
                         if (n.$.uikey) storageapi.o.set('uistates')?.(n.$.uikey, n.$.currentstate)
                         n.childNodes.forEach(n => call(n))
@@ -154,66 +160,61 @@ export class DOMInterface extends Module {
 
     GlobalEvents: UiEventsInterface = {
         onEvent: (ev: keyof GlobalEvents, node: Node, ...handlers: ((ev: Event) => void)[]) => {
-            this.#ne(node, () => this.IMC.emit('ln', this.rune.events, [ev, node, ...handlers]))
+            this.#be(node, () => this.IMC.emit('ln', this.rune.events, [ev, node, ...handlers]), 'uiEvent')
         },
 
         unEvent: (node: Node, ev: keyof GlobalEvents | null = null) => {
-            this.#ne(node, () => this.IMC.emit('un', this.rune.events, [node, ev]))
+            this.#be(node, () => this.IMC.emit('un', this.rune.events, [node, ev]), 'uiEvent')
         },
 
         keyEvent: (node: Node, keys: string[], handler: ((ev: Event) => void)) => {
-            this.#ne(node, () => this.IMC.emit('kc', this.rune.events, [keys, node, handler]))
+            this.#be(node, () => this.IMC.emit('kc', this.rune.events, [keys, node, handler]), 'uiEvent')
         },
 
         unKey: (node: Node) => {
-            this.#ne(node, () => this.IMC.emit('ku', this.rune.events, [node]))
+            this.#be(node, () => this.IMC.emit('ku', this.rune.events, [node]), 'uiEvent')
         }
     }
 
     GlobalStates: UiStatesInterface = {
         setState: (node, state, opts = {schedule: false}) => {
-            this.#se(node, () => this.IMC.emit('set', this.rune.states, [node, state, opts]))
+            this.#be(node, () => this.IMC.emit('set', this.rune.states, [node, state, opts]), 'uiState')
         },
 
         defineState: (node, state, call) => {
-            this.#se(node, () => this.IMC.emit('df', this.rune.states, [node, state, call]))
+            this.#be(node, () => this.IMC.emit('df', this.rune.states, [node, state, call]), 'uiState')
         },
 
         defineCompute: (node, state, call) => {
-            this.#se(node, () => this.IMC.emit('dc', this.rune.states, [node, state, call]))
+            this.#be(node, () => this.IMC.emit('dc', this.rune.states, [node, state, call]), 'uiState')
         },
 
         hasState: (node, state) => {
             const o = this.rune.states.reg.get(node)
             if (o) return Object.hasOwn(o, state)
-            else return false
+            else return undefined
         },
     }
 
-    #ne(node: Node, emit: Handler) {
-        if (this.root.contains(node)) emit()
-        else {
-            const r = node.$.belongsTo?.rune
-            if (r) {
-                const o = this.rune.proxy.send({type: 'uiEvent', msg: node}, r)
-                o.then(v => {
-                    if (v?.type === 'rejected') throw OutOfReachError(node)
-                    else emit()
-                })
-            }
-            else throw OutOfReachError(node)
-        }
+    GlobalMotion: UiAnimationInterface = {
+        animate: (node, frames, opts) => {
+            return this.#be(node, () => this.IMC.emit('anim', this.rune.motion, [node, frames, opts]), 'uiAnimation') as Animation
+        },
+
+        play: (node, key) => {
+            this.rune.motion.play(node, key)
+        },
     }
 
-    #se(node: Node, emit: Handler) {
-        if (this.root.contains(node)) emit()
+    #be(node: Node, emit: Handler, type: 'uiEvent' | 'uiState' | 'uiAnimation') {
+        if (this.root.contains(node)) return emit()
         else {
             const r = node.$.belongsTo?.rune
             if (r) {
-                const o = this.rune.proxy.send({type: 'uiState', msg: node}, r)
-                o?.then(v => {
+                const o = this.rune.proxy.send({type: type, msg: node}, r)
+                o.then(v => {
                     if (v?.type === 'rejected') throw OutOfReachError(node)
-                    else emit()
+                    else return emit()
                 })
             }
             else throw OutOfReachError(node)
