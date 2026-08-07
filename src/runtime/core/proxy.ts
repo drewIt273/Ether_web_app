@@ -12,6 +12,10 @@ interface uiStateMsg {
     type: 'uiState'
     msg: Node
 }
+interface uiAnimationMsg {
+    type: 'uiAnimation'
+    msg: Node
+}
 interface rejectedMsg {
     type: 'rejected'
     msg: string
@@ -22,7 +26,7 @@ interface requestMsg {
 }
 
 export type MessageHandler = (msg: ProxyMessage) => null | Promise<ProxyMessage>
-export type ProxyMessage = uiEventMsg | uiStateMsg | rejectedMsg | requestMsg
+export type ProxyMessage = uiEventMsg | uiStateMsg | uiAnimationMsg | rejectedMsg | requestMsg
 export const RuneProxies: ArrayLogLock<RuntimeProxy> = new ArrayLogLock()
 
 export class RuntimeProxy {
