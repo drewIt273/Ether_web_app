@@ -4,40 +4,33 @@
 
 interface ModuleMessageResolver {
     resolve<K extends keyof ModulesMappedData>(sender: Module, receiver: Module, data: K, args: ModulesMappedData[K]): any
-    subscribe(n: Module, key: any, ...fn: Handler[]): void
-    unsubscribe(n: Module, key: any, fn?: Handler|null): void
+    subscribe(n: Module, key: any, fn: Handler): void
+    unsubscribe(n: Module, key: any): void
 }
 
 const IMC: ModuleMessageResolver = {
     resolve(sender, receiver, data, args) {
-        const hs = receiver.IMC.mappedData.get(data); let k;
-        if (hs) for (const fn of hs) k = fn.apply(receiver, args)
+        const fn = receiver.IMC.mappedData.get(data); let k;
+        if (fn) k = fn.apply(receiver, args)
         sender.IMC.emittedData = receiver.IMC.receivedData = data
         return k
     },
 
-    subscribe(n, key, ...fn) {
-        const existing = n.IMC.mappedData.get(key)
-        if (!existing) n.IMC.mappedData.set(key, [...fn])
-        else existing.push(...fn)
+    subscribe(n, key, fn) {
+        n.IMC.mappedData.set(key, fn)
     },
 
-    unsubscribe(n, key, fn: Handler|null = null) {
-        const hs = n.IMC.mappedData.get(key)
-        if (hs)
-            if (fn) {
-                n.IMC.mappedData.set(key, hs.filter(h => h !== fn))
-            }
-            else n.IMC.mappedData.delete(key)
+    unsubscribe(n, key) {
+        if (n.IMC.mappedData.has(key)) n.IMC.mappedData.delete(key)
     }
 }
 
 interface MsgResolverUnit {
     emittedData: any
     receivedData: any
-    mappedData: Map<any, Handler[]>
-    map: (data: any, ...fn: Handler[]) => MsgResolverUnit
-    unmap: (data: any, fn?: Handler | null) => MsgResolverUnit
+    mappedData: Map<any, Handler>
+    map: (data: any, fn: Handler) => MsgResolverUnit
+    unmap: (data: any) => MsgResolverUnit
     emit<K extends keyof ModulesMappedData> (data: K, to: Module, args: ModulesMappedData[K]): any
 }
 
@@ -55,12 +48,12 @@ export class Module {
             mappedData: new Map(),
             receivedData: null,
             emittedData: null,
-            map: (data, ...fn: Handler[]) => {
-                IMC.subscribe(this, data, ...fn)
+            map: (data, fn: Handler) => {
+                IMC.subscribe(this, data, fn)
                 return this.IMC
             },
-            unmap: (data, fn: Handler | null = null) => {
-                IMC.unsubscribe(this, data, fn)
+            unmap: (data) => {
+                IMC.unsubscribe(this, data)
                 return this.IMC
             },
             emit: (data, to: Module, args) => {
@@ -89,7 +82,11 @@ interface EventsModuleData {
 interface StatesModuleData {
     'df': [Node, string, Handler]
     'dc': [Node, string, Handler]
-    'set': [Node, string, opts?: {schedule: boolean}]
+    'set': [Node, string, {schedule: boolean}]
 }
 
-type ModulesMappedData = EventsModuleData & StatesModuleData
+interface MotionModuleData {
+    'anim': [Node, MotionFrame[] | null, UiMotionOptions]
+}
+
+type ModulesMappedData = EventsModuleData & StatesModuleData & MotionModuleData
