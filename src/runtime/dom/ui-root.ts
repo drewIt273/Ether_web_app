@@ -103,7 +103,7 @@ export async function NodeMetaDataInit() {
 }
 
 function nm(o: HTMLElement): NodeMetaData {
-    const SRC = Symbol('src'), c: NodeMetaData = {
+    const SRC = Symbol('src'), O = Symbol('anims'), c: NodeMetaData = {
         ID: ranstring(5, 1),
         tag: 'node',
         node: o,
@@ -116,7 +116,45 @@ function nm(o: HTMLElement): NodeMetaData {
         emittedData: null,
         receivedData: null,
         mappedData: new Map(),
-        motion: {state: 'null', current: null},
+        motion: {
+            state: 'null',
+            current: null,
+            defs: new Map(),
+            define(key, frames) {
+                if (!this[O]) this[O] = new Map<string, MotionFrame[]>()
+                if (!this[O].has(key)) this[O].set(key, frames)
+            },
+            undef(key) {
+                this[O]?.delete(key)
+            },
+            onanime(ev, key, opts = {target: null, options: undefined}) {
+                const n = opts.target ? opts.target.$.motion : c.motion
+                c.on(ev, () => n.animate(key, opts.options))
+            },
+            animate(key, opts = undefined) {
+                const a = c.belongsTo?.GlobalMotion.animate(c.node, this[O]?.get(key) ?? [], opts)
+                if (a) this.defs.set(key, a)
+                return a
+            },
+            play(m) {
+                c.belongsTo?.GlobalMotion.play(c.node, m)
+            },
+            reverseThenPlay(key) {
+                const a = this[O]?.get(key), b: MotionFrame[] = [], r = `${key}:rev`
+                if (a) {
+                    for (let i = a.length - 1; i <= a.length -1; i--) {
+                        let c = a[i]
+                        if (c !== undefined) b.push(c)
+                    }
+                    this.define(r, b)
+                    if (!this.defs.has(r)) {
+                        const k = this.animate(r)
+                        if (k) this.play(k)
+                    }
+                    else this.play(r)
+                }
+            },
+        },
         get mounted() {
             return (this.node.isConnected && this.node.parentNode && this.node.$.belongsTo) ? true : false
         },
