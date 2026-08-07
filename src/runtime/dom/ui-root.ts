@@ -158,17 +158,20 @@ function nm(o: HTMLElement): NodeMetaData {
         get mounted() {
             return (this.node.isConnected && this.node.parentNode && this.node.$.belongsTo) ? true : false
         },
-        set belongsTo(o: DOMInterface) { // @ts-expect-error
-            if (!this[SRC].dom) { this[SRC].dom = o
+        set belongsTo(o: DOMInterface | null) { // @ts-expect-error
+            if (!this[SRC].dom || this[SRC].dom === null) { this[SRC].dom = o
                 for (const [k, v] of this.pendingStates.entries()) {
                     v.type === 'static' ? this.defineState(k, v.fn) : this.defineComputedState(k, v.fn)
                 }
                 this.pendingStates.clear()
             }
-            else throw new DOMInterfaceError(`Node ${this.node} already belongs to a Rune instance and cannot be reset`)
+            else {
+                if (o !== null && this.mounted === !1) throw new DOMInterfaceError(`Node ${this.node} already belongs to a Rune instance and cannot be reset`) // @ts-expect-error
+                else if (o === null) this[SRC].dom = null
+            }
         },
-        get belongsTo() { // @ts-expect-error
-            return this[SRC].dom
+        get belongsTo() {
+            return (this[SRC] ?? null)?.dom ?? null
         },
         set onStateChange(fn: Handler) { // @ts-expect-error
             this[SRC].ofn = fn
@@ -242,8 +245,9 @@ function nm(o: HTMLElement): NodeMetaData {
         hasDefinedState(s) {
             return this.belongsTo?.GlobalStates.hasState(this.node, s) as boolean
         },
-    } // @ts-expect-error
-    c[SRC] = {}; return c
+    }
+    c[SRC] = {dom: null, ofn: null}
+    return c
 }
 
 const SVG_NAMESPACE = `http://www.w3.org/2000/svg`;
