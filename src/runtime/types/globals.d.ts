@@ -29,7 +29,7 @@ declare global {
         onevent: Map<keyof GlobalEvents, ((ev?: Event) => any)[]>
         prop: FiberDepRecord
         pendingStates: Map<string, {type: 'static'|'computed', fn: Handler}> & Map<string, string>
-        motion: UiNodeMotionObject
+        motion: UiNodeAnimation
         readonly ID: NodeID
         readonly mounted: boolean
         readonly node: Node
@@ -45,7 +45,11 @@ declare global {
         setState(state: string, opts?: {schedule: boolean;}): void
         hasDefinedState(s: string): boolean
         onStateChange(fn: Handler): void
-        ofn: Handler | null
+        ofn: Handler | null;
+        [x: unique symbol]: {
+            dom: DOMInterface | null
+            ofn: Handler | null
+        }
     }
     interface NodeMsgResolverUnit {
         emittedData: null | any
@@ -58,13 +62,17 @@ declare global {
     interface UiNodeDependency {
         dependsOn(sourceNode: Node, fn: (changeData: any) => any): void
     }
-    interface UiNodeMotionObject {
+    interface UiNodeAnimation {
         state: 'running' | 'pending' | 'paused' | 'null'
         current: Animation | null
-        buffer: Record<string, MotionFrame[]>
+        defs: Map<string, Animation>
         define<K extends string>(key: K, frames: MotionFrame[]): void
-        onanime(ev: keyof GlobalEvents, motion: string, target: Node | null): void
-        animate(key: string)
+        undef(key: string): void
+        onanime(ev: keyof GlobalEvents, key: string, opts?: {target: Node | null, options: UiMotionOptions}): void
+        animate(key: string, opts?: UiMotionOptions): Animation | undefined
+        play(motion: string | Animation): void
+        reverseThenPlay(key: string): void
+        [x: symbol]: Map<string, MotionFrame[]>
     }
     type NodeMetaTag = 'uicell' | 'uiblock' | 'uicomp' | 'node'
     type UiElementInterfaceMap = HTMLElementTagNameMap & SVGElementTagNameMap
