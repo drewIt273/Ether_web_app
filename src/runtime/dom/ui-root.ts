@@ -32,6 +32,7 @@ interface Fiber extends FiberHandlers {
     innerHTML?: string
     append?: (nodefn<Node> | string | Node)[]
     states?: Record<string, (n: HTMLElement | SVGElement, ...args: any[]) => any>
+    anims?: Record<string, {keys: MotionFrame[], opts?: UiMotionOptions, upon?: Node | nodefn<Node>}>
     readonly node?: HTMLElement | SVGElement
     [x: string]: any
 }
@@ -300,6 +301,13 @@ function concat(n: HTMLElement | SVGElement, o: Fiber) {
         }
         if (k === 'states') {
             for (const [k, fn] of Object.entries(v)) n.$.defineState(k, () => (fn as Handler).call(n, n))
+            continue;
+        }
+        if (k === 'anims') {
+            const o: [string, {keys: MotionFrame[], upon?: Node | nodefn<Node>, opts?: UiMotionOptions}][] = Object.entries(v)
+            for (const [k, r] of o) { // @ts-expect-error
+                (r.upon ? (typeof r.upon === 'function' ? r.upon(n) : r.upon) : n).$.motion.define(k, r.keys)(r.opts)
+            }
             continue;
         }
         if (k === 'innerHTML') {
