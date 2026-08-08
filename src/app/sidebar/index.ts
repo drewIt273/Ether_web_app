@@ -8,13 +8,13 @@ import {ui} from "../module";
 function sn() {
     let v = () => {
         return {
-            open: (n: HTMLElement | SVGElement) => {},
-            close: (n: HTMLElement | SVGElement) => {}
+            open: (n: HNode) => {},
+            close: (n: HNode) => {}
         }
     }, e = () => {
         return {
-            expanded: (n: HNode) => n.parentElement?.querySelector('#eobj')?.setAttribute('open', 'true'),
-            close: (n: HNode) => n.parentElement?.querySelector('#eobj')?.setAttribute('open', 'false')
+            expanded: (n: HNode) => n.$.motion.play('expand', n.parentElement?.querySelector('#eobj') as Node),
+            close: (n: HNode) => n.$.motion.play('close', n.parentElement?.querySelector('#eobj') as Node)
         }
     }, b = {states: v(), abcon: ''}, se = (n: Node, s: string) => n.$.setState(s)
     const k = jsx('div', {
@@ -83,6 +83,16 @@ function sn() {
                     }),
                     jsx('div', {
                         id: 'eobj',
+                        anims: {
+                            'expand': {
+                                keys: [{opacity: 1}, {opacity: 0}],
+                                opts: {duration: 1000, easing: 'ease-in-out'}
+                            },
+                            'close': {
+                                keys: [{opacity: 0}, {opacity: 1}],
+                                opts: {duration: 1000, easing: 'ease-in-out'}
+                            }
+                        },
                         append: [function() {
                             const o = storageapi.o.get('userdocs'), n = jsx('div', {})
                             if (o && Object.entries(o).length) {
@@ -93,7 +103,7 @@ function sn() {
                             else n.jsx({class: 'center pb-xl pt-xl flex-column gap-sm', append: [jsx('span', {append: [vector.document.text]}), "no documents available", jsx('div', {class: 'primary-tab', append: ["Create"]})]})
                             return n
                         }]
-                    })
+                    }),
                 ],
                 style: {paddingInline: '20px'}
             }),
