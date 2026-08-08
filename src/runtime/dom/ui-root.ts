@@ -120,6 +120,10 @@ function nm(o: HTMLElement): NodeMetaData {
             state: 'null',
             current: null,
             defs: new Map(),
+            pending: {
+                p: new Map(),
+                a: new Map()
+            },
             define(key, frames) {
                 if (!this[O]) this[O] = new Map<string, MotionFrame[]>()
                 if (!this[O].has(key)) this[O].set(key, frames)
@@ -132,12 +136,22 @@ function nm(o: HTMLElement): NodeMetaData {
                 c.on(ev, () => n.animate(key, opts.options))
             },
             animate(key, opts = undefined) {
-                const a = c.belongsTo?.GlobalMotion.animate(c.node, this[O]?.get(key) ?? [], opts)
+                const b = c.belongsTo;
+                if (!b) {
+                    this.pending.a.set(key, opts)
+                    return;
+                }
+                const a = b.GlobalMotion.animate(c.node, this[O]?.get(key) ?? [], opts)
                 if (a) this.defs.set(key, a)
                 return a
             },
-            play(m) {
-                c.belongsTo?.GlobalMotion.play(c.node, m)
+            play(m, u = undefined) {
+                const b = c.belongsTo
+                if (!b) {
+                    this.pending.p.set(m, u)
+                    return;
+                }
+                b.GlobalMotion.play(u ? u : c.node, m)
             },
             reverseThenPlay(key) {
                 const a = this[O]?.get(key), b: MotionFrame[] = [], r = `${key}:rev`

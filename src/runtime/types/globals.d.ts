@@ -66,7 +66,11 @@ declare global {
         state: 'running' | 'pending' | 'paused' | 'null'
         current: Animation | null
         defs: Map<string, Animation>
-        define<K extends string>(key: K, frames: MotionFrame[]): void
+        pending: {
+            a: Map<string, UiMotionOptions>
+            p: Map<Animation | string, Node | undefined>
+        }
+        define<K extends string>(key: K, frames: MotionFrame[]): (o: UiMotionOptions) => Animation | undefined
         undef(key: string): void
         onanime(ev: keyof GlobalEvents, key: string, opts?: {target: Node | null, options: UiMotionOptions}): void
         animate(key: string, opts?: UiMotionOptions): Animation | undefined
