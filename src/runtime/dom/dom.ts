@@ -66,6 +66,8 @@ export class DOMInterface extends Module {
                                 if (n.$.hasDefinedState(a)) n.$.setState(a)
                             })
                         }
+                        n.$.motion.pending.a.forEach((v, k) => {n.$.motion.animate(k, v)})
+                        n.$.motion.pending.p.forEach((v, k) => n.$.motion.play(k, v))
                         n.childNodes.forEach(a => call(a));
                     }
                     call(added),
