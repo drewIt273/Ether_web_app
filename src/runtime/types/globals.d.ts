@@ -74,8 +74,8 @@ declare global {
         undef(key: string): void
         onanime(ev: keyof GlobalEvents, key: string, opts?: {target: Node | null, options: UiMotionOptions}): void
         animate(key: string, opts?: UiMotionOptions): Animation | undefined
-        play(motion: string | Animation): void
-        reverseThenPlay(key: string): void
+        play(motion: string | Animation, upon?: Node): void
+        reverseThenPlay(key: string, target?: Node): void
         [x: symbol]: Map<string, MotionFrame[]>
     }
     type NodeMetaTag = 'uicell' | 'uiblock' | 'uicomp' | 'node'
