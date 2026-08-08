@@ -127,6 +127,7 @@ function nm(o: HTMLElement): NodeMetaData {
             define(key, frames) {
                 if (!this[O]) this[O] = new Map<string, MotionFrame[]>()
                 if (!this[O].has(key)) this[O].set(key, frames)
+                return (o: UiMotionOptions) => this.animate(key, o)
             },
             undef(key) {
                 this[O]?.delete(key)
@@ -153,19 +154,21 @@ function nm(o: HTMLElement): NodeMetaData {
                 }
                 b.GlobalMotion.play(u ? u : c.node, m)
             },
-            reverseThenPlay(key) {
-                const a = this[O]?.get(key), b: MotionFrame[] = [], r = `${key}:rev`
+            reverseThenPlay(key, target = undefined) {
+                const a = this[O]?.get(key), b: MotionFrame[] = [], r = `${key}:rev`, n = target ? target.$.motion : this
                 if (a) {
-                    for (let i = a.length - 1; i <= a.length -1; i--) {
-                        let c = a[i]
-                        if (c !== undefined) b.push(c)
+                    if (!this[O]?.has(r)) {
+                        for (let i = a.length - 1; i <= a.length -1; i--) {
+                            let c = a[i]
+                            if (c !== undefined) b.push(c)
+                        }
+                        this.define(r, b)
                     }
-                    this.define(r, b)
                     if (!this.defs.has(r)) {
-                        const k = this.animate(r)
-                        if (k) this.play(k)
+                        const k = n.animate(r)
+                        if (k) n.play(k)
                     }
-                    else this.play(r)
+                    else n.play(r)
                 }
             },
         },
