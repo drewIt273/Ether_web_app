@@ -5,8 +5,8 @@
 import {Module} from "./module";
 
 interface AnimatableCSSProperties {
-    width?: `${number}` | `${number}px` | 'auto'
-    height?: `${number}` | `${number}px` | 'auto'
+    width?: number | `${number}px` | 'auto'
+    height?: number | `${number}px` | 'auto'
     transformX?: `${number}px`
     transformY?: `${number}px`
     opacity?: number
@@ -38,7 +38,7 @@ export class UiMotionEngine extends Module {
         const m = node.$.motion, a = typeof motion === 'string' ? m.defs.get(motion) : motion
         if (a) {
             if (m.current) m.current.finish()
-            a.play(), m.current = a, m.state = 'running';
+            a.play(), a.commitStyles(), m.current = a, m.state = 'running';
             let fn = () => {m.current = null, m.state = 'null'; a.removeEventListener('finish', fn)}
             a.addEventListener('finish', fn)
         }
