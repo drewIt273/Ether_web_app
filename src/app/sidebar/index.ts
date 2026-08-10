@@ -85,13 +85,13 @@ function sn() {
                         id: 'eobj',
                         anims: {
                             'expand': {
-                                keys: [{opacity: 1}, {opacity: 0}],
-                                opts: {duration: 1000, easing: 'ease-in-out'}
+                                keys: [{opacity: 0}, {opacity: 1}],
+                                opts: {duration: 300, easing: 'ease-in-out'}
                             },
                             'close': {
-                                keys: [{opacity: 0}, {opacity: 1}],
-                                opts: {duration: 1000, easing: 'ease-in-out'}
-                            }
+                                keys: [{opacity: 1}, {opacity: 0}],
+                                opts: {duration: 300, easing: 'ease-in-out'}
+                            },
                         },
                         append: [function() {
                             const o = storageapi.o.get('userdocs'), n = jsx('div', {})
