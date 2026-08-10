@@ -70,6 +70,7 @@ declare global {
             a: Map<string, UiMotionOptions>
             p: Map<Animation | string, Node | undefined>
         }
+        buffer: Partial<Record<keyof CSSStyleProperties, string>>
         define<K extends string>(key: K, frames: MotionFrame[]): (o: UiMotionOptions) => Animation | undefined
         undef(key: string): void
         onanime(ev: keyof GlobalEvents, key: string, opts?: {target: Node | null, options: UiMotionOptions}): void

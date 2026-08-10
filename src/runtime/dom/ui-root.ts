@@ -125,6 +125,7 @@ function nm(o: HTMLElement): NodeMetaData {
                 p: new Map(),
                 a: new Map()
             },
+            buffer: {},
             define(key, frames) {
                 if (!this[O]) this[O] = new Map<string, MotionFrame[]>()
                 if (!this[O].has(key)) this[O].set(key, frames)
