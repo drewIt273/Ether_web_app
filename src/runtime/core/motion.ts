@@ -5,8 +5,8 @@
 import {Module} from "./module";
 
 interface AnimatableCSSProperties {
-    width?: number | `${number}px` | 'auto'
-    height?: number | `${number}px` | 'auto'
+    width?: `${number}px` | 'auto' | 'fit-content'
+    height?: `${number}px` | 'auto' | 'fit-content'
     transformX?: `${number}px`
     transformY?: `${number}px`
     opacity?: number
@@ -21,7 +21,7 @@ interface playOptions {
 
 interface AnimationEventInterface {
     readonly record: WeakMap<Animation, Record<keyof AnimationEventMap, Handler>>
-    set(key: Animation, ev: keyof AnimationEventMap, fn: Handler): void
+    set(key: Animation, ev: keyof AnimationEventMap, fn: Handler<any>): void
 }
 
 const ei: AnimationEventInterface = {
@@ -32,7 +32,7 @@ const ei: AnimationEventInterface = {
     },
 }
 
-const sym = Symbol('MotionFrames')
+const sym = Symbol('MotionFrames'), bool = Symbol('bool')
 
 export class UiMotionEngine extends Module {
 
@@ -49,8 +49,16 @@ export class UiMotionEngine extends Module {
             get() {
                 return this[sym]
             },
-            configurable: false,
-            enumerable: false
+            configurable: false, enumerable: false
+        }),
+        Object.defineProperty(Animation.prototype, 'persit', {
+            set(v) {
+                if (typeof v === 'boolean') this[bool] = v
+            },
+            get() {
+                return this[bool]
+            },
+            configurable: false, enumerable: false
         })
         this.init = !0
     }
