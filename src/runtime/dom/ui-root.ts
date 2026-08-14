@@ -149,12 +149,12 @@ function nm(o: HTMLElement): NodeMetaData {
                 return a
             },
             play(m, u = undefined) {
-                const b = c.belongsTo
+                const b = c.belongsTo, a = typeof m === 'string' ? this.defs.get(m) : m
                 if (!b) {
                     this.pending.p.set(m, u)
                     return;
                 }
-                b.GlobalMotion.play(u ? u : c.node, m)
+                if (a) b.GlobalMotion.play(u ? u : c.node, a)
             },
             reverseThenPlay(key, target = undefined) {
                 const a = this[O]?.get(key), b: MotionFrame[] = [], r = `${key}:rev`, n = target ? target.$.motion : this
