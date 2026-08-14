@@ -87,20 +87,20 @@ export class UiMotionEngine extends Module {
                     m.current = null, m.state = 'null'
                 }
                 if (options.commit) a.commitStyles()
+                ps(node, a)
             }
             ei.record.has(a) ? ei.record.get(a)?.finish() : (a.addEventListener('finish', fn), ei.set(a, 'finish', fn))
         }
     }
 }
 
-function persistComputedStyles(n: Node, frames: MotionFrame[]) {
-    for (const f of frames) {
-        for (const [k, v] of Object.entries(f)) {
-            n.$.motion.buffer = {}
-            if (Object.hasOwn(CSSStyleProperties.prototype, k)) n.$.motion.buffer[k as keyof CSSStyleProperties] = `${v}`
+function ps(n: Node, a: Animation) {
+    const o = (a.effect as KeyframeEffect).getKeyframes(); n.$.motion.buffer = {}
+    if (a.persit) o.forEach(k => {
+        for (const [l, v] of Object.entries(k)) {
+            if (getComputedStyle(n as HTMLElement)[l as keyof CSSStyleProperties] !== undefined) n.$.motion.buffer[l as keyof CSSStyleProperties] = `${v}`
         }
-    }
-    return frames
+    })
 }
 
 function constructFrames(n: Node, frames: MotionFrame[]) {
@@ -121,8 +121,12 @@ declare global {
         composite?: CompositeOperationOrAuto
         offset?: number | null
     }
-    type UiMotionOptions = number | KeyframeAnimationOptions | undefined
+    type UiMotionOptions = number | MotionAnimationOptions | undefined
+    interface MotionAnimationOptions extends KeyframeAnimationOptions {
+        persist?: boolean
+    }
     interface Animation {
         frames: MotionFrame[]
+        persit: boolean
     }
 }
