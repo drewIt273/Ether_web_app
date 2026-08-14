@@ -85,12 +85,12 @@ function sn() {
                         id: 'eobj',
                         anims: {
                             'expand': {
-                                keys: [{opacity: 0}, {opacity: 1}],
+                                keys: [{opacity: 0}, {opacity: 1, height: '150px'}],
                                 opts: {duration: 300, easing: 'ease-in-out'}
                             },
                             'close': {
-                                keys: [{opacity: 1}, {opacity: 0}],
-                                opts: {duration: 300, easing: 'ease-in-out'}
+                                keys: [{opacity: 1}, {opacity: 0, height: '0px'}],
+                                opts: {duration: 300, easing: 'ease-in-out', persist: !1}
                             },
                         },
                         append: [function() {
