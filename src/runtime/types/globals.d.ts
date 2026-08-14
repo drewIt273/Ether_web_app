@@ -7,7 +7,7 @@ import {U, F} from "@dom/ui-root"; import {Rune as R} from "@core/rune"; import 
 declare global {
     type UINode = U;
     type HNode = HTMLElement | SVGElement
-    type Handler = (...args: any[]) => any;
+    type Handler<T extends unknown = any> = (...args: any[]) => T;
     type Rune = R
     type DOMInterface = D
     type GlobalEvents = G
