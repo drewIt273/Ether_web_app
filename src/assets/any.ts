@@ -62,30 +62,54 @@ function deepEqual(a: any, b: any): boolean {
 }
 
 function parentPropertyOf(value: any, obj: Record<string, any>): string | undefined {
+    if (!strictObject(obj)) return undefined
+
+    const isKeySearch = (v: string) => typeof v === 'string' && v.startsWith('key:')
+    const targetKeyFrom = (v: string) => v.slice(4)
+
     for (const [key, val] of Object.entries(obj)) {
-        // Direct reference match (for object references)
-        if (val === value) {
-            return key
+        // 1) If searching by object reference or deep-equal object, return current key
+        if (typeof value === 'object' && value !== null) {
+            if (val === value) return key
+            if (strictObject(val) && strictObject(value) && deepEqual(val, value)) return key
         }
-        
-        // Deep equality match (for objects with same content)
-        if (strictObject(val) && strictObject(value)) {
-            if (deepEqual(val, value)) {
+
+        // 2) If value is a primitive and matches this property's value, return this key
+        if (typeof value !== 'object' && val === value) return key
+
+        // 3) If string is in "key:NAME" form -> look for property NAME inside nested objects
+        if (typeof value === 'string' && isKeySearch(value)) {
+            const targetKey = targetKeyFrom(value)
+            if (strictObject(val) && Object.prototype.hasOwnProperty.call(val, targetKey)) {
                 return key
             }
-            // Recursively search in nested objects
-            const result = parentPropertyOf(value, val)
-            if (result !== undefined) {
-                return result
+            if (strictObject(val)) {
+                return parentPropertyOf(value, val)
             }
+            continue
         }
-        
-        // String key matching (if a key name is passed as the value argument)
-        if (typeof value === 'string' && key === value) {
-            return key
+
+        // 4) If plain string (not "key:") treat it as:
+        //    - a primitive value (handled above), or
+        //    - a property-name to find inside nested objects (returning the parent's key)
+        if (typeof value === 'string') {
+            if (strictObject(val) && Object.prototype.hasOwnProperty.call(val, value)) {
+                return key
+            }
+            if (strictObject(val)) {
+                const found = parentPropertyOf(value, val)
+                if (found !== undefined) return found
+            }
+            continue
+        }
+
+        // 5) Recurse into nested objects for any remaining cases (covers nested object search)
+        if (strictObject(val)) {
+            const found = parentPropertyOf(value, val)
+            if (found !== undefined) return found
         }
     }
-    
+
     return undefined
 }
 
@@ -96,4 +120,4 @@ const ranstring = (length: number, count: number, end = '') => {
     return (end.length) ? key += `${end}` : key
 }
 
-export {strictObject, isValidJSONString, toKebab, safeParse, ranstring}
+export {strictObject, isValidJSONString, toKebab, safeParse, ranstring, parentPropertyOf, deepEqual}
