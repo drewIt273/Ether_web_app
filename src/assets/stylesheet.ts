@@ -39,24 +39,26 @@ class StylesheetConstructor {
     }
 
     #base: string | null = null;
-    #odecl: CSSDeclaration = {};
     #decls: string[] = []
-    #processBlock(s: string, block: CSSDeclaration, push: boolean = true) {
-        const decls = []
+    #processBlock(s: string, block: CSSDeclaration) {
+        const decls: string[] = []
         for (const prop in block) {
             const value = block[prop]
             // Nested selector (like ".parent": { ".child": {...} })
                 if (strictObject(value)) {
-                    let ch = prop.startsWith('&') ? prop.replace('&', s) : prop.startsWith('$') ? prop.replace('$', parentPropertyOf(block, this.#odecl) ?? '') : `${s} ${prop}`.trim()
-                    this.#processBlock(ch, value, false), this.#decls.push(`${parentPropertyOf('prop', this.#odecl)} ${ch} {${decls.join('; ')};}`);
+                    let ch = prop.startsWith('&') ? prop.replace('&', s) : `${s} ${prop}`.trim()
+                    this.#processBlock(ch, value)
                     continue
                 }
             // Convert property names to kebab-case
                 if (typeof value === 'string' || typeof value === 'number') decls.push(`${toKebab(prop)}: ${value}`)
         }
         // Only push if the block has at least one property
-            if (push && decls.length) this.#decls.push(`${s} {${decls.join('; ')};}`);
+            if (decls.length) this.#decls.push(`${s} {${decls.join('; ')};}`);
     }
+
+    /** Returns the original raw CSS Declaration that was passed as argument to the css method */
+    readonly odecl: CSSDeclaration = {};
 
     /**
      * Generates CSS text from an object and writes it into the style tag.
@@ -64,7 +66,7 @@ class StylesheetConstructor {
      * The object o can have nested objects.
      */
     css(o: CSSDeclaration) {
-        this.#odecl = o
+        Object.assign(this.odecl, o)
         for (const [selector, block] of Object.entries(o)) {
             const fs = this.#base ? (selector === '&' ? `${this.#base}` : selector.startsWith('&') ? `${this.#base}${selector.replace('&', '')}` : `${this.#base} ${selector}`) : selector
             this.#processBlock(fs, block)
@@ -76,7 +78,7 @@ class StylesheetConstructor {
      * Appends the stylesheet into the document head
      */
     mount() {
-        !this.sheet.isConnected ? document.head.append(this.sheet) : null
+        if (!this.sheet.isConnected) document.head.append(this.sheet)
     }
 
     /**
