@@ -44,7 +44,8 @@ declare global {
         defineComputedState(state: string, call?: Handler): this['defineComputedState']
         setState(state: string, opts?: {schedule: boolean;}): void
         hasDefinedState(s: string): boolean
-        onStateChange(fn: Handler): void
+        set onStateChange(fn: Handler)
+        get onStateChange(): null | Handler
         ofn: Handler | null;
         [x: unique symbol]: {
             dom: DOMInterface | null

@@ -32,7 +32,7 @@ interface Fiber extends FiberHandlers {
     innerHTML?: string
     append?: (nodefn<Node> | string | Node)[]
     states?: Record<string, (n: HTMLElement | SVGElement, ...args: any[]) => any>
-    anims?: Record<string, {keys: MotionFrame[], opts?: UiMotionOptions, upon?: Node | nodefn<Node>}>
+    anims?: Record<string, {keys: MotionFrame[], opts?: UiMotionOptions, upon?: Node | nodefn<Node>, style?: Partial<Record<keyof CSSStyleProperties, any>>}>
     readonly node?: HTMLElement | SVGElement
     [x: string]: any
 }
@@ -149,12 +149,12 @@ function nm(o: HTMLElement): NodeMetaData {
                 return a
             },
             play(m, u = undefined) {
-                const b = c.belongsTo, a = typeof m === 'string' ? this.defs.get(m) : m
+                const b = c.belongsTo
                 if (!b) {
                     this.pending.p.set(m, u)
                     return;
                 }
-                if (a) b.GlobalMotion.play(u ? u : c.node, a)
+                b.GlobalMotion.play(u ? u : c.node, m)
             },
             reverseThenPlay(key, target = undefined) {
                 const a = this[O]?.get(key), b: MotionFrame[] = [], r = `${key}:rev`, n = target ? target.$.motion : this
@@ -192,11 +192,11 @@ function nm(o: HTMLElement): NodeMetaData {
         get belongsTo() {
             return (this[SRC] ?? null)?.dom ?? null
         },
-        set onStateChange(fn: Handler) { // @ts-expect-error
-            this[SRC].ofn = fn
+        set onStateChange(fn: Handler | null) {
+            if (this[SRC]) this[SRC].ofn = fn as Handler
         },
-        get onStateChange() { // @ts-expect-error
-            return this[SRC].ofn
+        get onStateChange() {
+            return this[SRC]?.ofn ?? null
         },
         createTooltip(props: Partial<Props> = {}) {
             const o = this.belongsTo?.Tippy?.createTooltip(this.node as HTMLElement, props)
@@ -305,9 +305,10 @@ function concat(n: HTMLElement | SVGElement, o: Fiber) {
             continue;
         }
         if (k === 'anims') {
-            const o: [string, {keys: MotionFrame[], upon?: Node | nodefn<Node>, opts?: UiMotionOptions}][] = Object.entries(v)
+            const o: [string, {keys: MotionFrame[], upon?: Node | nodefn<Node>, opts?: UiMotionOptions, style?: Record<keyof CSSStyleProperties, any>}][] = Object.entries(v)
             for (const [k, r] of o) { // @ts-expect-error
                 (r.upon ? (typeof r.upon === 'function' ? r.upon(n) : r.upon) : n).$.motion.define(k, r.keys)(r.opts)
+                if (r.style) Object.assign(n.style, r.style)
             }
             continue;
         }
@@ -330,8 +331,7 @@ function concat(n: HTMLElement | SVGElement, o: Fiber) {
                 set(v) {
                     j = v, DepObject.notifyDependents(n, v)
                 },
-                configurable: true,
-                enumerable: false
+                configurable: true, enumerable: true
             })
             continue;
         }
