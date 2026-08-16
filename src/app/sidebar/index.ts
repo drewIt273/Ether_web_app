@@ -16,7 +16,7 @@ function sn() {
             expanded: (n: HNode) => n.$.motion.play('expand', n.parentElement?.querySelector('#eobj') as Node),
             close: (n: HNode) => n.$.motion.play('close', n.parentElement?.querySelector('#eobj') as Node)
         }
-    }, b = {states: v(), abcon: ''}, se = (n: Node, s: string) => n.$.setState(s)
+    }, b = {states: v(), abcon: !0}, se = (n: Node, s: string) => n.$.setState(s)
     const k = jsx('div', {
         append: [
             jsx('div', {
@@ -26,7 +26,7 @@ function sn() {
                         class: 'htab',
                         append: [
                             jsx('div', {
-                                append: [jsx('span', {append: [vector.viewfinder.jsx({width: 16, height: 16, strokeWidth: 3})], i: true}), jsx('span', {append: ["Issues"]})],
+                                append: [jsx('span', {append: [vector.viewfinder.jsx({width: 18, height: 18, strokeWidth: 3})], i: true}), jsx('span', {append: ["Issues"]})],
                                 hasIcon: true
                             }),
                             jsx('div', {
@@ -38,7 +38,7 @@ function sn() {
                         class: 'htab',
                         append: [
                             jsx('div', {
-                                append: [jsx('span', {append: [vector.i.cube.jsx({width: 16, height: 16})], i: true}), jsx('span', {append: ["Projects"]})],
+                                append: [jsx('span', {append: [vector.i.cube.jsx({width: 18, height: 18})], i: true}), jsx('span', {append: ["Projects"]})],
                                 hasIcon: true
                             }),
                             jsx('div', {
@@ -50,7 +50,7 @@ function sn() {
                         class: 'htab',
                         append: [
                             jsx('div', {
-                                append: [jsx('span', {append: [vector.i.sq2x2.jsx({wdith: 16, height: 16})], i: true}), jsx('span', {append: ["Dashboard"]})],
+                                append: [jsx('span', {append: [vector.i.sq2x2.jsx({wdith: 18, height: 18})], i: true}), jsx('span', {append: ["Dashboard"]})],
                                 hasIcon: true
                             }),
                             jsx('div', {
@@ -62,7 +62,7 @@ function sn() {
                         class: 'htab',
                         append: [
                             jsx('div', {
-                                append: [jsx('span', {append: [vector.calenderDays.jsx({wdith: 16, height: 16})], i: true}), jsx('span', {append: ["Schedule"]})],
+                                append: [jsx('span', {append: [vector.calenderDays.jsx({wdith: 18, height: 18})], i: true}), jsx('span', {append: ["Schedule"]})],
                                 hasIcon: true
                             }),
                             jsx('div', {
@@ -76,21 +76,24 @@ function sn() {
             jsx('div', {
                 append: [
                     jsx('div', {
-                        uikey: 'a-workspace-expander--1', class: 'expander items-center justify-between pt-md',
+                        uikey: 'a-workspace-expander--1', class: 'expander items-center htab w-fit',
                         states: e(),
                         onclick: (n) => toggleStateOf(n, 'expanded', 'close'),
-                        append: ["documents", jsx('span', {append: [vector.chevron.right.jsx({width: 16, height: 16})], dataSlot: 'icon'})]
+                        append: ["documents"],
+                        style: {paddingBlock: '5px'}
                     }),
                     jsx('div', {
                         id: 'eobj',
                         anims: {
                             'expand': {
                                 keys: [{opacity: 0}, {opacity: 1, height: '150px'}],
-                                opts: {duration: 300, easing: 'ease-in-out'}
+                                opts: {duration: 300, easing: 'ease-in-out'},
+                                style: {zIndex: ''}
                             },
                             'close': {
                                 keys: [{opacity: 1}, {opacity: 0, height: '0px'}],
-                                opts: {duration: 300, easing: 'ease-in-out', persist: !1}
+                                opts: {duration: 300, persist: !1},
+                                style: {zIndex: -1}
                             },
                         },
                         append: [function() {
@@ -105,28 +108,33 @@ function sn() {
                         }]
                     }),
                 ],
-                style: {paddingInline: '20px'}
+                style: {paddingInline: '10px'}
             }),
             jsx('div', {
                 append: [
                     jsx('div', {
-                        uikey: 'a-tasks-expander--1', class: 'expander items-center justify-between pt-md',
+                        uikey: 'a-tasks-expander--1', class: 'expander items-center htab',
                         states: e(),
                         onclick: (n) => toggleStateOf(n, 'expanded', 'close'),
-                        append: ["tasks", jsx('span', {append: [vector.chevron.right.jsx({width: 16, height: 16})], dataSlot: 'icon'})]
+                        append: ["tasks", jsx('span', {append: [vector.chevron.right.jsx({width: 16, height: 16})], dataSlot: 'icon'})],
+                        
                     }),
                     jsx('div', {
                         id: 'eobj',
                         append: [jsx('div', {
-                            class: 'd-flex flex-column gap-md px-sm py-md',
+                            class: 'px-md',
                             append: [
-                                jsx('div', {class: 'd-flex gap-xs', append: [jsx('span', {class: 'items-center gap-xs', append: [vector.bell, "Current"]})]}),
-                                jsx('div', {class: 'd-flex gap-xs', append: [jsx('span', {class: 'items-center gap-xs', append: [vector.clock, "Upcoming"]})]})
+                                jsx('div', {class: 'd-flex gap-xs htab', append: [
+                                    jsx('div', {append: [jsx('span', {class: 'items-center gap-xs', append: [vector.bell.jsx({width: 18, height: 18}), "Current"]})]})
+                                ]}),
+                                jsx('div', {class: 'd-flex gap-xs htab', append: [
+                                    jsx('div', {append: [jsx('span', {class: 'items-center gap-xs', append: [vector.clock.jsx({width: 18, height: 18}), "Upcoming"]})]})
+                                ]})
                             ]
                         })]
                     })
                 ],
-                style: {paddingInline: '20px'}
+                style: {paddingInline: '10px'}
             })
         ],
         ...b
