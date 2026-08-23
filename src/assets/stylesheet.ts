@@ -46,7 +46,7 @@ class StylesheetConstructor {
             const value = block[prop]
             // Nested selector (like ".parent": { ".child": {...} })
                 if (strictObject(value)) {
-                    let ch = prop.startsWith('&') ? prop.replace('&', s) : `${s} ${prop}`.trim()
+                    let ch = prop.startsWith('&') ? prop.replace('&', s) : prop.startsWith(':') ? `${s}${prop}` : prop.startsWith('$') ? `${s}${prop.replace('$', '')}` : `${s} ${prop}`.trim()
                     this.#processBlock(ch, value)
                     continue
                 }
