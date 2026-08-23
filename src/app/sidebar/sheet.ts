@@ -9,29 +9,27 @@ export const sheet: stylesheet = new stylesheet({base: '[node-key="sidebar"]'})
 sheet.css({
     '&': {
         height: '100dvh',
-        width: '300px',
+        width: '60px',
     },
-    '.itab, [icon]': {
-        color: 'var(--fg-base-color)'
-    },
-    '#nav-controls': {
-        display: 'flex',
-        gap: '6px'
-    },
-    "#asidecontent": {
-        position: 'relative',
-        height: 'calc(100dvh - 8em)',
+    '.bar': {
+        height: '100%',
         overflow: 'hidden',
         overflowY: 'auto',
-        '[abcon]': {
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: 'calc(100dvh - 8em)',
-            overflow: 'hidden',
-            overflowY: 'auto',
-            padding: '10px 0',
+        scrollbarWidth: 0
+    },
+    '.tab': {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '10px',
+        borderRadius: '10px',
+        ':hover': {
+            backgroundColor: 'var(--bg-hover-color)'
         },
-    }
+        '$[active]': {
+            backgroundColor: 'var(--bg-hover-color)',
+            color: 'var(--cr-lightgrey)',
+            boxShadow: '3px 3px 3px 0px #0000004f'
+        }
+    },
 })
