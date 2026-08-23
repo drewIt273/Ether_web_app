@@ -38,6 +38,8 @@ body {
     text-rendering: optimizeLegibility;
     -webkit-text-size-adjust: 100%;
     line-height: 1.5;
+    background-image: url('../resources/bg.jpg');
+    background-repeat: no-repeat;
 }
 body [default-scrollbar] {
     scrollbar-width: thin;
@@ -52,74 +54,13 @@ web-app {
 html, body, web-app {
     overflow: hidden;
     background-color: var(--bg-base-color);
-    font-size: 15px;
+    backdrop-filter: blur(70px);
+    font-size: 14px;
     font-family: var(--font-display);
 }
 body, web-app {
     height: 100%;
     margin: 0;
-}
-[node-key="sidebar"] {
-    height: 100dvh;
-    min-width: 300px;
-    transition: all .3s ease-in-out;
-    background-color: var(--bg-aside-color);
-    color: #adadad;
-    border: 2px solid var(--cr-transparent);
-    .i-tab, [icon] {
-        color: var(--fg-base-color);
-    }
-}
-[node-key="sidebar"][data-state="relative"] {
-    position: relative;
-    width: 0;
-    border-right-color: var(--bg-border-color);
-}
-[node-key="sidebar"][data-state="relative"][expand] {
-    width: 300px;
-    top: 0;
-}
-[node-key="sidebar"][data-state="absolute"] {
-    position: absolute;
-    border-radius: 15px;
-    border: 1px solid var(--bg-border-color);
-    height: calc(100dvh - 20px);
-    top: 10px;
-    overflow: hidden;
-}
-[node-key="sidebar"] {
-    #nav-controls {
-        display: flex;
-        gap: 6px;
-    }
-    #asideContent {
-        position: relative;
-        height: calc(100dvh - 8em);
-        overflow: hidden;
-        overflow-y: auto;
-        [abcon] {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%;
-            overflow: hidden;
-            overflow-y: auto;
-            height: calc(100dvh - 8em);
-            padding: 10px 0;
-        }
-        [abcon][data-state="open"] {
-            opacity: 1;
-            z-index: 2;
-        }
-        [abcon][data-state="close"] {
-            opacity: 0;
-            z-index: -1;
-            pointer-events: none;
-        }
-        .htab [has-icon] span[i] {
-            height: 19px;
-        }
-        .htab:hover {background-color: var(--cr-transparent); color: #dbdbdb}
-    }
 }
 [node-key="mainLayoutConstructive"] {
     width: 100%;
