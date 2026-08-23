@@ -288,7 +288,7 @@ function concat(n: HTMLElement | SVGElement, o: Fiber) {
             continue;
         }
         if (k.startsWith('on')) { // @ts-expect-error
-            n.$.on(k.slice(2), () => v.call(n, n))
+            n.$.on(k.slice(2), (e) => v.call(n, n, e))
             continue;
         }
         if (k === 'uikey') {
@@ -308,7 +308,6 @@ function concat(n: HTMLElement | SVGElement, o: Fiber) {
             const o: [string, {keys: MotionFrame[], upon?: Node | nodefn<Node>, opts?: UiMotionOptions, style?: Record<keyof CSSStyleProperties, any>}][] = Object.entries(v)
             for (const [k, r] of o) { // @ts-expect-error
                 (r.upon ? (typeof r.upon === 'function' ? r.upon(n) : r.upon) : n).$.motion.define(k, r.keys)(r.opts)
-                if (r.style) Object.assign(n.style, r.style)
             }
             continue;
         }
