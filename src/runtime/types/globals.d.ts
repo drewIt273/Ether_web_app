@@ -2,7 +2,7 @@
  * Instance by DrewIt
  */
 
-import {U, F} from "@dom/ui-root"; import {Rune as R} from "@core/rune"; import {D} from "@dom/dom"; import {G} from "@core/events"; import {vector as v} from "@dom/vectors"; import {storageapi as O} from "@assets/storageapi"; import {ui as I} from "../../app/module"; import {ModuleDefinitionObject as MO, UiModulesInterfaceMap as UM} from "../../app/module"; import {Tooltip} from "@dom/floating"; import {Props} from "tippy.js";
+import {U, F} from "@dom/ui-root"; import {Rune as R} from "@core/rune"; import {D} from "@dom/dom"; import {G} from "@core/events"; import {vector as v} from "@dom/vectors"; import {storageapi as O} from "@assets/storageapi"; import {ui as I} from "../../app/module"; import {ModuleDefinitionObject as MO} from "../../app/module"; import {Tooltip} from "@dom/floating"; import {Props} from "tippy.js";
 
 declare global {
     type UINode = U;
@@ -30,6 +30,7 @@ declare global {
         prop: FiberDepRecord
         pendingStates: Map<string, {type: 'static'|'computed', fn: Handler}> & Map<string, string>
         motion: UiNodeAnimation
+        cacheapi: NodePerisitedDataResolverUnit
         readonly ID: NodeID
         readonly mounted: boolean
         readonly node: Node
@@ -50,6 +51,7 @@ declare global {
         [x: unique symbol]: {
             dom: DOMInterface | null
             ofn: Handler | null
+            dfn: Handler | null
         }
     }
     interface NodeMsgResolverUnit {
@@ -59,6 +61,12 @@ declare global {
         emit(data: any, to: string | Node, ...args: any[]): void
         map(data: any, ...fn: Handler[]): void
         unmap(data: any, fn?: Handler | null): void
+    }
+    interface NodePerisitedDataResolverUnit {
+        onChangeData: Handler | null
+        resolveData: (key: StorageKeyReference, data: any) => void
+        defineBehavior: (key: StorageKeyReference, fn: Handler) => void
+        dep: Partial<Record<StorageKeyReference, Handler>>
     }
     interface UiNodeDependency {
         dependsOn(sourceNode: Node, fn: (changeData: any) => any): void
@@ -86,7 +94,6 @@ declare global {
     type FiberDepRecord = Record<string, any>
     type NodeID = string
     type ModuleDefinitionObject = MO
-    type UiModulesInterfaceMap = UM
     const jsx: <K extends HTMLTagName>(n: K, o: Fiber) => UiElementInterfaceMap[K]
     const vector = v
     const storageapi = O
