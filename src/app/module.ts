@@ -77,7 +77,8 @@ class UiComponent {
 }
 
 interface ModuleDefinitionObject {
-    root?: HTMLElement | UiComponent | null
+    root: HTMLElement | UiComponent | null
+    storeRef?: StorageKeyReference[]
     imports?: string[]
     onMount?: Handler
     onUnmount?: Handler
@@ -95,11 +96,12 @@ interface UiComponentDefinitionObject {
 
 class UiModule {
 
-    root: UiComponent | null
-    constructor(name: keyof UiModulesInterfaceMap, root: UiComponent | null = null) {
+    root: UiComponent
+    constructor(name: keyof UiModulesInterfaceMap, root: UiComponent) {
         this.#n = name
         this.root = root // @ts-expect-error
         if (this.root?.module) this.root.module = name
+        NodeModuleMap.set(this.root.node, this)
     }
 
     #n: keyof UiModulesInterfaceMap
@@ -107,6 +109,8 @@ class UiModule {
     get name() {
         return this.#n
     }
+
+    readonly storagekey: StorageKeyReference[] = []
 
     readonly imports: string[] = []
 
@@ -118,7 +122,8 @@ class UiConstructor {
     static define<K extends keyof UiModulesInterfaceMap>(name: K, props: ModuleDefinitionObject): UiModulesInterfaceMap[K] { // @ts-expect-error
         const u = props.root instanceof UiComponent ? props.root : props.root instanceof HTMLElement ? this.expose({node: props.root as HTMLElement, name: `${name}:root`, module: name}) : null, o: UiModulesInterfaceMap[K] = new UiModule(name, u)
         o.onImport = props.onImport ?? null
-        if (o.root && o.root.o) o.root.o = {mount: props.onMount, unmount: props.onUnmount}
+        if (o.root && o.root.o) o.root.o = {mount: props.onMount, unmount: props.onUnmount} // @ts-expect-error
+        o.storagekey = props.storeRef ?? []
         this.modules[name] = o, o.imports.push(...props.imports ?? [])
         return o
     }
@@ -170,7 +175,7 @@ class UiConstructor {
 export const ui: UiConstructor = UiConstructor
 
 interface UiConstructor {
-    new (): UiConstructor
+    new(): UiConstructor
     require<K extends keyof UiModulesInterfaceMap>(key: K): Promise<UiModulesInterfaceMap[K] | undefined>
     require<K extends keyof UiModulesInterfaceMap, L extends string>(key: `${K}:${L}`): Promise<UiComponent | stylesheet | undefined>
     defineProperty<K extends keyof UiModulesInterfaceMap>(key: K | UiModule, property: string, value: any): ((prop: string, value: any) => returnedCall | undefined) | undefined
