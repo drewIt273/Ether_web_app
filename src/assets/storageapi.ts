@@ -16,8 +16,11 @@ interface CacheAPI {
         set<K extends keyof CacheObject>(k: K, v: CacheObject[K]): void;
         has(k: keyof CacheObject): boolean;
         remove(k: keyof CacheObject): void;
-    }
+    },
+    dep: Record<StorageKeyReference, string[]>
 }
+
+const dep: Partial<Record<StorageKeyReference, string[]>> = {}
 
 type nodekey = string
 
@@ -99,5 +102,9 @@ function syncCache() {
     catch(e) {return new CacheError(`${e}`)}
 }
 
+declare global {
+    type StorageKeyReference = 'projects' | 'issues' | 'spaces' | 'docs'
+}
+
 // @ts-expect-error
-export const storageapi: CacheAPI = {syncCache, setCache, isValidBackend, log: () => console.log(cache), o: memory}
+export const storageapi: CacheAPI = {syncCache, setCache, isValidBackend, log: () => console.log(cache), o: memory, dep: dep}
