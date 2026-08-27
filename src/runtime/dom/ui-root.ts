@@ -174,6 +174,27 @@ function nm(o: HTMLElement): NodeMetaData {
                 }
             },
         },
+        cacheapi: {
+            get onChangeData() {
+                return c[SRC]?.dfn ?? null
+            },
+            set onChangeData(fn: Handler | null) {
+                if (c[SRC]) c[SRC].dfn = fn
+            },
+            resolveData(key, data) {
+                if (this.dep[key]) {
+                    this.dep[key].call(data, key, data)
+                    this.onChangeData?.call(data, key, data)
+                }
+            },
+            defineBehavior(key, fn) {
+                this.dep[key] = fn
+                const o = storageapi.dep[key]
+                if (o) o.push(c.ID)
+                else storageapi.dep[key] = [c.ID]
+            },
+            dep: {}
+        },
         get mounted() {
             return (this.node.isConnected && this.node.parentNode && this.node.$.belongsTo) ? true : false
         },
@@ -265,7 +286,7 @@ function nm(o: HTMLElement): NodeMetaData {
             return this.belongsTo?.GlobalStates.hasState(this.node, s) as boolean
         },
     }
-    c[SRC] = {dom: null, ofn: null}
+    c[SRC] = {dom: null, ofn: null, dfn: null}
     return c
 }
 
