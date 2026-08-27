@@ -24,7 +24,12 @@ type nodekey = string
 interface CacheObject {
     uistates?: Record<nodekey, string>
     userdocs?: Record<string, string>
+    session?: SessionCache
     [x: string]: any
+}
+
+interface SessionCache {
+    constructedModule: keyof UiModulesInterfaceMap
 }
 
 const cache: CacheObject = {}
