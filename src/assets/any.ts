@@ -35,6 +35,12 @@ function safeParse(v: any) {
     }
 }
 
+function getNodeByID(s: string) {
+    for (const n of Array.from(document.querySelectorAll('*'))) {
+        if (n.$.ID === s) return n
+    }
+}
+
 /**
  * Javascript compare objects by reference using '===' or '=='. This function can be used to compare 2 objects which have exact the same keys and exact the same values, returning false otherwise.
  */
@@ -120,4 +126,4 @@ const ranstring = (length: number, count: number, end = '') => {
     return (end.length) ? key += `${end}` : key
 }
 
-export {strictObject, isValidJSONString, toKebab, safeParse, ranstring, parentPropertyOf, deepEqual}
+export {strictObject, isValidJSONString, toKebab, safeParse, ranstring, getNodeByID, parentPropertyOf, deepEqual}
