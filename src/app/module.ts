@@ -4,18 +4,23 @@
 
 import {stylesheet} from '@assets/stylesheet'
 
-interface UiModule {
-    root: UiComponent | null
-    readonly imports: string[]
-    onImport: Handler | null
+declare global {
+    interface UiModule {
+        root: UiComponent
+        readonly imports: string[]
+        readonly storagekey: StorageKeyReference[]
+        readonly name: keyof UiModulesInterfaceMap
+        onImport: Handler | null
+    }
+    interface UiModulesInterfaceMap {
+        "sidebar": UiModule
+        "issues": UiModule
+        "projects": UiModule
+        "UxNotificationModule": UxNotify & UiModule
+    }
 }
 
-interface UiModulesInterfaceMap {
-    "sidebar": UiModule
-    "issues": UiModule
-    "projects": UiModule
-    "UxNotificationModule": UxNotify & UiModule
-}
+const NodeModuleMap = new WeakMap<Node, UiModule>()
 
 // @ts-expect-error
 const modules: UiModulesInterfaceMap = {}
@@ -158,6 +163,8 @@ class UiConstructor {
         }
         else return (prop: string, value: any) => this.defineProperty(key, prop, value) as returnedCall
     }
+
+    static readonly NodeModuleMap = NodeModuleMap
 }
 
 export const ui: UiConstructor = UiConstructor
@@ -174,4 +181,4 @@ interface UiConstructor {
 
 type returnedCall = (props: string, value: any) => returnedCall
 
-export type {ModuleDefinitionObject, UiComponentDefinitionObject, UiModulesInterfaceMap}
+export type {ModuleDefinitionObject, UiComponentDefinitionObject}
