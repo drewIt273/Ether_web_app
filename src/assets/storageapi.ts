@@ -2,7 +2,7 @@
  * Instance by DrewIt
  */
 
-import {safeParse, strictObject} from "./any"
+import {safeParse, strictObject, getNodeByID} from "./any"
 import {CacheError} from "@core/error"
 
 interface CacheAPI {
@@ -52,14 +52,19 @@ function setCache() {
     catch(e) {return new CacheError(`${e}`)}
 }
 
+function notifyNodes(k: StorageKeyReference, d: any) {
+    dep[k]?.forEach(n => {
+        getNodeByID(n)?.$.cacheapi.resolveData(k, d)
+    })
+}
+
 const memory = {
     get<K extends keyof CacheObject>(k: K) {
         return cache[k]
     },
     set<K extends keyof CacheObject>(k: K, v: CacheObject[K] | undefined = undefined): ((p: string, o: any) => void) | void {
         if (v !== undefined) {
-            cache[k] = v
-            setItem(k, v)
+            cache[k] = v, setItem(k, v)
             return;
         }
         else return (p: string, o: any) => {
@@ -75,12 +80,13 @@ const memory = {
     },
     remove(k: keyof CacheObject) {
         delete cache[k]
-        syncCache()
+        syncCache(), notifyNodes(k as StorageKeyReference, cache[k])
     }
 }
 
 function setItem(k: keyof CacheObject, v: any) {
     localStorage.setItem(String(k), JSON.stringify(v))
+    notifyNodes(k as StorageKeyReference, v)
 }
 
 function syncCache() {
@@ -89,6 +95,7 @@ function syncCache() {
         for (const [k, v] of Object.entries(cache)) {
             const serialized = JSON.stringify(v)
             if (localStorage.getItem(k) !== serialized) localStorage.setItem(k, serialized)
+            notifyNodes(k as StorageKeyReference, v)
         }
         // DELETE
         for (let i = 0; i < localStorage.length; i++) {
