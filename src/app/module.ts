@@ -10,6 +10,7 @@ declare global {
         readonly imports: string[]
         readonly storagekey: StorageKeyReference[]
         readonly name: keyof UiModulesInterfaceMap
+        readonly mounted: boolean
         onImport: Handler | null
     }
     interface UiModulesInterfaceMap {
@@ -108,6 +109,10 @@ class UiModule {
 
     get name() {
         return this.#n
+    }
+
+    get mounted() {
+        return this.root.node.$.mounted
     }
 
     readonly storagekey: StorageKeyReference[] = []
