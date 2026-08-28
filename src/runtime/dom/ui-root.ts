@@ -2,7 +2,7 @@
  * Instance by DrewIt
  */
 
-import {ranstring, toKebab} from "@assets/any"; import {DOMInterfaceError} from "@core/error";
+import {ranstring, toKebab} from "@assets/any"; import {DOMInterfaceError} from "@core/error"; import {ui} from "../../app/module";
 import { Props } from "tippy.js";
 
 export const NodeKeys = new Set<string>()
@@ -117,6 +117,9 @@ function nm(o: HTMLElement): NodeMetaData {
         emittedData: null,
         receivedData: null,
         mappedData: new Map(),
+        get module() {
+            return ui.getModule(c.node)
+        },
         motion: {
             state: 'null',
             current: null,

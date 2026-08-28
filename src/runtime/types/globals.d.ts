@@ -31,6 +31,8 @@ declare global {
         pendingStates: Map<string, {type: 'static'|'computed', fn: Handler}> & Map<string, string>
         motion: UiNodeAnimation
         cacheapi: NodePerisitedDataResolverUnit
+        readonly module: UiModule | undefined
+        uicomp?: UiModule['root']
         readonly ID: NodeID
         readonly mounted: boolean
         readonly node: Node
