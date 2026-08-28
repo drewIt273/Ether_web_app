@@ -3,7 +3,6 @@
  */
 
 import {Rune} from "@core/rune";
-import {main$} from "./MainLayout";
 import {ui} from "./module";
 
 const rune = new Rune(), a = await rune.boot()
@@ -11,9 +10,9 @@ if (a instanceof Error) throw a
 
 export const dom = rune.dom, scheduler = rune.scheduler
 
-const sidebar = await ui.require('sidebar')
+const sidebar = await ui.require('sidebar'), main = await ui.require('mainLayoutConstructive')
 
-if (dom.ready) dom.append(sidebar?.root?.node as HTMLElement);
+if (dom.ready) dom.append(sidebar.root.node)(main.root.node);
 
 (function() {
     if (!storageapi.o.has('userdocs')) storageapi.o.set('userdocs', {})
