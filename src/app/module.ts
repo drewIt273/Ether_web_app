@@ -47,7 +47,7 @@ class UiComponent {
     }
 
     readonly name: string = ''
-    readonly module: keyof UiModulesInterfaceMap | null = null
+    readonly module: UiModule | null = null
 
     deps: string[] = []
 
@@ -102,8 +102,7 @@ class UiModule {
     root: UiComponent
     constructor(name: keyof UiModulesInterfaceMap, root: UiComponent) {
         this.#n = name
-        this.root = root // @ts-expect-error
-        if (this.root?.module) this.root.module = name
+        this.root = root
         NodeModuleMap.set(this.root.node, this)
     }
 
@@ -121,7 +120,7 @@ class UiModule {
 
     readonly imports: string[] = []
 
-    onImport: Handler | null = null
+    onImport: ((u: UiComponent) => any) | null = null
 }
 
 class UiConstructor {
@@ -137,7 +136,7 @@ class UiConstructor {
 
     static expose(props: UiComponentDefinitionObject) {
         const o = new UiComponent(() => props.node) // @ts-expect-error
-        o.name = props.name, o.module = props.module ?? null
+        o.name = props.name
         o.deps = props.deps ?? []
         o.o = {mount: props.onmount, unmount: props.unmount}
         return o
@@ -151,7 +150,7 @@ class UiConstructor {
         else {
             // @ts-expect-error
             const a: {module: UiModule} = await Imports[key]()
-            a.module.onImport?.(), a.module.imports.forEach(async i => {
+            a.module.onImport?.call(a.module, a.module.root), a.module.imports.forEach(async i => {
                 const o = await this.require(`${key}:${i}`);
                 o instanceof stylesheet ? o.mount() : null
             }) // @ts-expect-error
@@ -161,7 +160,7 @@ class UiConstructor {
 
     static readonly modules: UiModulesInterfaceMap = modules
 
-    static defineProperty<K extends keyof UiModulesInterfaceMap>(key: K | UiModule, property: string, value: any): returnedCall | undefined {
+    static defineProperty<K extends keyof UiModulesInterfaceMap>(key: K | UiModule, property: string, value: any): returnedCall {
         const u = key instanceof UiModule ? key : this.modules[key]
         if (u) {
             if (u[property as keyof UiModule] === undefined) {
@@ -173,7 +172,7 @@ class UiConstructor {
             }
             else throw new Error(`Cannot overwrite already defined property of UiModule ${u.name}`)
         }
-        else return (prop: string, value: any) => this.defineProperty(key, prop, value) as returnedCall
+        return (prop: string, value: any) => this.defineProperty(key, prop, value) as returnedCall
     }
 
     static readonly NodeModuleMap = NodeModuleMap
