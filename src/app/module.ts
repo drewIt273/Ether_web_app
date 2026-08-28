@@ -17,6 +17,7 @@ declare global {
         "sidebar": UiModule
         "issues": UiModule
         "projects": UiModule
+        "mainLayoutConstructive": UiModule & mainLayoutConstructiveModule
         "UxNotificationModule": UxNotify & UiModule
     }
 }
@@ -30,7 +31,8 @@ const Imports = {
     sidebar: () => import('./sidebar/index'),
     isses: () => import('./issues/index'),
     projects: () => import('./projects/index'),
-    UxNotificationModule: () => import('./uix/notix')
+    UxNotificationModule: () => import('./uix/notix'),
+    mainLayoutConstructive: () => import('./main/index')
 }
 
 class UiComponent {
