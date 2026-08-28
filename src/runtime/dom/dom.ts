@@ -149,7 +149,7 @@ export class DOMInterface extends Module {
         if (this.root.contains(into)) {
             const e = NodeHierarchyCheck(node)
             if (e) throw e
-            if ((h$(into) > h$(node)) || (h$(into) && h$(node)) === 0) into.appendChild(node)
+            if ((h$(into) > h$(node)) || (h$(into) && h$(node)) === 0) into.appendChild(node), node.$.module?.root.o.mount?.()
             else throw new NodeHierarchyError(`${into.$.tag} cannot mount ${node.$.tag}`)
         }
         else throw new DOMInterfaceError(`Node ${into} is out of reach`)
