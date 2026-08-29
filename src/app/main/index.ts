@@ -10,7 +10,7 @@ function main$() {
         uikey: 'mainLayoutConstructive',
         append: [
             jsx('main', {
-                id: 'main',
+                id: 'moduleContainer',
                 class: 'h-full',
             })
         ]
@@ -19,18 +19,40 @@ function main$() {
 
 export const module: UiModulesInterfaceMap['mainLayoutConstructive'] = ui.define('mainLayoutConstructive', {root: main$()})
 
+function f$() {
+    return module.root.node.querySelector('main#moduleContainer')
+}
 function fo() {
-    for (const a of Array.from(module.root.node.childNodes)) if (a.$.module !== undefined) return a.$.module
+    const r: UiModule[] = []
+    for (const a of Array.from(module.root.node.childNodes)) if (a.$.module !== undefined) r.push(a.$.module)
+    return r
+}
+function fd() {
+    const e = f$()
+    if (e) {
+        for (const c of Array.from(e.childNodes)) if (c.$.module) return c.$.module
+    }
 }
 function fx(n: UiModule) {
-    module.root.node.querySelector('main')?.append(n.root.node)
+    f$()?.append(n.root.node)
+}
+function fe(n: UiModule) {
+    const e = f$()
+    if (e) {
+        for (const c of Array.from(e.childNodes)) if (c.$.module && c.$.module === n) {
+            n.root.unmount()
+            return;
+        }
+    }
 }
 
-ui.defineProperty('mainLayoutConstructive', 'active', fo)('mount', fx)
+ui.defineProperty('mainLayoutConstructive', 'modules', fo)('mount', fx)('unmount', fe)('active', fd)
 
 declare global {
     interface mainLayoutConstructiveModule {
+        modules(): UiModule[]
         active(): UiModule | undefined
         mount(n: UiModule): void
+        unmount(n: UiModule): void
     }
 }
