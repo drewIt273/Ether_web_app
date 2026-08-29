@@ -21,7 +21,7 @@ function $() {
                                     jsx('div', {class: 'tab', append: [vector.i.sq2x2], $uig: ''}),
                                     jsx('div', {class: 'tab', append: [vector.i.cubetr], $uig: ''}),
                                     jsx('div', {class: 'tab', append: [vector.i.cube], $uig: '', onclick: () => ui.load('projects')}),
-                                    jsx('div', {class: 'tab', append: [vector.viewfinder], $uig: 'issues'}),
+                                    jsx('div', {class: 'tab', append: [vector.viewfinder], $uig: 'issues', onclick: () => ui.load('issues')}),
                                     jsx('div', {class: 'tab', append: [vector.calenderDays], $uig: ''}),
                                 ]
                             }),
