@@ -182,16 +182,18 @@ class UiConstructor {
     static readonly NodeModuleMap = NodeModuleMap
 
     static async load(u: UiModule | keyof UiModulesInterfaceMap, callback: Handler = () => {}) {
-        const o = this.modules.mainLayoutConstructive, n = u instanceof UiModule ? u : await this.require(u) as UiModule;
+        const o = this.modules.mainLayoutConstructive, b = o.active(), n = u instanceof UiModule ? u : await this.require(u) as UiModule
+        if (b) o.unmount(b)
         if (n.mounted === !1) {
             o.mount(n), n.root.o.mount?.(), callback()
         }
+        storageapi.o.set('session')('constructedModule', n.name)
     }
 
     static async unmount(u: UiModule | keyof UiModulesInterfaceMap, callback: Handler = () => {}) {
         const o = this.modules.mainLayoutConstructive, n = u instanceof UiModule ? u : await this.require(u) as UiModule;
         if (n.mounted === !0) {
-            n.root.o.unmount?.(), callback()
+            o.unmount(n), n.root.o.unmount?.(), callback()
         }
     }
 
