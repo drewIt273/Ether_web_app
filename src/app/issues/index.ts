@@ -26,11 +26,16 @@ function fb() {
     })
 }
 
+function th() {
+    const o = storageapi.o.get('projects')
+    return o ? document.createElement('div') : fb()
+}
+
 function Issues$() {
     return jsx('div', {
         class: 'h-full',
-        append: [fb()]
+        append: []
     })
 }
 
-export const module: UiModulesInterfaceMap['issues'] = ui.define('issues', {root: Issues$()})
+export const module: UiModulesInterfaceMap['issues'] = ui.define('issues', {root: Issues$(), onMount: () => module.root.node.append(th())})
