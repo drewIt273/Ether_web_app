@@ -101,15 +101,15 @@ class UiModule {
 
     root: UiComponent
     constructor(name: keyof UiModulesInterfaceMap, root: UiComponent) {
-        this.#n = name
+        this.n = name
         this.root = root
         NodeModuleMap.set(this.root.node, this)
     }
 
-    #n: keyof UiModulesInterfaceMap
+    private n: keyof UiModulesInterfaceMap
 
     get name() {
-        return this.#n
+        return this.n
     }
 
     get mounted() {
@@ -149,12 +149,16 @@ class UiConstructor {
         }
         else {
             // @ts-expect-error
-            const a: {module: UiModule} = await Imports[key]()
-            a.module.onImport?.call(a.module, a.module.root), a.module.imports.forEach(async i => {
-                const o = await this.require(`${key}:${i}`);
-                o instanceof stylesheet ? o.mount() : null
-            }) // @ts-expect-error
-            return a.module
+            if (this.modules[key as keyof UiModulesInterfaceMap]) return this.modules[key as keyof UiModulesInterfaceMap]
+            else {
+                // @ts-expect-error
+                const a: {module: UiModule} = await Imports[key]()
+                a.module.onImport?.call(a.module, a.module.root), a.module.imports.forEach(async i => {
+                    const o = await this.require(`${key}:${i}`);
+                    o instanceof stylesheet ? o.mount() : null
+                }) // @ts-expect-error
+                return a.module
+            }
         }
     }
 
