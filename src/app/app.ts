@@ -12,8 +12,7 @@ export const dom = rune.dom, scheduler = rune.scheduler
 
 const sidebar = await ui.require('sidebar'), main = await ui.require('mainLayoutConstructive')
 
-if (dom.ready) dom.append(sidebar.root.node)(main.root.node);
+if (dom.ready) dom.append(sidebar.root.node)(main.root.node)
 
-(function() {
-    if (!storageapi.o.has('userdocs')) storageapi.o.set('userdocs', {})
-})()
+const c = storageapi.o.get('session')?.constructedModule
+if (c) await ui.load(c)
