@@ -111,7 +111,7 @@ export class UiStateManager extends Module {
             if (opts.schedule === !1) {
                 if (entry.t === 'static') entry.fn.call(node)
             }
-            else this.rune.scheduler.schedule(node, entry.fn)
+            else this.rune.scheduler.schedule(entry.fn)
         node.$.currentstate = state; if (node.$.uikey) persist(node.$.uikey, state)
         // Computed states are not manually set
     }

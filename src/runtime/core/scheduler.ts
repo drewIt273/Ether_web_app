@@ -4,21 +4,21 @@
 
 export class Scheduler {
 
-    microQueue: Map<Node, Handler>
-    frameQueue: Map<Node, Handler>
+    microQueue: Set<Handler>
+    frameQueue: Set<Handler>
     microPending: boolean
     framePending: boolean
     isFlushing: boolean
     constructor() {
-        this.microQueue = new Map
-        this.frameQueue = new Map
+        this.microQueue = new Set()
+        this.frameQueue = new Set()
         this.microPending = !1
         this.framePending = !1
         this.isFlushing = !1
     }
 
-    schedule(node: Node, job: Handler) {
-        this.microQueue.set(node, job)
+    schedule(job: Handler) {
+        this.microQueue.add(job)
         if (this.isFlushing) return;
         if (!this.microPending) {
             this.microPending = !0
@@ -27,7 +27,7 @@ export class Scheduler {
     }
 
     flushMicro() {
-        for (const [node, job] of this.microQueue) this.frameQueue.set(node, job)
+        for (const job of this.microQueue.values()) this.frameQueue.add(job)
         this.microQueue.clear()
         this.microPending = !1
         this.scheduleFrame()
