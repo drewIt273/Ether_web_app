@@ -7,11 +7,15 @@ import {stylesheet} from '@assets/stylesheet'
 declare global {
     interface UiModule {
         root: UiComponent
+        readonly nodes: UiComponent[]
         readonly imports: string[]
         readonly storagekey: StorageKeyReference[]
         readonly name: keyof UiModulesInterfaceMap
-        readonly mounted: boolean
         onImport: Handler | null
+        /**Returns true if root node is still mounted. */
+        readonly mounted: boolean
+        /**Unmounts all the UiComponents for this UiModule. */
+        unMount(): void
     }
     interface UiModulesInterfaceMap {
         "sidebar": UiModule
@@ -100,9 +104,11 @@ interface UiComponentDefinitionObject {
 class UiModule {
 
     root: UiComponent
-    constructor(name: keyof UiModulesInterfaceMap, root: UiComponent) {
+    nodes: UiComponent[]
+    constructor(name: keyof UiModulesInterfaceMap, root: UiComponent, ...comps: UiComponent[]) {
         this.n = name
         this.root = root
+        this.nodes = [this.root, ...comps]
         NodeModuleMap.set(this.root.node, this)
     }
 
@@ -116,8 +122,11 @@ class UiModule {
         return this.root.node.$.mounted
     }
 
-    readonly storagekey: StorageKeyReference[] = []
+    unMount() {
+        this.nodes.forEach(n => n.unmount())
+    }
 
+    readonly storagekey: StorageKeyReference[] = []
     readonly imports: string[] = []
 
     onImport: ((u: UiComponent) => any) | null = null
