@@ -19,11 +19,11 @@ declare global {
     }
     interface UiModulesInterfaceMap {
         "sidebar": UiModule
-        "issues": UiModule
-        "projects": UiModule
+        "issues": UiConstructiveModule
+        "projects": UiConstructiveModule
         "mainLayoutConstructive": UiModule & mainLayoutConstructiveModule
-        "UxNotificationModule": UxNotify & UiModule
     }
+    interface UiConstructiveModule extends UiModule {}
 }
 
 const NodeModuleMap = new WeakMap<Node, UiModule>()
@@ -35,7 +35,6 @@ const Imports = {
     sidebar: () => import('./sidebar/index'),
     isses: () => import('./issues/index'),
     projects: () => import('./projects/index'),
-    UxNotificationModule: () => import('./uix/notix'),
     mainLayoutConstructive: () => import('./main/index')
 }
 
@@ -87,6 +86,7 @@ interface ModuleDefinitionObject {
     root: HTMLElement | UiComponent | null
     storeRef?: StorageKeyReference[]
     imports?: string[]
+    nodes?: UiComponent[]
     onMount?: Handler
     onUnmount?: Handler
     onImport?: Handler
@@ -99,6 +99,11 @@ interface UiComponentDefinitionObject {
     deps?: string[]
     onmount?: Handler
     unmount?: Handler
+}
+
+interface ModuleStateManager {
+    stateOf(s: string): string
+    [x: string]: any
 }
 
 class UiModule {
