@@ -20,8 +20,8 @@ function $() {
                                 append: [
                                     jsx('div', {class: 'tab', append: [vector.i.sq2x2], $uig: ''}),
                                     jsx('div', {class: 'tab', append: [vector.i.cubetr], $uig: ''}),
-                                    jsx('div', {class: 'tab', append: [vector.i.cube], $uig: '', onclick: () => ui.load('projects')}),
-                                    jsx('div', {class: 'tab', append: [vector.viewfinder], $uig: 'issues', onclick: () => ui.load('issues')}),
+                                    jsx('div', {class: 'tab', append: [vector.i.cube], $uig: '', onclick: async () => await ui.load('projects')}),
+                                    jsx('div', {class: 'tab', append: [vector.viewfinder], $uig: 'issues', onclick: async () => await ui.load('issues')}),
                                     jsx('div', {class: 'tab', append: [vector.calenderDays], $uig: ''}),
                                 ]
                             }),
@@ -49,4 +49,4 @@ function $() {
     })
 }
 
-export const module: UiModulesInterfaceMap['sidebar'] = ui.define('sidebar', {root: $(), imports: ['sheet']})
+export const module: UiModulesInterfaceMap['sidebar'] = ui.define('sidebar', {root: $(), imports: ['sheet'], type: 'constructed'})

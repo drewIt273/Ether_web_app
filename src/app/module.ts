@@ -7,6 +7,7 @@ import {stylesheet} from '@assets/stylesheet'
 declare global {
     interface UiModule {
         root: UiComponent
+        type: TypeOfModule
         readonly nodes: UiComponent[]
         readonly imports: string[]
         readonly storagekey: StorageKeyReference[]
@@ -84,6 +85,7 @@ class UiComponent {
 
 interface ModuleDefinitionObject {
     root: HTMLElement | UiComponent | null
+    type?: TypeOfModule
     storeRef?: StorageKeyReference[]
     imports?: string[]
     nodes?: UiComponent[]
@@ -106,6 +108,8 @@ interface ModuleStateManager {
     [x: string]: any
 }
 
+type TypeOfModule = 'default' | 'constructed'
+
 class UiModule {
 
     root: UiComponent
@@ -114,10 +118,11 @@ class UiModule {
         this.n = name
         this.root = root
         this.nodes = [this.root, ...comps]
-        NodeModuleMap.set(this.root.node, this)
+        this.nodes.forEach(n => NodeModuleMap.set(n.node, this))
     }
 
     private n: keyof UiModulesInterfaceMap
+    private k: TypeOfModule = 'default'
 
     get name() {
         return this.n
@@ -125,6 +130,14 @@ class UiModule {
 
     get mounted() {
         return this.root.node.$.mounted
+    }
+
+    set type(v: TypeOfModule) {
+        this.k = v
+    }
+
+    get type() {
+        return this.k
     }
 
     unMount() {
@@ -144,6 +157,7 @@ class UiConstructor {
         o.onImport = props.onImport ?? null
         if (o.root && o.root.o) o.root.o = {mount: props.onMount, unmount: props.onUnmount} // @ts-expect-error
         o.storagekey = props.storeRef ?? []
+        o.type = props.type ?? 'default'
         this.modules[name] = o, o.imports.push(...props.imports ?? [])
         return o
     }
