@@ -55,8 +55,11 @@ class UiComponent {
 
     deps: string[] = []
 
-    mount(n: HTMLElement | keyof UiModulesInterfaceMap, asOnlyNode: boolean = false) {
-        if (this.module) this.deps.forEach(async d => await ui.require(`${this.module as keyof UiModulesInterfaceMap}:${d}`))
+    mount(n: HTMLElement) {
+        if (this.module) {
+            this.deps.forEach(async d => await ui.require(`${this.module?.name as keyof UiModulesInterfaceMap}:${d}`))
+            if (n instanceof HTMLElement) n.append(this.node)
+        }
         this.o.mount?.()
     }
 
@@ -73,10 +76,7 @@ class UiComponent {
     o: {
         mount: Handler | undefined
         unmount: Handler | undefined
-    } = {
-        mount: () => {},
-        unmount: () => {}
-    }
+    } = {mount: () => {}, unmount: () => {}}
 
     // @ts-expect-error
     private n: HTMLElement
@@ -192,12 +192,18 @@ class UiConstructor {
 
     static readonly modules: UiModulesInterfaceMap = modules
 
-    static defineProperty<K extends keyof UiModulesInterfaceMap>(key: K | UiModule, property: string, value: any): returnedCall {
+    static defineProperty<K extends keyof UiModulesInterfaceMap>(key: K | UiModule, property: string, obj: {get?: () => any, set?: (v: any) => void, value?: any}): returnedCall {
         const u = key instanceof UiModule ? key : this.modules[key]
         if (u) {
             if (u[property as keyof UiModule] === undefined) {
                 Object.defineProperty(u, property, {
-                    value: value,
+                    get() {
+                        return obj.get?.()
+                    },
+                    set(v) {
+                        obj.set?.(v)
+                    },
+                    value: obj.value,
                     enumerable: false,
                     configurable: false
                 })
@@ -210,24 +216,24 @@ class UiConstructor {
     static readonly NodeModuleMap = NodeModuleMap
 
     static async load(u: UiModule | keyof UiModulesInterfaceMap, callback: Handler = () => {}) {
-        const o = this.modules.mainLayoutConstructive, b = o.active(), n = u instanceof UiModule ? u : await this.require(u) as UiModule
-        if (b) o.unmount(b)
+        const o = this.modules.mainLayoutConstructive, b = o.constructed, n = u instanceof UiModule ? u : await this.require(u) as UiModule // @ts-expect-error
+        if (b) this.unmount(b)
         if (n.mounted === !1) {
-            o.mount(n), n.root.o.mount?.(), callback()
+            o.mount(n), callback()
         }
         storageapi.o.set('session')('constructedModule', n.name)
     }
 
     static async unmount(u: UiModule | keyof UiModulesInterfaceMap, callback: Handler = () => {}) {
-        const o = this.modules.mainLayoutConstructive, n = u instanceof UiModule ? u : await this.require(u) as UiModule;
-        if (n.mounted === !0) {
-            o.unmount(n), n.root.o.unmount?.(), callback()
-        }
+        const o = this.modules.mainLayoutConstructive, n = u instanceof UiModule ? u : await this.require(u) as UiModule
+        if (n.type === 'constructed' && o.constructed === n) o.unmount(n), callback();
     }
 
     static getModule(n: Node) {
         return NodeModuleMap.get(n)
     }
+
+    static UiModule = UiModule
 }
 
 export const ui: UiConstructor = UiConstructor
@@ -236,15 +242,16 @@ interface UiConstructor {
     new(): UiConstructor
     require<K extends keyof UiModulesInterfaceMap>(key: K): Promise<UiModulesInterfaceMap[K]>
     require<K extends keyof UiModulesInterfaceMap, L extends string>(key: `${K}:${L}`): Promise<UiComponent | stylesheet | undefined>
-    defineProperty<K extends keyof UiModulesInterfaceMap>(key: K | UiModule, property: string, value: any): ((prop: string, value: any) => returnedCall)
+    defineProperty<K extends keyof UiModulesInterfaceMap>(key: K | UiModule, property: string, value: {set?: (v: any) => void, get?: () => any, value?: any}): ((prop: string, value: any) => returnedCall)
     define<K extends keyof UiModulesInterfaceMap>(name: K, props: ModuleDefinitionObject): UiModulesInterfaceMap[K]
     expose(props: UiComponentDefinitionObject): UiComponent
     load(u: UiModule | keyof UiModulesInterfaceMap, callback?: Handler): Promise<void>
     getModule(n: Node): UiModule | undefined
     readonly NodeModuleMap: WeakMap<Node, UiModule>
     readonly modules: UiModulesInterfaceMap
+    UiModule: typeof UiModule
 }
 
-type returnedCall = (props: string, value: any) => returnedCall
+type returnedCall = (props: string, value: {set?: (v: any) => void, get?: () => any, value?: any}) => returnedCall
 
 export type {ModuleDefinitionObject, UiComponentDefinitionObject}
