@@ -32,7 +32,7 @@ declare global {
         motion: UiNodeAnimation
         cacheapi: NodePerisitedDataResolverUnit
         readonly module: UiModule | undefined
-        uicomp?: UiModule['root']
+        uicomp?: UiComponent
         readonly ID: NodeID
         readonly mounted: boolean
         readonly node: Node
