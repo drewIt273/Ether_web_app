@@ -101,6 +101,7 @@ function syncCache() {
         for (let i = 0; i < localStorage.length; i++) {
             const k = localStorage.key(i)
             if (k) if (!(k in cache)) {
+                notifyNodes(k as StorageKeyReference, localStorage[k])
                 localStorage.removeItem(k)
                 i-- // adjust index after removal
             }
