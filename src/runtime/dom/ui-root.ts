@@ -5,7 +5,7 @@
 import {ranstring, toKebab} from "@assets/any"; import {DOMInterfaceError} from "@core/error"; import {ui} from "../../app/module";
 import { Props } from "tippy.js";
 
-export const NodeKeys = new Set<string>()
+export const NodeKeys = new Map<string, Node>()
 export const StatesMap = new WeakMap<Node, string>()
 export const UiDependencyMap = new WeakMap<Node, Array<{node: Node, fn: (data: any) => any}>>()
 
@@ -100,6 +100,15 @@ export async function NodeMetaDataInit() {
         },
         configurable: false,
         enumerable: false,
+    })
+    Object.defineProperty(window, 'getNodeByUIKey', {
+        get() {
+            return (s: string) => {
+                return NodeKeys.get(s)
+            }
+        },
+        configurable: false,
+        enumerable: false
     })
 }
 
@@ -316,7 +325,7 @@ function concat(n: HTMLElement | SVGElement, o: Fiber) {
             continue;
         }
         if (k === 'uikey') {
-            if (!NodeKeys.has(v)) n.$.uikey = v, NodeKeys.add(v), n.setAttribute('node-key', v)
+            if (!NodeKeys.has(v)) n.$.uikey = v, NodeKeys.set(v, n), n.setAttribute('node-key', v)
             else throw new Error(`An existing node already has the uikey ${v}`)
             continue;
         }
@@ -408,7 +417,7 @@ class UINode {
     }
 
     set UIKey(s: string) {
-        if (!NodeKeys.has(s)) this.node.$.uikey = s, NodeKeys.add(s)
+        if (!NodeKeys.has(s)) this.node.$.uikey = s, NodeKeys.set(s, this.node)
         else throw new Error(`An existing node already have the uikey ${s}`)
     }
 

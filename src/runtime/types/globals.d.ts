@@ -97,6 +97,7 @@ declare global {
     type NodeID = string
     type ModuleDefinitionObject = MO
     const jsx: <K extends HTMLTagName>(n: K, o: Fiber) => UiElementInterfaceMap[K]
+    const getNodeByUIKey = (s: string) => Node | undefined
     const vector = v
     const storageapi = O
     var ui = I
