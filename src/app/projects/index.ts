@@ -34,8 +34,8 @@ function th() {
 function Projects$() {
     return jsx('div', {
         class: 'h-full',
-        append: []
+        append: [fb()]
     })
 }
 
-export const module: UiModulesInterfaceMap['projects'] = ui.define('projects', {root: Projects$(), onMount: () => module.root.node.append(th())})
+export const module: UiModulesInterfaceMap['projects'] = ui.define('projects', {root: Projects$(), onMount: () => module.root.node.append(th()), type: 'constructed'})
