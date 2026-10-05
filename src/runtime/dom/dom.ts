@@ -219,13 +219,12 @@ export class DOMInterface extends Module {
                     else return emit()
                 })
             }
-            else throw OutOfReachError(node)
         }
     }
 }
 
 function OutOfReachError(n: Node) {
-    return new DOMInterfaceError(`Node ${n} is out of reach`)
+    return new DOMInterfaceError(`Node with ID ${n.$.ID} is out of reach`)
 }
 
 function NodeHierarchyCheck(n: Node) {
