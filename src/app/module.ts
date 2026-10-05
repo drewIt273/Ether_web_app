@@ -58,7 +58,7 @@ class UiComponent {
     mount(n: HTMLElement) {
         if (this.module) {
             this.deps.forEach(async d => await ui.require(`${this.module?.name as keyof UiModulesInterfaceMap}:${d}`))
-            if (n instanceof HTMLElement) n.append(this.node)
+            n.append(this.node)
         }
         this.o.mount?.()
     }
@@ -192,18 +192,13 @@ class UiConstructor {
 
     static readonly modules: UiModulesInterfaceMap = modules
 
-    static defineProperty<K extends keyof UiModulesInterfaceMap>(key: K | UiModule, property: string, obj: {get?: () => any, set?: (v: any) => void, value?: any}): returnedCall {
+    static defineProperty<K extends keyof UiModulesInterfaceMap>(key: K | UiModule, property: string, obj: any): returnedCall {
         const u = key instanceof UiModule ? key : this.modules[key]
         if (u) {
-            if (u[property as keyof UiModule] === undefined) {
+            if (u[property as keyof UiModule] === undefined) { // @ts-expect-error
+                const s = Symbol('S'); u[s] = {}
                 Object.defineProperty(u, property, {
-                    get() {
-                        return obj.get?.()
-                    },
-                    set(v) {
-                        obj.set?.(v)
-                    },
-                    value: obj.value,
+                    value: obj,
                     enumerable: false,
                     configurable: false
                 })
@@ -242,7 +237,7 @@ interface UiConstructor {
     new(): UiConstructor
     require<K extends keyof UiModulesInterfaceMap>(key: K): Promise<UiModulesInterfaceMap[K]>
     require<K extends keyof UiModulesInterfaceMap, L extends string>(key: `${K}:${L}`): Promise<UiComponent | stylesheet | undefined>
-    defineProperty<K extends keyof UiModulesInterfaceMap>(key: K | UiModule, property: string, value: {set?: (v: any) => void, get?: () => any, value?: any}): ((prop: string, value: any) => returnedCall)
+    defineProperty<K extends keyof UiModulesInterfaceMap>(key: K | UiModule, property: string, value: any): ((prop: string, value: any) => returnedCall)
     define<K extends keyof UiModulesInterfaceMap>(name: K, props: ModuleDefinitionObject): UiModulesInterfaceMap[K]
     expose(props: UiComponentDefinitionObject): UiComponent
     load(u: UiModule | keyof UiModulesInterfaceMap, callback?: Handler): Promise<void>
@@ -252,6 +247,6 @@ interface UiConstructor {
     UiModule: typeof UiModule
 }
 
-type returnedCall = (props: string, value: {set?: (v: any) => void, get?: () => any, value?: any}) => returnedCall
+type returnedCall = (props: string, value: any) => returnedCall
 
 export type {ModuleDefinitionObject, UiComponentDefinitionObject}
