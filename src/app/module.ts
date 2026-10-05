@@ -34,7 +34,7 @@ const modules: UiModulesInterfaceMap = {}
 
 const Imports = {
     sidebar: () => import('./sidebar/index'),
-    isses: () => import('./issues/index'),
+    issues: () => import('./issues/index'),
     projects: () => import('./projects/index'),
     mainLayoutConstructive: () => import('./main/index')
 }
@@ -211,17 +211,17 @@ class UiConstructor {
     static readonly NodeModuleMap = NodeModuleMap
 
     static async load(u: UiModule | keyof UiModulesInterfaceMap, callback: Handler = () => {}) {
-        const o = this.modules.mainLayoutConstructive, b = o.constructed, n = u instanceof UiModule ? u : await this.require(u) as UiModule // @ts-expect-error
-        if (b) this.unmount(b)
+        const o = this.modules.mainLayoutConstructive, b = o.constructed(), n = u instanceof UiModule ? u : (this.modules[u] ?? await this.require(u)) as UiModule
         if (n.mounted === !1) {
+            if (b) o.unmount(b)
             o.mount(n), callback()
         }
         storageapi.o.set('session')('constructedModule', n.name)
     }
 
     static async unmount(u: UiModule | keyof UiModulesInterfaceMap, callback: Handler = () => {}) {
-        const o = this.modules.mainLayoutConstructive, n = u instanceof UiModule ? u : await this.require(u) as UiModule
-        if (n.type === 'constructed' && o.constructed === n) o.unmount(n), callback();
+        const o = this.modules.mainLayoutConstructive, n = u instanceof UiModule ? u : this.modules[u]
+        if (n && n.type === 'constructed' && o.constructed() === n) o.unmount(n), callback()
     }
 
     static getModule(n: Node) {
