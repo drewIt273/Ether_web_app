@@ -70,5 +70,12 @@ class Issue {
         return this.#p
     }
 
+    /**
+     * Returns a copy of this Issue having a different ID.
+     */
+    duplicate() {
+        return new Issue({name: this.name, state: this.state, priority: this.priority, tags: this.tags, desc: this.desc})
+    }
+
     readonly ID = this.#id
 }
