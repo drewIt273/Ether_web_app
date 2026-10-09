@@ -16,7 +16,7 @@ interface IssueCreationObject {
 }
 
 function idfy(s: string) {
-    return s.replaceAll(/ /g, '-').toLowerCase()
+    return s.trim().toLowerCase().replaceAll(/\s+/g, '-')
 }
 
 class Issue {
@@ -24,7 +24,7 @@ class Issue {
     tags: string[]
     constructor(o: IssueCreationObject) {
         this.#n = o.name
-        this.#id = `${idfy(o.name).concat(ranstring(6, 1))}`
+        this.#id = `${idfy(o.name).concat('-', ranstring(6, 1))}`
         this.#desc = o.desc ?? ''
         this.#s = o.state ?? 'backlog'
         this.tags = o.tags ?? []
@@ -47,7 +47,7 @@ class Issue {
 
     set name(s: string) {
         this.#n = s
-        this.#id = `${idfy(s).concat(ranstring(6, 1))}`
+        this.#id = `${idfy(s).concat('-', ranstring(6, 1))}`
     }
 
     get name() {
@@ -74,8 +74,10 @@ class Issue {
      * Returns a copy of this Issue having a different ID.
      */
     duplicate() {
-        return new Issue({name: this.name, state: this.state, priority: this.priority, tags: this.tags, desc: this.desc})
+        return new Issue({name: this.name, state: this.state, priority: this.priority, tags: [...this.tags], desc: this.desc})
     }
 
-    readonly ID = this.#id
+    get ID () {
+        return this.#id
+    }
 }
