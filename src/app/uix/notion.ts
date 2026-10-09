@@ -21,13 +21,13 @@ function idfy(s: string) {
 
 class Issue {
 
-    tags: string[] | null
+    tags: string[]
     constructor(o: IssueCreationObject) {
         this.#n = o.name
         this.#id = `${idfy(o.name).concat(ranstring(6, 1))}`
-        this.#desc = o.desc ?? null
+        this.#desc = o.desc ?? ''
         this.#s = o.state ?? 'backlog'
-        this.tags = o.tags ?? null
+        this.tags = o.tags ?? []
         this.#p = o.priority ?? 'none'
     }
 
@@ -35,9 +35,9 @@ class Issue {
     #s: IssueProjectState
     #p: IssueProjectPriority
     #id: string = ''
-    #desc: string | null = null
+    #desc: string = ''
 
-    set desc(s: string | null) {
+    set desc(s: string) {
         this.#desc = s
     }
 
