@@ -26,7 +26,7 @@ sheet.css({
         ':hover': {
             backgroundColor: 'var(--bg-hover-color)'
         },
-        '$[active]': {
+        '$[data-state="active"]': {
             backgroundColor: 'var(--bg-hover-color)',
             color: 'var(--cr-lightgrey)',
             boxShadow: '3px 3px 3px 0px #0000004f'
