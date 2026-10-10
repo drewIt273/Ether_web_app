@@ -45,6 +45,7 @@ class Issue {
     #p: IssueProjectPriority
     #id: IssueID
     #desc: string = ''
+    #subs: IssueID[] = []
 
     set desc(s: string) {
         this.#desc = s
@@ -78,8 +79,17 @@ class Issue {
         return this.#p
     }
 
+    setSubIssue(s: IssueID) {
+        IssueMap.has(s) ? this.#subs.push(s) : console.error(`Cannot set unexistent issue as a sub-issue: "${s}"`)
+    }
+
+    getSubIssue(s: IssueID) {
+        if (this.#subs.includes(s)) return IssueMap.get(s)
+        else return undefined
+    }
+
     /**
-     * Returns a copy of this Issue having a different ID.
+     * Returns a new Issue which is a copy having a different ID.
      */
     duplicate() {
         return new Issue({name: this.name, state: this.state, priority: this.priority, tags: [...this.tags], desc: this.desc})
