@@ -15,8 +15,9 @@ function fb() {
                     jsx('div', {
                         append: [
                             jsx('div', {class: 'app-vector', append: [vector.app.blocks]}),
+                            jsx('span', {class: 'h4', append: ["Projects"]}),
                             jsx('span', {style: {maxWidth: '30em', paddingBottom: '1em'}, append: [s]}),
-                            jsx('div', {class: 'primary-tab', append: ["Create a Project"]}),
+                            jsx('div', {class: 'primary-tab', append: ["Create new project"]}),
                         ],
                         class: 'd-flex flex-column gap-lg'
                     })

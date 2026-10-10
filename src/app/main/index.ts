@@ -43,10 +43,7 @@ function fc() {
 function fe(n: UiModule) {
     const e = f$()
     if (e) {
-        for (const c of Array.from(e.childNodes)) if (c.$.module && c.$.module === n) {
-            n.unMount()
-            return;
-        }
+        if (n) n.unMount()
     }
 }
 
