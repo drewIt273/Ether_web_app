@@ -67,7 +67,7 @@
     font-weight: 500;
     color: var(--fg-base-color);
 }
-.h4 {font-size: 1.01rem;}
+.h4 {font-size: var(--size-lg);}
 .text-secondrary {
     color: var(--cr-grey);
     font-size: 14px;
@@ -152,7 +152,8 @@
     justify-content: space-between;
     align-items: center;
     padding: 7px 10px;
-    border-radius: 10px;
+    border-radius: 5px;
+    border: 1px solid var(--cr-transparent);
     span {
         font-weight: 500;
     }
@@ -189,7 +190,6 @@
 }
 .app-vector {
     width: 8em;
-    margin-bottom: 1em;
 }
 @keyframes gi {
     0% {opacity: 0;}
