@@ -4,19 +4,27 @@
 
 import {ranstring} from "@assets/any";
 
-type IssueProjectState = 'inProgress' | 'backlog' | 'finished' | 'planned'
-type IssueProjectPriority = 'high' | 'medium' | 'low' | 'none'
+type IssueProjectState = 'backlog' | 'todo' | 'inProgress' | 'inReview' | 'done' | 'canceled'
+type IssueProjectPriority = 'urgent' | 'high' | 'medium' | 'low' | 'none'
+type IssueID = `I${number}`
 
 interface IssueCreationObject {
     name: string
+    id?: IssueID
     desc?: string
     tags?: string[]
     state?: IssueProjectState
     priority?: IssueProjectPriority
 }
 
+const IssueMap = new Map<IssueID, Issue>()
+
 function idfy(s: string) {
     return s.trim().toLowerCase().replaceAll(/\s+/g, '-')
+}
+
+function checkIssueId(s: string) { 
+    return RegExp(/^(I[0-9])+$/, 'g').test(s.trim())
 }
 
 class Issue {
@@ -24,17 +32,18 @@ class Issue {
     tags: string[]
     constructor(o: IssueCreationObject) {
         this.#n = o.name
-        this.#id = `${idfy(o.name).concat('-', ranstring(6, 1))}`
+        this.#id = o.id ? checkIssueId(o.id) ? o.id : (() => {const a: IssueID = `I${IssueMap.size + 1}`; console.warn(`Invalid id "${o.id}". Attributed id: "${a}"`); return a})() : `I${IssueMap.size + 1}`
         this.#desc = o.desc ?? ''
         this.#s = o.state ?? 'backlog'
         this.tags = o.tags ?? []
         this.#p = o.priority ?? 'none'
+        IssueMap.set(this.#id, this)
     }
 
     #n: string = ''
     #s: IssueProjectState
     #p: IssueProjectPriority
-    #id: string = ''
+    #id: IssueID
     #desc: string = ''
 
     set desc(s: string) {
@@ -47,7 +56,6 @@ class Issue {
 
     set name(s: string) {
         this.#n = s
-        this.#id = `${idfy(s).concat('-', ranstring(6, 1))}`
     }
 
     get name() {
