@@ -19,7 +19,7 @@ declare global {
         unMount(): void
     }
     interface UiModulesInterfaceMap {
-        "sidebar": UiModule
+        "sidebar": UiModule & mainSidebarModule
         "issues": UiConstructiveModule
         "projects": UiConstructiveModule
         "mainLayoutConstructive": UiModule & mainLayoutConstructiveModule
@@ -213,7 +213,7 @@ class UiConstructor {
     static readonly NodeModuleMap = NodeModuleMap
 
     static async load(u: UiModule | keyof UiModulesInterfaceMap, callback: Handler = () => {}) {
-        const o = this.modules.mainLayoutConstructive, b = o.constructed(), n = u instanceof UiModule ? u : (this.modules[u] ?? await this.require(u)) as UiModule
+        const o = this.modules.mainLayoutConstructive, b = o.constructed(), n = u instanceof UiModule ? u : (this.modules[u] ?? await this.require(u)) as any as UiModule
         if (n.mounted === !1) {
             if (b) o.unmount(b)
             o.mount(n), callback()

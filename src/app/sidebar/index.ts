@@ -24,11 +24,11 @@ function $() {
                             jsx('div', {
                                 class: 'items-center gap-sm flex-column p-sm py-xl',
                                 append: [
-                                    jsx('div', {append: [vector.i.sq2x2], $uig: '', ...o}),
-                                    jsx('div', {append: [vector.i.cubetr], $uig: '', ...o}),
-                                    jsx('div', {append: [vector.i.cube], $uig: '', onclick: () => ui.load('projects'), ...o}),
-                                    jsx('div', {append: [vector.viewfinder], $uig: 'issues', onclick: () => ui.load('issues'), ...o}),
-                                    jsx('div', {append: [vector.calenderDays], $uig: '', ...o}),
+                                    jsx('div', {append: [vector.i.sq2x2], actionTab: true, $uig: 'workspace', ...o}),
+                                    jsx('div', {append: [vector.i.cubetr], actionTab: true, $uig: 'spaces', ...o}),
+                                    jsx('div', {append: [vector.i.cube], actionTab: true, $uig: 'projects', onclick: () => ui.load('projects'), ...o}),
+                                    jsx('div', {append: [vector.viewfinder], actionTab: true, $uig: 'issues', onclick: () => ui.load('issues'), ...o}),
+                                    jsx('div', {append: [vector.calenderDays], actionTab: true, $uig: 'schedule', ...o}),
                                 ]
                             }),
                             jsx('div', {
@@ -56,3 +56,17 @@ function $() {
 }
 
 export const module: UiModulesInterfaceMap['sidebar'] = ui.define('sidebar', {root: $(), imports: ['sheet'], type: 'constructed'})
+
+ui.defineProperty('sidebar', 'actionTabs', (() => {
+    const o: Record<string, Node> = {}
+    Array.from(module.root.node.querySelectorAll('[action-tab]')).forEach(n => {
+        if (n.$.prop.uig) o[n.$.prop.uig] = n
+    })
+    return o
+})())
+
+declare global {
+    interface mainSidebarModule {
+        actionTabs: Record<string, Node>
+    }
+}
