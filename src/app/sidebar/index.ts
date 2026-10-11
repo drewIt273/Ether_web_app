@@ -40,18 +40,6 @@ function $() {
                 ]
             })
         ],
-        onclick: ($, ev) => {
-            const o = Array.from($.querySelectorAll('.tab'));
-            if (ev && ev.target) {
-                let g = ev.target as Element
-                o.forEach((e, i, a) => {
-                    if ((e === g) || e.contains(g)) {
-                        a.forEach(n => {if (n !== e) n.$.setState('inactive')})
-                        e.$.setState('active')
-                    }
-                })
-            }
-        }
     })
 }
 

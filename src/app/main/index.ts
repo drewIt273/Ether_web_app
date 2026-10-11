@@ -33,7 +33,14 @@ function fd() {
 }
 function fx(n: UiModule) {
     const k = f$()
-    if (k) k.append(n.root.node)
+    if (k) {
+        k.append(n.root.node), console.log(ui.modules.sidebar.actionTabs)
+        for (const [p, v] of Object.entries(ui.modules.sidebar.actionTabs)) {
+            if (p === n.name) v.$.setState('active')
+            else v.$.setState('inactive')
+            console.log(p, n.name)
+        }
+    }
 }
 function fc() {
     const k = f$()
