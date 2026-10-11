@@ -40,3 +40,5 @@ function Issues$() {
 }
 
 export const module: UiModulesInterfaceMap['issues'] = ui.define('issues', {root: Issues$(), onMount: () => module.root.node.append(th()), type: 'constructed'})
+
+ui.defineProperty('issues', 'fbui', fb())

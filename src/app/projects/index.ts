@@ -40,3 +40,5 @@ function Projects$() {
 }
 
 export const module: UiModulesInterfaceMap['projects'] = ui.define('projects', {root: Projects$(), onMount: () => module.root.node.append(th()), type: 'constructed'})
+
+ui.defineProperty('projects', 'fbui', fb())

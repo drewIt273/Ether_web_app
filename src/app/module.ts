@@ -24,7 +24,9 @@ declare global {
         "projects": UiConstructiveModule
         "mainLayoutConstructive": UiModule & mainLayoutConstructiveModule
     }
-    interface UiConstructiveModule extends UiModule {}
+    interface UiConstructiveModule extends UiModule {
+        fbui: Node | null
+    }
 }
 
 const NodeModuleMap = new WeakMap<Node, UiModule>()
