@@ -175,7 +175,7 @@
     transition-duration: .2s;
     width: fit-content;
 }
-.primary-tab:hover {background-color: #4363a7;} .primary-tab, .primary-tab:active {background-color: var(--cr-blue);}
+.primary-tab:hover {background-color: #904927;} .primary-tab, .primary-tab:active {background-color: var(--cr-sienna);}
 .expander #eobj {
     height: fit-content;
 }
