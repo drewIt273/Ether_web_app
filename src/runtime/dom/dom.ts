@@ -56,9 +56,11 @@ export class DOMInterface extends Module {
                     (added as Element).setAttribute('_hide_', '')
                     const call = (n: Node) => {
                         n.$.belongsTo = this
+                        const r = this.rune.events.ActiveListeners.find((v, k) => ((k === 'append') && v.find(a => a.node === n)) ? !0 : !1), k = r?.find(v => v.node === n); // @ts-expect-error
+                        if (k) k.fn.forEach(f => f())
                         n.$.onevent.forEach((v, k) => {
-                            if (k === 'append') v.forEach(h => h())
-                            else this.GlobalEvents.onEvent(k, n, ...v)
+                            if (k === 'append') v.forEach(fn => fn());
+                            this.GlobalEvents.onEvent(k, n, ...v)
                         }), n.$.onevent.clear()
                         if (n.$.uikey) {
                             const a = storageapi.o.get('uistates')?.[n.$.uikey]
@@ -66,15 +68,17 @@ export class DOMInterface extends Module {
                                 if (n.$.hasDefinedState(a)) n.$.setState(a)
                             })
                         }
-                        n.$.motion.pending.a.forEach((v, k) => {n.$.motion.animate(k, v)})
+                        n.$.motion.pending.a.forEach((v, k) => n.$.motion.animate(k, v))
                         n.$.motion.pending.p.forEach((v, k) => n.$.motion.play(k, v))
-                        n.childNodes.forEach(a => call(a));
+                        n.childNodes.forEach(a => call(a))
                     }
                     call(added),
                     (added as Element).removeAttribute('_hide_')
                 }
                 if (mut.removedNodes) for (const removed of mut.removedNodes) {
                     const call = (n: Node) => {
+                        const r = this.rune.events.ActiveListeners.find((v, k) => ((k === 'remove') && v.find(a => a.node === n)) ? !0 : !1), k = r?.find(v => v.node === n); // @ts-expect-error
+                        if (k) k.fn.forEach(f => f())
                         n.$.belongsTo = null
                         this.GlobalEvents.unEvent(n)
                         if (n.$.uikey) storageapi.o.set('uistates')?.(n.$.uikey, n.$.currentstate)
@@ -100,7 +104,7 @@ export class DOMInterface extends Module {
                     if (!existing) node.$.mappedData.set(key, [...fn])
                     else existing.push(...fn)
                 }
-                else throw new DOMInterfaceError(`UINode ${node.$.ID} out of reach`)
+                else throw new DOMInterfaceError(`Node ${node.$.ID} out of reach`)
             },
             unsubscribe: (node: Node, key: any, fn: Handler|null = null) => {
                 if (node.$.belongsTo === this) {
@@ -111,7 +115,7 @@ export class DOMInterface extends Module {
                         }
                         else node.$.mappedData.delete(key)
                 }
-                else throw new DOMInterfaceError(`UINode ${node.$.ID} is out of reach`)
+                else throw new DOMInterfaceError(`Node ${node.$.ID} is out of reach`)
             },
         }
         this.root.rune = {

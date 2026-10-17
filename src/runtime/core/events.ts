@@ -9,6 +9,7 @@ type EventHandler = (e: Event) => any
 
 interface CustomEvents {
     'append': Event
+    'remove': Event
 }
 
 type GlobalEvents = DocumentEventMap & CustomEvents
