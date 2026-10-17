@@ -50,6 +50,15 @@ function sui() {
     })
 }
 
+function ah(n: HTMLElement) {
+    const o = getNodeByUIKey('popup-layer'), a = Array.from(o.childNodes), k = a.find(g => (g as Element).hasAttribute('popup'))
+    if (k) {
+        if (k !== n) k.remove()
+        else return;
+    }
+    if (n.hasAttribute('popup')) o.appendChild(n)
+}
+
 const o = {
     fb: fb(),
     sui: sui(),
@@ -57,7 +66,7 @@ const o = {
 
 export const module: UiModulesInterfaceMap['issues'] = ui.define('issues', {root: Issues$(), onMount: () => module.root.node.append(th()), type: 'constructed', imports: ['sheet']})
 // @ts-expect-error
-ui.defineProperty('issues', 'fbui', o.fb)('sui', o.sui)('opensui', () => getNodeByUIKey('popup-layer')?.append(module.sui))('closesui', () => module.sui.setState('inactive'))
+ui.defineProperty('issues', 'fbui', o.fb)('sui', o.sui)('opensui', () => ah(module.sui))('closesui', () => module.sui.setState('inactive'))
 
 function th() {
     const o = storageapi.o.get('issues')
