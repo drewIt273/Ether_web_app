@@ -45,7 +45,7 @@ declare global {
         unbindkeys(): void
         defineState(state: string, call?: Handler): this['defineState']
         defineComputedState(state: string, call?: Handler): this['defineComputedState']
-        setState(state: string, opts?: {schedule: boolean;}): void
+        setState(state: string, opts?: {schedule?: boolean; attr?: boolean}): void
         hasDefinedState(s: string): boolean
         set onStateChange(fn: Handler)
         get onStateChange(): null | Handler

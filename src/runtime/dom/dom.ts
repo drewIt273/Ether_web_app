@@ -24,7 +24,7 @@ interface UiEventsInterface {
 }
 
 interface UiStatesInterface {
-    setState(node: Node, state: string, opts?: {schedule: boolean}): void
+    setState(node: Node, state: string, opts?: {schedule?: boolean, attr?: boolean}): void
     defineState(node: Node, state: string, call: Handler): void
     defineCompute(node: Node, state: string, call: Handler): void
     hasState(node: Node, state: string): boolean | undefined

@@ -82,7 +82,7 @@ interface EventsModuleData {
 interface StatesModuleData {
     'df': [Node, string, Handler]
     'dc': [Node, string, Handler]
-    'set': [Node, string, {schedule: boolean}]
+    'set': [Node, string, {schedule?: boolean, attr?: boolean}]
 }
 
 interface MotionModuleData {

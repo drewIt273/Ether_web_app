@@ -76,7 +76,7 @@ export class UiStateManager extends Module {
 
         this.IMC.map('df', (n: Node, s: string, fn: Handler) => this.define(n, s, fn))
         this.IMC.map('dc', (n: Node, s: string, fn: Handler) => this.defineComputed(n, s, fn))
-        this.IMC.map('set', (n: Node, s: string, opts: {schedule: boolean} = {schedule: false}) => this.set(n, s, opts))
+        this.IMC.map('set', (n: Node, s: string, opts: {schedule: boolean, attr: boolean} = {schedule: false, attr: false}) => this.set(n, s, opts))
     }
 
     async onInit() {
@@ -90,7 +90,7 @@ export class UiStateManager extends Module {
 
     define(node: Node, state: string, fn: Handler) {
         const map = this.reg.get(node) ?? {}
-        map[state] = {t: 'static', fn: () => {(node as HTMLElement).setAttribute('data-state', state), fn.call(node)}}
+        map[state] = {t: 'static', fn: () => fn.call(node)}
         this.reg.set(node, map)
     }
 
@@ -98,18 +98,18 @@ export class UiStateManager extends Module {
         const map = this.reg.get(node) ?? {}, c = computed(() => fn.call(node))
         map[state] = {t: 'computed', fn: () => c.get()}
         effect(() => {
+            if (node.$.uikey) persist(node.$.uikey, state);
             (node as HTMLElement).setAttribute('data-state', c.get())
-            if (node.$.uikey) persist(node.$.uikey, state)
         })
         this.reg.set(node, map)
     }
 
-    set(node: Node, state: string, opts = {schedule: false}) {
+    set(node: Node, state: string, opts = {schedule: false, attr: false}) {
         const map = this.reg.get(node), entry = map ? map[state] : null
-        if (!map || !map[state]) throw new Error(`State ${state} not defined for node ${node}`)
+        if (!map || !map[state]) throw `State ${state} not defined for node ${node.$.ID}`
         if (entry)
             if (opts.schedule === !1) {
-                if (entry.t === 'static') entry.fn.call(node)
+                if (entry.t === 'static') entry.fn.call(node), opts.attr ? (node as Element).setAttribute(state, '') : (node as Element).setAttribute('data-state', state)
             }
             else this.rune.scheduler.schedule(entry.fn)
         node.$.currentstate = state; if (node.$.uikey) persist(node.$.uikey, state)

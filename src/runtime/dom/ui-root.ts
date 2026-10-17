@@ -286,7 +286,7 @@ function nm(o: HTMLElement): NodeMetaData {
             else a.set(state, {type: 'computed', fn: call})
             return (state: string, call: Handler = () => {}) => this.defineComputedState.call(this.node, state, call)
         },
-        setState(state: string, opts = {schedule: false}) {
+        setState(state: string, opts = {schedule: false, attr: false}) {
             if (this.belongsTo) {
                 this.prevstate = this.node.$.currentstate
                 this.belongsTo.GlobalStates.setState(this.node, state, opts)
