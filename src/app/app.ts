@@ -13,7 +13,7 @@ export const dom = rune.dom, scheduler = rune.scheduler;
 (async function() {
     // Requiring default modules and appending their root nodes into the dom.
     const sidebar = await ui.require('sidebar'), main = await ui.require('mainLayoutConstructive')
-    if (dom.ready) dom.append(sidebar.root.node)(main.root.node)
+    if (dom.ready) dom.append(jsx('main', {uikey: "main", class: 'd-flex w-full', append: [sidebar.root.node, main.root.node]}))
 
     // Define the session key of the CacheObject if it is undefined.
     if (!storageapi.o.has('session')) storageapi.o.set('session', {
@@ -22,4 +22,7 @@ export const dom = rune.dom, scheduler = rune.scheduler;
 
     // Loads the Constructive UiModule of the previous session.
     await ui.load(storageapi.o.get('session')?.constructedModule as keyof UiModulesInterfaceMap)
+
+    // Defining and appending a node which will serve as a container for popups excluding notification banners.
+    dom.append(jsx('div', {uikey: "popup-layer"}))
 })()
