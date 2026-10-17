@@ -245,6 +245,9 @@ function nm(o: HTMLElement): NodeMetaData {
             const n = typeof to === 'string' ? Array.from(document.body.childNodes).find(v => v.$.uikey === to) : to
             if (n) this.belongsTo?.nodeMsg.resolve(this.node, n, data, ...args)
         },
+        attrs(o) {
+            for (const [k, v] of Object.entries(o)) (this.node as Element)?.setAttribute(k, v)
+        },
         find(n: string) {
             return (this.node as Element).querySelector(n)
         },

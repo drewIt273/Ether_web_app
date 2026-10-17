@@ -36,6 +36,7 @@ declare global {
         readonly ID: NodeID
         readonly mounted: boolean
         readonly node: Node
+        attrs(o: Record<string, string>): void
         createTooltip(props?: Partial<Props>): void
         findAll(n: string): Element[]
         find(n: string): Element | null
@@ -97,7 +98,7 @@ declare global {
     type NodeID = string
     type ModuleDefinitionObject = MO
     const jsx: <K extends HTMLTagName>(n: K, o: Fiber) => UiElementInterfaceMap[K]
-    const getNodeByUIKey = (s: string) => Node | undefined
+    const getNodeByUIKey = (s: string) => Node as Node || undefined
     const vector = v
     const storageapi = O
     var ui = I
