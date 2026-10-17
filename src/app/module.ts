@@ -26,6 +26,8 @@ declare global {
     }
     interface UiConstructiveModule extends UiModule {
         fbui: Node | null
+        sui?: HTMLDivElement
+        opensui?: () => void
     }
 }
 

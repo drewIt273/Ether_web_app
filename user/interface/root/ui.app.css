@@ -6,6 +6,10 @@
 
 @import url("ui.roots.css");
 @import url("ui.themes.css");
+@font-face {
+    font-family: open;
+    src: url('../resources/Openfont.ttf');
+}
 
 * {
     box-sizing: border-box;
@@ -46,7 +50,7 @@ body [default-scrollbar] {
     scrollbar-color: var(--bg-scrollbar-color);
 }
 web-app {
-    font-family: var(--font-display);
+    font-family: open;
     color: var(--fg-secondrary-color);
     display: block;
     display: flex;
@@ -65,6 +69,22 @@ body, web-app {
 [node-key="mainLayoutConstructive"] {
     width: 100%;
     position: relative;
+}
+[node-key="popup-layer"] {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    z-index: -1;
+}
+[node-key="popup-layer"][active] {
+    z-index: 1;
+}
+[node-key="popup-layer"] [popup] {
+    z-index: 3;
+    pointer-events: all;
+}
+*[fade] {
+    opacity: .7;
 }
 html button {
     height: 100%;
