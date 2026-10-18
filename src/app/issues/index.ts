@@ -30,7 +30,7 @@ function fb() {
 function sui() {
     return jsx('div', {
         popup: true,
-        class: 'd-flex items-center h-full w-full',
+        class: 'd-flex justify-center h-full w-full',
         onappend: (n) => {
             n.$.setState('active')
         },
@@ -45,8 +45,92 @@ function sui() {
             }
         },
         onclick: (n, e) => {
-            n.$.setState('inactive'), n.remove()
+            if (!n.querySelector('[modal]')?.contains(e?.target as Element)) n.$.setState('inactive'), n.remove()
         }
+    })
+}
+
+function pl(s: string) {
+    return `<span placeholder style="opacity: .6; position: absolute;">${s}</span>`
+}
+
+function cr() {
+    return jsx('div', {
+        modal: true,
+        class: 'relative rounded-lg h-fit shadow-1',
+        style: {
+            background: '#262424',
+            width: '630px',
+            top: '8em',
+            border: '1px solid var(--bg-border-color)',
+        },
+        append: [
+            jsx('div', {
+                class: 'd-flex'
+            }),
+            jsx('div', {
+                editableContent: true,
+                append: [
+                    jsx('div', {
+                        contenteditable: true,
+                        placeholder: 'Issue title',
+                        class: 'pb-md mt-xs',
+                        style: {
+                            fontSize: 'var(--size-lg)',
+                            color: 'var(--cr-white)'
+                        },
+                        oninput: (n) => {
+                            if (n.textContent.length !== 0) n.removeAttribute('placeholder')
+                            else n.jsx({placeholder: 'Issue title'}), n.textContent = ''
+                        }
+                    }),
+                    jsx('div', {
+                        contenteditable: true,
+                        placeholder: 'Add description...',
+                        class: 'pb-md',
+                        style: {
+                            fontSize: 'var(--size-md)',
+                            color: 'var(--cr-lightgrey)',
+                            minHeight: '50px'
+                        },
+                        oninput: (n) => {
+                            if (n.textContent.length !== 0) n.removeAttribute('placeholder')
+                            else n.jsx({placeholder: 'Add description...'}), n.textContent = ''
+                        }
+                    }),
+                ],
+                style: {
+                    padding: '10px 20px'
+                }
+            }),
+            jsx('div', {
+                class: 'd-flex items-center gap-xs p-sm',
+                append: [
+                    jsx('div', {
+                        class: 'secondrary-tab',
+                        append: [jsx('span', {class: 'h-center', append: [vector.i.cube.jsx({class: 'size-2'})]}), 'Project']
+                    }),
+                    jsx('div', {
+                        class: 'secondrary-tab',
+                        append: [jsx('span', {class: 'h-center', append: [vector.ellipsis.horizontal]})]
+                    })
+                ]
+            }),
+            jsx('div', {
+                class: 'd-flex justify-between items-center',
+                style: {
+                    borderTop: '1px solid var(--bg-border-color)',
+                    padding: '10px 20px'
+                },
+                append: [
+                    jsx('div', {}),
+                    jsx('div', {
+                        class: "primary-tab",
+                        append: ['Create Issue']
+                    })
+                ]
+            })
+        ]
     })
 }
 
@@ -62,11 +146,12 @@ function ah(n: HTMLElement) {
 const o = {
     fb: fb(),
     sui: sui(),
+    cr: cr()
 }
 
 export const module: UiModulesInterfaceMap['issues'] = ui.define('issues', {root: Issues$(), onMount: () => module.root.node.append(th()), type: 'constructed', imports: ['sheet']})
 // @ts-expect-error
-ui.defineProperty('issues', 'fbui', o.fb)('sui', o.sui)('opensui', () => ah(module.sui))('closesui', () => module.sui.setState('inactive'))
+ui.defineProperty('issues', 'fbui', o.fb)('sui', o.sui)('opensui', () => ah(module.sui?.jsx({append: [o.cr]})))('closesui', () => module.sui.setState('inactive'))
 
 function th() {
     const o = storageapi.o.get('issues')
