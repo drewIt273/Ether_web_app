@@ -45,3 +45,34 @@ export function openDataBase(): Promise<IDBDatabase> {
     })
     return idb
 }
+
+
+export async function putRecord<T extends { id: string }>(storeName: "projects" | "issues", record: T): Promise<void> {
+    const db = await openDataBase();
+
+    return new Promise((resolve, reject) => {
+        const trans = db.transaction(storeName, "readwrite")
+        trans.objectStore(storeName).put(record)
+        trans.oncomplete = () => resolve()
+        trans.onabort = () => {
+            reject(trans.error ?? new Error("Database transaction aborted."));
+        }
+        trans.onerror = () => {
+            reject(trans.error ?? new Error("Database transaction failed."));
+        }
+  })
+}
+
+export async function getRecord<T>(storeName: "projects" | "issues", id: string): Promise<T | undefined> {
+    const db = await openDataBase();
+
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(storeName, "readonly"), request = transaction.objectStore(storeName).get(id);
+        request.onsuccess = () => {
+            resolve(request.result as T | undefined);
+        }
+        request.onerror = () => {
+            reject(request.error ?? new Error("Failed to retrieve record."));
+        }
+    })
+}
