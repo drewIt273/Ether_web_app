@@ -4,11 +4,15 @@
 
 import {Rune} from "@core/rune";
 import {ui} from "./module";
+import {edb} from "./storage";
 
 const rune = new Rune(), a = await rune.boot()
 if (a instanceof Error) throw a
 
 export const dom = rune.dom, scheduler = rune.scheduler;
+
+// Setting the database into the window scope.
+Object.defineProperty(window, "edb", {enumerable: false, configurable: false, get() {return edb}});
 
 (async function() {
     // Requiring default modules and appending their root nodes into the dom.

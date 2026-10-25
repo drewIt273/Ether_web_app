@@ -2,7 +2,7 @@
  * Instance by DrewIt
  */
 
-import {U, F} from "@dom/ui-root"; import {Rune as R} from "@core/rune"; import {D} from "@dom/dom"; import {G} from "@core/events"; import {vector as v} from "@dom/vectors"; import {storageapi as O} from "@assets/storageapi"; import {ui as I} from "../../app/module"; import {ModuleDefinitionObject as MO} from "../../app/module"; import {Tooltip} from "@dom/floating"; import {Props} from "tippy.js";
+import {U, F} from "@dom/ui-root"; import {Rune as R} from "@core/rune"; import {D} from "@dom/dom"; import {G} from "@core/events"; import {vector as v} from "@dom/vectors"; import {storageapi as O} from "@assets/storageapi"; import {ui as I} from "../../app/module"; import {ModuleDefinitionObject as MO} from "../../app/module"; import {Tooltip} from "@dom/floating"; import {Props} from "tippy.js"; import {edb as DB} from "@app/storage";
 
 declare global {
     type UINode = U;
@@ -102,4 +102,5 @@ declare global {
     const vector = v
     const storageapi = O
     var ui = I
+    var edb = DB
 }
