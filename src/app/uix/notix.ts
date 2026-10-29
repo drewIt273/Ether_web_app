@@ -35,13 +35,3 @@ function bannerContainer() {
         style: {zIndex: 10, position: 'absolute', bottom: '20px', right: '20px', display: 'flex', flexDirection: 'column', gap: '6px'}
     })
 }
-
-export const module: UiModulesInterfaceMap['UxNotificationModule'] = ui.define('UxNotificationModule', {root: bannerContainer()})
-
-ui.defineProperty('UxNotificationModule', 'notify', notify)?.('container', bannerContainer())
-
-declare global {
-    interface UxNotify extends UxNotifier {
-        notify(content: HTMLElement, defn?: UxNotifierDefinitionObject): UxNotifier
-    }
-}
