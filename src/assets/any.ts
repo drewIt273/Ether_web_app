@@ -17,9 +17,7 @@ function isValidJSONString(s: unknown, opts?: {requireObjectOrArray: boolean}): 
         }
         return true
     }
-    catch {
-        return false
-    }
+    catch { return false }
 }
 
 function toKebab(s: string): string {
@@ -119,11 +117,20 @@ function parentPropertyOf(value: any, obj: Record<string, any>): string | undefi
     return undefined
 }
 
-const ranstring = (length: number, count: number, end = '') => {
+function hasSubObject(obj: Record<string, any>, sub: Record<string, any>) {
+    let b = false;
+    for (const [k, v] of Object.entries(sub)) {
+        if (obj[k] === v) b = true
+        else {b = false; break}
+    }
+    return b
+}
+
+function ranstring(length: number, count: number, end = '') {
     const chars = 'abcdefd', vchars = chars + '1234567890';
     let f = (s: string, c: number) => Array.from({length: c}, () => s[Math.floor(Math.random() * s.length)]).join(''), key = f(chars, 1);
     key += Array.from({length: count}, () => f(vchars, length)).join('-')
     return (end.length) ? key += `${end}` : key
 }
 
-export {strictObject, isValidJSONString, toKebab, safeParse, ranstring, getNodeByID, parentPropertyOf, deepEqual}
+export {strictObject, isValidJSONString, toKebab, safeParse, ranstring, getNodeByID, parentPropertyOf, deepEqual, hasSubObject}
