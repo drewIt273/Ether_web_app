@@ -106,7 +106,6 @@ class EtherDataBase {
 
     static async getRecord<K extends keyof DBObjectStore>(storeName: K, id: string): Promise<K | undefined> {
         const db = await this.openDataBase();
-
         return new Promise((res, rej) => {
             const trans = db.transaction(storeName, "readonly"), request = trans.objectStore(storeName).get(id);
             request.onsuccess = () => {
@@ -118,8 +117,8 @@ class EtherDataBase {
         })
     }
 
-    static async updateRecord<K extends keyof DBObjectStore>(storeName: K, id: DBObjectStore[K]['id'], o: Partial<DBObjectStore[K]>): Promise<void> {
-        const db = await this.openDataBase();
+    static async updateRecord<K extends keyof DBObjectStore>(storeName: K, id: DBObjectStore[K]['id'], o: Partial<DBObjectStore[K]>, idb: IDBDatabase | null = null): Promise<void> {
+        const db = idb ? idb : await this.openDataBase();
         return new Promise((res, rej) => {
             const trans = db.transaction(storeName, "readwrite"), store = trans.objectStore(storeName), req = store.get(id) as IDBRequest<DBObjectStore[K]>;
             req.onsuccess = () => {
@@ -144,6 +143,25 @@ class EtherDataBase {
                 rej(req.error)
             }
         })
+    }
+
+    static async delete<K extends keyof DBObjectStore>(storeName: K, query: DBObjectStore[K]): Promise<void> {
+        const j = await this.openDataBase(), o = await this.findRecords(storeName, query, j), k = j.transaction(storeName, "readwrite"), t = k.objectStore(storeName);
+        for (const r of o) {
+            if (r && r.id) t.delete(r.id)
+        }
+        return new Promise((res, rej) => {
+            k.oncomplete = () => res()
+            k.onabort = () => rej(k.error ?? new Error(`Delete transaction aborted`))
+            k.onerror = () => rej(k.error ?? new Error(`Delete transaction failed`))
+        })
+    }
+
+    /**
+     * Returns immediately and closes the connection in a separate thread.
+     */
+    static async close() {
+        (await idb)?.close()
     }
 }
 
