@@ -56,7 +56,7 @@ class EtherDataBase {
         idb = new Promise((res, rej) => {
             const request = indexedDB.open(DATABASE_NAME, DATABASE_VERSION)
             request.onupgradeneeded = () => {
-                const db = request.result
+                const db = request.result;
                 // Create object stores only when they don't exist
                 if (!db.objectStoreNames.contains('issues')) {
                     const issues = db.createObjectStore('issues', {
@@ -120,22 +120,20 @@ class EtherDataBase {
 
     static async updateRecord<K extends keyof DBObjectStore>(storeName: K, id: DBObjectStore[K]['id'], o: Partial<DBObjectStore[K]>): Promise<void> {
         const db = await this.openDataBase();
-        new Promise((res, rej) => {
-            const trans = db.transaction(storeName, "readwrite").objectStore(storeName), req = trans.get(id) as IDBRequest<DBObjectStore[K]>;
+        return new Promise((res, rej) => {
+            const trans = db.transaction(storeName, "readwrite"), store = trans.objectStore(storeName), req = store.get(id) as IDBRequest<DBObjectStore[K]>;
             req.onsuccess = () => {
                 for (const [k, v] of Object.entries(o as DBObjectStore[K])) { // @ts-expect-error
-                    if (k !== 'id') req.result[k] = v; trans
+                    if (k !== 'id') req.result[k] = v
                 }
-                trans.put(req.result)
+                store.put(req.result), res()
             }
-            req.onerror = () => {
-                rej(req.error ?? new Error('Failed to update record'))
-            }
+            req.onerror = () => rej(req.error ?? new Error('Failed to update record'))
         })
     }
 
-    static async findRecords<K extends keyof DBObjectStore>(storeName: K, query: DBObjectStore[K]): Promise<DBObjectStore[K][]> {
-        const db = await this.openDataBase()
+    static async findRecords<K extends keyof DBObjectStore>(storeName: K, query: Partial<DBObjectStore[K]>, idb: IDBDatabase | null = null): Promise<DBObjectStore[K][]> {
+        const db = idb ? idb : await this.openDataBase()
         return new Promise((res, rej) => {
             const o = db.transaction(storeName, "readonly").objectStore(storeName), req = o.getAll() as IDBRequest<DBObjectStore[K][]>, ans: DBObjectStore[K][] = [];
             req.onsuccess = () => {
