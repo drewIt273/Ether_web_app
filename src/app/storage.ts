@@ -2,6 +2,8 @@
  * Instance by DrewIt
  */
 
+import {hasSubObject} from "@assets/any"
+
 const DATABASE_NAME = "ether"
 const DATABASE_VERSION = 1
 
@@ -91,7 +93,7 @@ class EtherDataBase {
 
         return new Promise((res, rej) => {
             const trans = db.transaction(storeName, "readwrite")
-            trans.objectStore(storeName).put(record);
+            trans.objectStore(storeName).add(record);
             trans.oncomplete = () => res()
             trans.onabort = () => {
                 rej(trans.error ?? new Error("Database transaction aborted."));
@@ -122,12 +124,26 @@ class EtherDataBase {
             const trans = db.transaction(storeName, "readwrite").objectStore(storeName), req = trans.get(id) as IDBRequest<DBObjectStore[K]>;
             req.onsuccess = () => {
                 for (const [k, v] of Object.entries(o as DBObjectStore[K])) { // @ts-expect-error
-                    if (k !== 'id') req.result[k] = v
+                    if (k !== 'id') req.result[k] = v; trans
                 }
                 trans.put(req.result)
             }
             req.onerror = () => {
                 rej(req.error ?? new Error('Failed to update record'))
+            }
+        })
+    }
+
+    static async findRecords<K extends keyof DBObjectStore>(storeName: K, query: DBObjectStore[K]): Promise<DBObjectStore[K][]> {
+        const db = await this.openDataBase()
+        return new Promise((res, rej) => {
+            const o = db.transaction(storeName, "readonly").objectStore(storeName), req = o.getAll() as IDBRequest<DBObjectStore[K][]>, ans: DBObjectStore[K][] = [];
+            req.onsuccess = () => {
+                for (const a of req.result) if (hasSubObject(a, query)) ans.push(a);
+                res(ans)
+            }
+            req.onerror = () => {
+                rej(req.error)
             }
         })
     }
