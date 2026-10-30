@@ -33,12 +33,12 @@ declare global {
         projects: ProjectObjectCreation
     }
     interface DBObjectIssue extends IssueObjectCreation {
-        createdAt: string
-        modifiedAt: string
+        createdAt: Date
+        updatedAt: Date
     }
     interface DBObjectProject extends ProjectObjectCreation {
-        createdAt: string
-        updatedAt: string
+        createdAt: Date
+        updatedAt: Date
         issues: IssueID[]
     }
     interface DBObjectStore {
