@@ -145,6 +145,23 @@ class EtherDataBase {
         })
     }
 
+    static async getObjectStore<K extends keyof DBObjectStore, O = Record<DBObjectStore[K]['id'], DBObjectStore[K]>>(storeName: K): Promise<O> {
+        const db = await this.openDataBase()
+        return new Promise((res, rej) => {
+            const o = db.transaction(storeName, "readonly").objectStore(storeName), req = o.getAll() as IDBRequest<DBObjectStore[K][]>
+            req.onsuccess = () => {
+                let obj = {} as O
+                res((() => { // @ts-expect-error
+                    for (const a of req.result) obj[a['id']] = a;
+                    return obj
+                })())
+            }
+            req.onerror = () => {
+                rej(req.error)
+            }
+        })
+    }
+
     static async delete<K extends keyof DBObjectStore>(storeName: K, query: DBObjectStore[K]): Promise<void> {
         const j = await this.openDataBase(), o = await this.findRecords(storeName, query, j), k = j.transaction(storeName, "readwrite"), t = k.objectStore(storeName);
         for (const r of o) {
