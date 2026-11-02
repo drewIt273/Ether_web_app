@@ -4,6 +4,14 @@
 
 import {ui} from "../module"
 
+type IssueRecord = Record<DBObjectIssue["id"], DBObjectIssue>
+
+let Issues: IssueRecord | null = null
+
+async function issueInit() {
+    if (!Issues) Issues = await edb.getObjectStore("issues")
+}
+
 function fb() {
     let s = 'An issue is a bug, task, question, or enhancement tracked with a title, description, priority, assignee, status, and comments so teams can capture context, coordinate fixes or work, and measure progress toward resolution.'
     return jsx('div', {
@@ -149,13 +157,12 @@ const o = {
     cr: cr()
 }
 
-export const module: UiModulesInterfaceMap['issues'] = ui.define('issues', {root: Issues$(), onMount: () => module.root.node.append(th()), type: 'constructed', imports: ['sheet']})
+export const module: UiModulesInterfaceMap['issues'] = ui.define('issues', {root: Issues$(), onImport: async () => await issueInit(), onMount: () => module.root.node.append(th()), type: 'constructed', imports: ['sheet']})
 // @ts-expect-error
 ui.defineProperty('issues', 'fbui', o.fb)('sui', o.sui)('opensui', () => ah(module.sui?.jsx({append: [o.cr]})))('closesui', () => module.sui.setState('inactive'))
 
 function th() {
-    const o = storageapi.o.get('issues')
-    return o ? document.createElement('div') : o.fb
+    return Issues ? document.createElement('div') : o.fb
 }
 
 function Issues$() {
