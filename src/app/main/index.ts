@@ -34,11 +34,10 @@ function fd() {
 function fx(n: UiModule) {
     const k = f$()
     if (k) {
-        k.append(n.root.node), console.log(ui.modules.sidebar.actionTabs)
+        k.append(n.root.node), n.root.o.mount?.()
         for (const [p, v] of Object.entries(ui.modules.sidebar.actionTabs)) {
             if (p === n.name) v.$.setState('active')
             else v.$.setState('inactive')
-            console.log(p, n.name)
         }
     }
 }
