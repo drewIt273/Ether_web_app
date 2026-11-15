@@ -172,3 +172,9 @@ function Issues$() {
         append: [o.fb]
     })
 }
+
+declare global {
+    interface issuesConstructiveModule {
+        defObject: IssueObjectCreation
+    }
+}
