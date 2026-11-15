@@ -174,6 +174,14 @@ class EtherDataBase {
         })
     }
 
+    static async size(key: keyof DBObjectStore): Promise<number> {
+        if (!idb) return 0
+        const db = await idb, tr = db.transaction(key, "readonly"), o = tr.objectStore(key).count()
+        return new Promise((res, rej) => {
+            tr.oncomplete = () => res(o.result)
+        })
+    }
+
     /**
      * Returns immediately and closes the connection in a separate thread.
      */
