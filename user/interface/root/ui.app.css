@@ -72,16 +72,15 @@ body, web-app {
 }
 [node-key="popup-layer"] {
     position: absolute;
-    height: 100%;
     width: 100%;
-    z-index: -1;
 }
-[node-key="popup-layer"][active] {
-    z-index: 1;
-}
-[node-key="popup-layer"] [popup] {
+
+[node-key="popup-layer"] [modal] {
     z-index: 3;
     pointer-events: all;
+    position: absolute;
+    justify-self: center;
+    transition-timing-function: var(--ease-in-out-quint);
 }
 *[fade] {
     opacity: .7;
