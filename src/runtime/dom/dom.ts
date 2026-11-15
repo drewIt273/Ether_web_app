@@ -11,7 +11,7 @@ import {vector} from "./vectors";
 import {TippyModule} from "./floating";
 
 interface NodeMessageResolver {
-    resolve(sender: Node, receiver: Node, data: any, ...args: any[]): void
+    resolve(sender: Node, receiver: DOMMsgTarget, data: any, ...args: any[]): void
     subscribe(node: Node, key: any, ...fn: Handler[]): void
     unsubscribe(node: Node, key: any, fn?: Handler|null): void
 }
@@ -90,13 +90,18 @@ export class DOMInterface extends Module {
         })
         this.root = document.querySelector(`[${this.rune.config.approot}]`) ?? document.body
         this.nodeMsg = {
-            resolve: (sender: Node, receiver: Node, data: any, ...args: any[]) => {
-                let o = receiver.$.belongsTo
-                if (o && o === this) {
-                    const hs = receiver.$.mappedData.get(data)
-                    if (hs) for (const fn of hs) fn.apply(receiver, args)
-                    sender.$.emittedData = data
+            resolve: (sender: Node, receiver: DOMMsgTarget, data: any, ...args: any[]) => {
+                let r = restarget(receiver, this)
+                const fn = (n: Node) => {
+                    let o = n.$.belongsTo
+                    if (o && o === this) {
+                        const hs = n.$.mappedData.get(data)
+                        if (hs) for (const fn of hs) fn.apply(n, args)
+                        sender.$.emittedData = data
+                    }
                 }
+                if (r instanceof Node) fn(r)
+                else if (Array.isArray(r)) r.forEach(n => fn(n))
             },
             subscribe: (node: Node, key: any, ...fn: Handler[]) => {
                 if (node.$.belongsTo === this) {
@@ -248,6 +253,10 @@ function h$(n: Node) {
     else if (t === 'uiblock') return 2
     else if (t === 'uicomp') return 3
     else return 0
+}
+
+function restarget(n: DOMMsgTarget, dom: DOMInterface) {
+    return n instanceof Node ? n : typeof n === 'string' ? n.startsWith(':') ? getNodeByUIKey(n.substring(1)) : Array.from(dom.root.querySelectorAll(n)) : null
 }
 
 export type D = DOMInterface

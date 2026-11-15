@@ -61,7 +61,7 @@ declare global {
         emittedData: null | any
         receivedData: null | any
         mappedData: Map<any, Handler[]>
-        emit(data: any, to: string | Node, ...args: any[]): void
+        emit(data: any, to: DOMMsgTarget, ...args: any[]): void
         map(data: any, ...fn: Handler[]): void
         unmap(data: any, fn?: Handler | null): void
     }
@@ -91,6 +91,7 @@ declare global {
         reverseThenPlay(key: string, target?: Node): void
         [x: symbol]: Map<string, MotionFrame[]>
     }
+    type DOMMsgTarget = Node | string | `:${string}`
     type NodeMetaTag = 'uicell' | 'uiblock' | 'uicomp' | 'node'
     type UiElementInterfaceMap = HTMLElementTagNameMap & SVGElementTagNameMap
     type HTMLTagName = keyof HTMLElementTagNameMap | keyof SVGElementTagNameMap

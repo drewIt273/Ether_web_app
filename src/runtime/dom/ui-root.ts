@@ -242,8 +242,7 @@ function nm(o: HTMLElement): NodeMetaData {
             this.belongsTo?.nodeMsg.unsubscribe(this.node, data, fn)
         },
         emit(data, to, ...args: any[]) {
-            const n = typeof to === 'string' ? Array.from(document.body.childNodes).find(v => v.$.uikey === to) : to
-            if (n) this.belongsTo?.nodeMsg.resolve(this.node, n, data, ...args)
+            this.belongsTo?.nodeMsg.resolve(this.node, to, data, ...args)
         },
         attrs(o) {
             for (const [k, v] of Object.entries(o)) (this.node as Element)?.setAttribute(k, v)
