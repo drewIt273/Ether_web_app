@@ -79,7 +79,7 @@ function cr() {
                             color: 'var(--cr-white)'
                         },
                         oninput: (n) => {
-                            if (n.textContent.length !== 0) n.removeAttribute('placeholder')
+                            if (n.textContent.length !== 0) n.jsx({placeholder: false})
                             else n.jsx({placeholder: 'Issue title'}), n.textContent = '';
                             module.o.defObject.name = n.textContent
                         }
@@ -94,7 +94,7 @@ function cr() {
                             minHeight: '50px'
                         },
                         oninput: (n) => {
-                            if (n.textContent.length !== 0) n.removeAttribute('placeholder')
+                            if (n.textContent.length !== 0) n.jsx({placeholder: false})
                             else n.jsx({placeholder: 'Add description...'}), n.textContent = '';
                             module.o.defObject.desc = n.textContent
                         }
@@ -129,7 +129,7 @@ function cr() {
                         class: "primary-tab",
                         append: ['Create Issue'],
                         onclick: async () => {
-                            let o = module.o.defObject;
+                            let now = new Date(), o: DBObjectIssue = {createdAt: now, updatedAt: now, ...module.o.defObject};
                             if (o.name) {
                                 o.id = `I${await edb.size("issues")+1}`
                                 edb.putRecord('issues', o), module.o.defObject = {name: '', id: 'I0'}
