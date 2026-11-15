@@ -13,7 +13,14 @@ function main$() {
                 constructor: true,
                 class: 'h-full',
             })
-        ]
+        ],
+        onclick: () => {
+            const o = getNodeByUIKey('popup-layer'), m = getNodeByUIKey('main'), ns = (o as Element).querySelectorAll('[modal]');
+            ns.forEach(n => {
+                n.$.motion.defs.has('fadeOut') ? n.$.motion.play('fadeOut') : n.remove()
+            });
+            (m as Element).removeAttribute('fade')
+        }
     })
 }
 
