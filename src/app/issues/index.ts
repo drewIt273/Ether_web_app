@@ -41,7 +41,7 @@ function ah(n: HTMLElement) {
         if (k !== n) k.remove()
         else return;
     }
-    if (n.hasAttribute('modal')) m.$.attrs({fade: ''}), o.appendChild(n)
+    if (n.hasAttribute('modal')) m.jsx({fade: true}), o.appendChild(n)
 }
 
 const o = {
@@ -50,8 +50,8 @@ const o = {
 }
 
 export const module: UiModulesInterfaceMap['issues'] = ui.define('issues', {root: Issues$(), onImport: async () => await issueInit(), onMount: () => module.root.node.append(th()), type: 'constructed', imports: ['sheet']})
-// @ts-expect-error
-ui.defineProperty('issues', 'fbui', o.fb)('cr', o.cr)('opensui', () => {ah(module.cr), module.cr.$.motion.play('fadeIn')})('closesui', () => module.sui.setState('inactive'))('defObject', {name: '', id: ''})
+
+ui.defineProperty('issues', 'fbui', o.fb)('sui', o.cr)('opensui', () => {ah(module.sui as HTMLElement), module.sui?.$.motion.play('fadeIn')})('closesui', () => {module.sui?.$.motion.play('fadeOut'), getNodeByUIKey('main').jsx({fade: false})})('o', {defObject: {name: '', id: 'I0'}})
 
 function cr() {
     return jsx('div', {
@@ -81,7 +81,7 @@ function cr() {
                         oninput: (n) => {
                             if (n.textContent.length !== 0) n.removeAttribute('placeholder')
                             else n.jsx({placeholder: 'Issue title'}), n.textContent = '';
-                            module.defObject.name = n.textContent
+                            module.o.defObject.name = n.textContent
                         }
                     }),
                     jsx('div', {
@@ -96,7 +96,7 @@ function cr() {
                         oninput: (n) => {
                             if (n.textContent.length !== 0) n.removeAttribute('placeholder')
                             else n.jsx({placeholder: 'Add description...'}), n.textContent = '';
-                            module.defObject.desc = n.textContent
+                            module.o.defObject.desc = n.textContent
                         }
                     }),
                 ],
@@ -128,9 +128,13 @@ function cr() {
                     jsx('div', {
                         class: "primary-tab",
                         append: ['Create Issue'],
-                        onclick: () => {
-                            let o = module.defObject;
-                            if (o.name) edb.putRecord('issues', o), module.defObject = {name: '', id: 'I0'}, module
+                        onclick: async () => {
+                            let o = module.o.defObject;
+                            if (o.name) {
+                                o.id = `I${await edb.size("issues")+1}`
+                                edb.putRecord('issues', o), module.o.defObject = {name: '', id: 'I0'}
+                            }
+                            module.closesui()
                         }
                     })
                 ]
@@ -163,6 +167,11 @@ function Issues$() {
 
 declare global {
     interface issuesConstructiveModule {
-        defObject: IssueObjectCreation
+        opensui: Handler
+        closesui: Handler
+        fbui: HTMLDivElement
+        o: {
+            defObject: IssueObjectCreation
+        }
     }
 }
