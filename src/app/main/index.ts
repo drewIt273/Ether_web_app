@@ -19,7 +19,7 @@ function main$() {
             ns.forEach(n => {
                 n.$.motion.defs.has('fadeOut') ? n.$.motion.play('fadeOut') : n.remove()
             });
-            (m as Element).removeAttribute('fade')
+            m.jsx({fade: false})
         }
     })
 }
