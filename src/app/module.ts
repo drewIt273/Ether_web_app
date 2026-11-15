@@ -21,7 +21,7 @@ declare global {
     interface UiModulesInterfaceMap {
         "sidebar": UiModule & mainSidebarModule
         "issues": UiConstructiveModule & issuesConstructiveModule
-        "projects": UiConstructiveModule
+        "projects": UiConstructiveModule & projectsConstructiveModule
         "mainLayoutConstructive": UiModule & mainLayoutConstructiveModule
     }
     interface UiConstructiveModule extends UiModule {
