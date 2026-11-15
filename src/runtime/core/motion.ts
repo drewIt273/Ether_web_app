@@ -67,9 +67,12 @@ export class UiMotionEngine extends Module {
         this.ready = !0
     }
 
-    animate(node: HTMLElement | null, keyframes: MotionFrame[], options: UiMotionOptions) {
+    animate(node: HTMLElement, keyframes: MotionFrame[], options: UiMotionOptions) {
         const k = new KeyframeEffect(node, keyframes, options), a = new Animation(k)
-        if (typeof options === 'object') a.persit = options.persist ?? !0
+        if (typeof options === 'object') {
+            a.persit = options.persist ?? !0
+            a.onfinish = () => options.onfinish?.call(node, node) ?? null
+        }
         a.frames = keyframes
         return a
     }
@@ -124,6 +127,7 @@ declare global {
     type UiMotionOptions = number | MotionAnimationOptions | undefined
     interface MotionAnimationOptions extends KeyframeAnimationOptions {
         persist?: boolean
+        onfinish?: (n: Node) => any
     }
     interface Animation {
         frames: MotionFrame[]
