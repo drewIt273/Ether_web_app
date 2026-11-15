@@ -218,7 +218,7 @@ export class DOMInterface extends Module {
     }
 
     #be(node: Node, emit: Handler, type: 'uiEvent' | 'uiState' | 'uiAnimation') {
-        if (this.root.contains(node)) return emit()
+        if (node.$.belongsTo === this) return emit()
         else {
             const r = node.$.belongsTo?.rune
             if (r) {
