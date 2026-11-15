@@ -32,7 +32,7 @@ const ei: AnimationEventInterface = {
     },
 }
 
-const sym = Symbol('MotionFrames'), bool = Symbol('bool')
+const sym = Symbol('MotionFrames'), bool = Symbol('bool'), nde = Symbol('node')
 
 export class UiMotionEngine extends Module {
 
@@ -59,6 +59,15 @@ export class UiMotionEngine extends Module {
                 return this[bool]
             },
             configurable: false, enumerable: false
+        }),
+        Object.defineProperty(Animation.prototype, 'node', {
+            set(v) {
+                if (v instanceof Node) this[nde] = v
+            },
+            get() {
+                return this[nde]
+            },
+            configurable: true, enumerable: false
         })
         this.init = !0
     }
@@ -73,7 +82,7 @@ export class UiMotionEngine extends Module {
             a.persit = options.persist ?? !0
             a.onfinish = () => options.onfinish?.call(node, node) ?? null
         }
-        a.frames = keyframes
+        a.frames = keyframes, a.node = node
         return a
     }
 
@@ -89,7 +98,7 @@ export class UiMotionEngine extends Module {
                 if (m.current === a) {
                     m.current = null, m.state = 'null'
                 }
-                if (options.commit) a.commitStyles()
+                if (options.commit && a.node.isConnected) a.commitStyles()
                 ps(node, a)
             }
             ei.record.has(a) ? ei.record.get(a)?.finish() : (a.addEventListener('finish', fn), ei.set(a, 'finish', fn))
@@ -131,6 +140,7 @@ declare global {
     }
     interface Animation {
         frames: MotionFrame[]
+        node: HTMLElement
         persit: boolean
     }
 }
