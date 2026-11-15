@@ -66,6 +66,9 @@ body, web-app {
     height: 100%;
     margin: 0;
 }
+main[node-key="main"][fade] > * > * {
+    pointer-events: none !important;
+}
 [node-key="mainLayoutConstructive"] {
     width: 100%;
     position: relative;
@@ -74,7 +77,6 @@ body, web-app {
     position: absolute;
     width: 100%;
 }
-
 [node-key="popup-layer"] [modal] {
     z-index: 3;
     pointer-events: all;
